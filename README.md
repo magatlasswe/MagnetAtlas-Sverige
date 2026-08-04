@@ -1,21 +1,43 @@
-# MagnetAtlas-Sverige
+# MagnetAtlas Sverige
 
-MagnetAtlas-Sverige är ett historiskt GIS-projekt för att hitta, analysera och
-exportera svenska platser av intresse för ansvarsfullt magnetfiske.
+**Status:** Alpha
 
-Projektet befinner sig i Sprint 2.4. Den körbara versionen erbjuder en lokal
-webbkarta, CLI, SQLite-lagring, sökning mot Riksarkivets öppna söktjänst och
-CSV-export.
-Riksarkivet använder nu projektets gemensamma Collector-kontrakt och plugin
-registry. En källoberoende `AtlasFeature`-modell beskriver geografiska objekt,
-geometri, tid, proveniens, licens och osäkerhet. Fler datakällor är ännu inte
-implementerade.
+**Python:** 3.13 eller 3.14
 
-## Krav
+MagnetAtlas Sverige är en lokal, användarvänlig historisk kartapplikation som
+samlar och visar spårbar geografisk information från öppna datakällor.
 
-- Python 3.13 eller 3.14
+## Projektbeskrivning
 
-## Installation för utveckling
+MagnetAtlas Sverige är en lokal historisk kartapplikation som samlar,
+normaliserar och visar spårbar geografisk information från öppna datakällor.
+Projektet är en modulär Python-applikation med CLI, SQLite, exportfunktioner och
+ett mobilanpassat webbgränssnitt.
+
+Projektet befinner sig i alpha. Den medföljande datamängden är demonstrationsdata
+och ska inte tolkas som verifierade historiska platser eller fyndplatser.
+
+## Vision
+
+MagnetAtlas ska bli Sveriges mest användarvänliga historiska kartplattform.
+Användare ska kunna upptäcka historiskt intressanta platser genom officiella
+datakällor utan att behöva förstå GIS eller avancerad kartteknik. Historisk
+korrekthet, tydlig proveniens och ansvarsfull användning går alltid före mängden
+data.
+
+## Funktioner
+
+- Lokal, responsiv webbkarta med OpenStreetMap som baskarta.
+- Visning av punkter, områden, linjer och polygoner.
+- Klustring, sökning och filter för typ, tidsperiod och källa.
+- Objektkort med källa, licens, osäkerhet och navigation.
+- Valfri positionering, favoriter, historik samt ljust och mörkt tema.
+- Collector Framework och en gemensam `AtlasFeature`-domänmodell.
+- CLI, lokal SQLite-lagring och CSV-export.
+
+## Installation
+
+Krav: Python 3.13 eller 3.14.
 
 ```powershell
 python -m venv .venv
@@ -23,10 +45,10 @@ python -m venv .venv
 python -m pip install -e ".[dev]"
 ```
 
-`pyproject.toml` är projektets primära källa för beroenden. Den medföljande
-`requirements.txt` installerar samma projekt och finns endast för kompatibilitet.
+`pyproject.toml` är den kanoniska källan för projektets beroenden och
+verktygskonfiguration.
 
-## Användning
+## Quick Start
 
 ```powershell
 magnetatlas --help
@@ -34,47 +56,41 @@ magnetatlas search "bro"
 magnetatlas serve
 ```
 
-Som standard sparas databasen under `data/database/` och exporter under
-`output/csv/`. Använd `magnetatlas search --help` för samtliga alternativ.
+`magnetatlas serve` startar applikationen på `http://localhost:8000/` och öppnar
+standardwebbläsaren. Stoppa servern med Ctrl+C. Baskartan kräver
+internetanslutning; AtlasFeature-datan läses lokalt.
 
-`magnetatlas serve` startar kartan på `http://localhost:8000/` och öppnar
-standardwebbläsaren. Stoppa den med Ctrl+C. Den bundlade kartan innehåller 100
-tydligt märkta, syntetiska demoobjekt som visar gränssnittets funktioner; de är
-inte verifierade historiska platser eller fyndplatser. Använd en egen lokal fil
-med det versionerade AtlasFeature-formatet så här:
+## Screenshot
 
-```powershell
-magnetatlas serve --features path\to\features.json
-magnetatlas serve --no-browser
-```
+TODO: Lägg till en aktuell skärmdump av kartvyn.
 
-OpenStreetMap används endast som baskarta och kräver internetanslutning. Ingen
-adressökning eller annan AtlasFeature-data hämtas från OpenStreetMap.
+## Project Structure
 
-Kartvyn klustrar närliggande markörer och har lokal stavfelstolerant sökning,
-filter för typ, tidsperiod och källa, valfri “Min plats”, skala, kompass och
-helskärmsläge. Favoriter, senast besökta objekt och valt ljust eller mörkt tema
-sparas endast lokalt i den aktuella webbläsaren. Ingen ranking eller AI används.
-
-## Kvalitetskontroller
-
-```powershell
-pytest
-ruff check .
-black --check .
+```text
+src/
+docs/
+tests/
+data/
+output/
+PROJECT.md
+README.md
+AGENTS.md
 ```
 
 ## Dokumentation
 
+- [Projektstatus och roadmap](PROJECT.md)
+- [Instruktioner för bidragsgivare och agenter](AGENTS.md)
 - [Produktprinciper](docs/product_principles.md)
 - [Arkitektur](docs/architecture.md)
-- [Datamodell](docs/data-model.md)
-- [Datakällor](docs/data-sources.md)
-- [Utveckling](docs/development.md)
-- [Roadmap](docs/roadmap.md)
-- [UI-riktlinjer](docs/UI_GUIDELINES.md)
+- [Utvärdering av datakällor](docs/data-source-evaluation.md)
 
-## Projektstatus och licens
+## Licensstatus
 
-Projektet är pre-alpha. En uttrycklig open source-licens måste väljas innan den
-första publika releasen; tills dess är ingen återanvändningslicens beviljad.
+En uttrycklig open source-licens har ännu inte valts. Fram till dess är ingen
+återanvändningslicens för repositoryts innehåll beviljad. Externa datakällor och
+kartlager omfattas av sina respektive licenser och attribueringskrav.
+
+## Kontakt
+
+Frågor, felrapporter och förslag hanteras via repositoryts issue tracker.
