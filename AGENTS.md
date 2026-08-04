@@ -15,6 +15,10 @@ Projektet ska respektera källornas licenser, användningsvillkor, proveniens oc
 osäkerhet. Det får inte uppmuntra till olagligt, farligt eller kulturhistoriskt
 skadligt magnetfiske.
 
+Projektets officiella produktmanifest finns i
+[`docs/product_principles.md`](docs/product_principles.md) och ska följas vid
+produkt-, UX- och prioriteringsbeslut.
+
 ## Arkitektur
 
 Projektet är en modulär monolit med principer från hexagonal arkitektur:

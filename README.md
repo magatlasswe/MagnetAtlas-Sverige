@@ -66,6 +66,7 @@ black --check .
 
 ## Dokumentation
 
+- [Produktprinciper](docs/product_principles.md)
 - [Arkitektur](docs/architecture.md)
 - [Datamodell](docs/data-model.md)
 - [Datakällor](docs/data-sources.md)
