@@ -37,3 +37,14 @@ kan vara okända och ska då inte antas vara vare sig tillåtna eller förbjudna
 Riksarkivet-funktionen. Den kan konverteras förlustfritt för relevanta fält till
 `AtlasFeature`, utan att okänd geometri, licens eller confidence hittas på.
 Databasschemat ändras inte i Sprint 2.2.
+
+## Lokalt JSON-format
+
+Webbgränssnittet kan läsa ett versionerat JSON-dokument med `schema_version: 1`
+och en lista under `features`. Geometri använder GeoJSON-liknande
+`type`/`coordinates`; `BoundingBox` använder ordningen west, south, east, north.
+Adaptern validerar alla domäninvariants innan objekten blir tillgängliga.
+
+Den bundlade `demo_features.json` innehåller endast syntetiska objekt för att
+demonstrera gränssnittet. `raw_data` kan bevaras vid inläsning för proveniens men
+skickas aldrig via webb-API:t.

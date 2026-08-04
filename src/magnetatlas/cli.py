@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import webbrowser
 from pathlib import Path
 from typing import Annotated
 
@@ -11,6 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from magnetatlas.application.collectors import CollectorRegistry
+from magnetatlas.application.features import FeatureCatalog
 from magnetatlas.application.search import SearchService
 from magnetatlas.config.logging import configure_logging
 from magnetatlas.config.settings import Settings
@@ -20,7 +22,9 @@ from magnetatlas.infrastructure.database.repositories import (
 )
 from magnetatlas.infrastructure.database.session import create_session_factory
 from magnetatlas.infrastructure.exporters.csv_exporter import export_csv
+from magnetatlas.infrastructure.features import load_demo_features, load_features
 from magnetatlas.infrastructure.sources.riksarkivet.client import RiksarkivetClient
+from magnetatlas.interfaces.web.server import create_server
 
 app = typer.Typer(
     name="magnetatlas",
@@ -90,3 +94,58 @@ def search(
         LOGGER.debug("Kommandot misslyckades", exc_info=True)
         console.print(f"[red]Fel:[/red] {exc}", stderr=True)
         raise typer.Exit(code=1) from exc
+
+
+@app.command()
+def serve(
+    host: Annotated[
+        str,
+        typer.Option(help="Värdadress. Standardvärdet är endast lokalt."),
+    ] = "127.0.0.1",
+    port: Annotated[
+        int,
+        typer.Option(min=1, max=65535, help="Lokal webbserverport."),
+    ] = 8000,
+    features_path: Annotated[
+        Path | None,
+        typer.Option(
+            "--features",
+            help="Läs AtlasFeatures från en lokal JSON-fil i stället för demodata.",
+        ),
+    ] = None,
+    browser: Annotated[
+        bool,
+        typer.Option("--browser/--no-browser", help="Öppna standardwebbläsaren."),
+    ] = True,
+) -> None:
+    """Start the first local MagnetAtlas map experience."""
+    server = None
+    try:
+        settings = Settings.from_env()
+        configure_logging(settings.log_level)
+        features = (
+            load_features(features_path)
+            if features_path is not None
+            else load_demo_features()
+        )
+        catalog = FeatureCatalog(features)
+        server = create_server(catalog, host=host, port=port)
+        actual_host, actual_port = server.server_address
+        display_host = (
+            "localhost" if actual_host in {"127.0.0.1", "::1"} else actual_host
+        )
+        url = f"http://{display_host}:{actual_port}/"
+        console.print(f"MagnetAtlas är öppet på [link={url}]{url}[/link]")
+        console.print("Stoppa servern med Ctrl+C.")
+        if browser:
+            webbrowser.open(url)
+        server.serve_forever()
+    except KeyboardInterrupt:
+        console.print("\nMagnetAtlas har stoppats.")
+    except (MagnetAtlasError, ValueError, OSError) as exc:
+        LOGGER.debug("Webbservern misslyckades", exc_info=True)
+        console.print(f"[red]Fel:[/red] {exc}", stderr=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        if server is not None:
+            server.server_close()

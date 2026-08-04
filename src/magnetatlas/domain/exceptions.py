@@ -11,3 +11,7 @@ class DataSourceError(MagnetAtlasError):
 
 class CollectorRegistryError(MagnetAtlasError):
     """Raised when collector registration or lookup fails."""
+
+
+class FeatureDataError(MagnetAtlasError):
+    """Raised when a local AtlasFeature dataset is invalid."""

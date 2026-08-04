@@ -1,0 +1,3194 @@
+{
+  "schema_version": 1,
+  "dataset_name": "MagnetAtlas syntetiska demonstrationsdata",
+  "features": [
+    {
+      "feature_id": "demo:001",
+      "title": "Demo 001: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kiruna",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.2253,
+          67.8558
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "001",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:002",
+      "title": "Demo 002: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Luleå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.1567,
+          65.5848
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "002",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:003",
+      "title": "Demo 003: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Umeå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.263,
+          63.8258
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "003",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:004",
+      "title": "Demo 004: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Östersund",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.6357,
+          63.1792
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "004",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:005",
+      "title": "Demo 005: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Sundsvall",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.3069,
+          62.3908
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "005",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:006",
+      "title": "Demo 006: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Gävle",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.1413,
+          60.6749
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "006",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:007",
+      "title": "Demo 007: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Falun",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6355,
+          60.6065
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "007",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:008",
+      "title": "Demo 008: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Uppsala",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.6389,
+          59.8586
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "008",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:009",
+      "title": "Demo 009: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Västerås",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.5448,
+          59.6099
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "009",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:010",
+      "title": "Demo 010: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Örebro",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.2134,
+          59.2753
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "010",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:011",
+      "title": "Demo 011: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Stockholm",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.0686,
+          59.3293
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "011",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:012",
+      "title": "Demo 012: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Karlstad",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.5036,
+          59.3793
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "012",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:013",
+      "title": "Demo 013: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Norrköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.1924,
+          58.5877
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "013",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:014",
+      "title": "Demo 014: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Linköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6214,
+          58.4108
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "014",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:015",
+      "title": "Demo 015: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Göteborg",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.9746,
+          57.7089
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "015",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:016",
+      "title": "Demo 016: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Jönköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.1618,
+          57.7826
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "016",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:017",
+      "title": "Demo 017: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Visby",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.2948,
+          57.6348
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "017",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:018",
+      "title": "Demo 018: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kalmar",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3568,
+          56.6634
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "018",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:019",
+      "title": "Demo 019: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Halmstad",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.8578,
+          56.6745
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "019",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:020",
+      "title": "Demo 020: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Malmö",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0038,
+          55.605
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "020",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:021",
+      "title": "Demo 021: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kiruna",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.2433,
+          67.8648
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "021",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:022",
+      "title": "Demo 022: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Luleå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.1747,
+          65.5938
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "022",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:023",
+      "title": "Demo 023: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Umeå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.281,
+          63.8348
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "023",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:024",
+      "title": "Demo 024: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Östersund",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.6537,
+          63.1882
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "024",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:025",
+      "title": "Demo 025: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Sundsvall",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.3249,
+          62.3998
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "025",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:026",
+      "title": "Demo 026: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Gävle",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.1593,
+          60.6839
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "026",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:027",
+      "title": "Demo 027: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Falun",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6535,
+          60.6155
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "027",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:028",
+      "title": "Demo 028: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Uppsala",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.6569,
+          59.8676
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "028",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:029",
+      "title": "Demo 029: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Västerås",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.5628,
+          59.6189
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "029",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:030",
+      "title": "Demo 030: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Örebro",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.2314,
+          59.2843
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "030",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:031",
+      "title": "Demo 031: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Stockholm",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.0866,
+          59.3383
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "031",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:032",
+      "title": "Demo 032: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Karlstad",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.5216,
+          59.3883
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "032",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:033",
+      "title": "Demo 033: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Norrköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.2104,
+          58.5967
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "033",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:034",
+      "title": "Demo 034: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Linköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6394,
+          58.4198
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "034",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:035",
+      "title": "Demo 035: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Göteborg",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.9926,
+          57.7179
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "035",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:036",
+      "title": "Demo 036: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Jönköping",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.1798,
+          57.7916
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "036",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:037",
+      "title": "Demo 037: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Visby",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3128,
+          57.6438
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "037",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:038",
+      "title": "Demo 038: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kalmar",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3748,
+          56.6724
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "038",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:039",
+      "title": "Demo 039: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Halmstad",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.8758,
+          56.6835
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "039",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:040",
+      "title": "Demo 040: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Malmö",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          13.0218,
+          55.614
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "040",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:041",
+      "title": "Demo 041: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kiruna",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.2613,
+          67.8738
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "041",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:042",
+      "title": "Demo 042: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Luleå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          22.1927,
+          65.6028
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "042",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:043",
+      "title": "Demo 043: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Umeå",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          20.299,
+          63.8438
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "043",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:044",
+      "title": "Demo 044: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Östersund",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.6717,
+          63.1972
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "044",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:045",
+      "title": "Demo 045: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Sundsvall",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.3429,
+          62.4088
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "045",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:046",
+      "title": "Demo 046: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Gävle",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.1773,
+          60.6929
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "046",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:047",
+      "title": "Demo 047: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Falun",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          15.6715,
+          60.6245
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "047",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:048",
+      "title": "Demo 048: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Uppsala",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          17.6749,
+          59.8766
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "048",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:049",
+      "title": "Demo 049: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Västerås",
+      "geometry": {
+        "type": "BoundingBox",
+        "coordinates": [
+          16.5558,
+          59.6129,
+          16.6058,
+          59.6429
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "049",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:050",
+      "title": "Demo 050: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Örebro",
+      "geometry": {
+        "type": "BoundingBox",
+        "coordinates": [
+          15.2244,
+          59.2783,
+          15.2744,
+          59.3083
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "050",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:051",
+      "title": "Demo 051: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Stockholm",
+      "geometry": {
+        "type": "BoundingBox",
+        "coordinates": [
+          18.0796,
+          59.3323,
+          18.1296,
+          59.3623
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "051",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:052",
+      "title": "Demo 052: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Karlstad",
+      "geometry": {
+        "type": "BoundingBox",
+        "coordinates": [
+          13.5146,
+          59.3823,
+          13.5646,
+          59.4123
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "052",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:053",
+      "title": "Demo 053: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Norrköping",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            16.1984,
+            58.5957
+          ],
+          [
+            16.2284,
+            58.6057
+          ],
+          [
+            16.2584,
+            58.6157
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "053",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:054",
+      "title": "Demo 054: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Linköping",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            15.6274,
+            58.4188
+          ],
+          [
+            15.6574,
+            58.4288
+          ],
+          [
+            15.6874,
+            58.4388
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "054",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:055",
+      "title": "Demo 055: historisk bro",
+      "feature_type": "bro",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Göteborg",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.9806,
+            57.7169
+          ],
+          [
+            12.0106,
+            57.7269
+          ],
+          [
+            12.0406,
+            57.7369
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "055",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:056",
+      "title": "Demo 056: historisk kvarn",
+      "feature_type": "kvarn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Jönköping",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.1678,
+            57.7906
+          ],
+          [
+            14.1978,
+            57.8006
+          ],
+          [
+            14.2278,
+            57.8106
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "056",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:057",
+      "title": "Demo 057: historisk färjeläge",
+      "feature_type": "färjeläge",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Visby",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.3058,
+              57.6378
+            ],
+            [
+              18.3558,
+              57.6378
+            ],
+            [
+              18.3558,
+              57.6678
+            ],
+            [
+              18.3058,
+              57.6678
+            ],
+            [
+              18.3058,
+              57.6378
+            ]
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "057",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:058",
+      "title": "Demo 058: historisk sluss",
+      "feature_type": "sluss",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Kalmar",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              16.3678,
+              56.6664
+            ],
+            [
+              16.4178,
+              56.6664
+            ],
+            [
+              16.4178,
+              56.6964
+            ],
+            [
+              16.3678,
+              56.6964
+            ],
+            [
+              16.3678,
+              56.6664
+            ]
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "058",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:059",
+      "title": "Demo 059: historisk hamn",
+      "feature_type": "hamn",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Halmstad",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              12.8688,
+              56.6775
+            ],
+            [
+              12.9188,
+              56.6775
+            ],
+            [
+              12.9188,
+              56.7075
+            ],
+            [
+              12.8688,
+              56.7075
+            ],
+            [
+              12.8688,
+              56.6775
+            ]
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "1800-talet",
+        "precision": "century",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "059",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    },
+    {
+      "feature_id": "demo:060",
+      "title": "Demo 060: historisk gammal väg",
+      "feature_type": "vägsträckning",
+      "description": "Syntetiskt demonstrationsobjekt för att prova MagnetAtlas gränssnitt. Uppgiften är inte en verifierad historisk plats eller fyndplats.",
+      "place": "Malmö",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              13.0148,
+              55.608
+            ],
+            [
+              13.0648,
+              55.608
+            ],
+            [
+              13.0648,
+              55.638
+            ],
+            [
+              13.0148,
+              55.638
+            ],
+            [
+              13.0148,
+              55.608
+            ]
+          ]
+        ]
+      },
+      "time_span": {
+        "original_text": "tidigt 1900-tal",
+        "precision": "approximate period",
+        "certainty": {
+          "value": 0.2,
+          "rationale": "Syntetisk tidsangivelse för demonstration."
+        }
+      },
+      "provenance": {
+        "source": "magnetatlas-demo",
+        "source_id": "060",
+        "source_url": null,
+        "fetched_at": "2026-08-04T00:00:00+02:00",
+        "license_info": {
+          "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+          "url": null,
+          "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+          "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+          "requires_attribution": true,
+          "commercial_use_allowed": false
+        },
+        "raw_data": {
+          "synthetic": true
+        }
+      },
+      "confidence": {
+        "value": 0.2,
+        "rationale": "Syntetiskt demonstrationsobjekt."
+      },
+      "geometry_confidence": {
+        "value": 0.2,
+        "rationale": "Koordinaten är vald för demonstration och är inte historiskt verifierad."
+      },
+      "properties": {
+        "demo": true
+      },
+      "relationships": []
+    }
+  ]
+}

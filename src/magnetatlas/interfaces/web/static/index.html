@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MagnetAtlas – historiska platser på karta.">
+    <title>MagnetAtlas Sverige</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+    <link rel="stylesheet" href="/static/app.css">
+    <script defer src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+    <script defer src="/static/app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="MagnetAtlas startsida">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>MagnetAtlas</span>
+      </a>
+      <div class="search" role="search">
+        <label class="sr-only" for="feature-search">Sök i atlasen</label>
+        <input
+          id="feature-search"
+          type="search"
+          placeholder="Sök plats eller namn…"
+          autocomplete="off"
+          aria-controls="search-results"
+          aria-expanded="false"
+        >
+        <div id="search-results" class="search-results" role="listbox" hidden></div>
+      </div>
+    </header>
+
+    <main>
+      <div id="map" aria-label="Interaktiv karta över Sverige"></div>
+      <div id="map-status" class="map-status" role="status">Laddar karta…</div>
+
+      <aside id="info-panel" class="info-panel" aria-label="Platsinformation">
+        <button id="close-panel" class="close-button" type="button" aria-label="Stäng information" hidden>×</button>
+        <div id="welcome-content">
+          <p class="eyebrow">Välkommen</p>
+          <h1>Utforska historiska platser</h1>
+          <p>Sök efter en plats eller klicka på ett objekt på kartan.</p>
+          <p class="demo-notice">
+            Kartans första objekt är syntetisk demodata och inte verifierade fyndplatser.
+          </p>
+        </div>
+        <article id="feature-content" hidden>
+          <p id="feature-type" class="eyebrow"></p>
+          <h2 id="feature-title"></h2>
+          <p id="feature-place" class="feature-place"></p>
+          <p id="feature-time" class="feature-time"></p>
+          <p id="feature-description"></p>
+
+          <dl class="facts">
+            <div><dt>Position</dt><dd id="geometry-confidence"></dd></div>
+            <div><dt>Uppgift</dt><dd id="feature-confidence"></dd></div>
+            <div><dt>Källa</dt><dd id="feature-source"></dd></div>
+            <div><dt>Licens</dt><dd id="feature-license"></dd></div>
+          </dl>
+
+          <p id="navigation-note" class="navigation-note"></p>
+          <a id="navigate-button" class="primary-button" target="_blank" rel="noopener noreferrer">Navigera hit</a>
+
+          <p class="responsibility-note">
+            Kontrollera tillstånd, lokala regler, vattenförhållanden och kulturmiljöhänsyn innan du besöker platsen.
+          </p>
+        </article>
+      </aside>
+    </main>
+  </body>
+</html>
