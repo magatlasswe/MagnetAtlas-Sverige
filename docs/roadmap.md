@@ -1,0 +1,8 @@
+# Roadmap
+
+1. Körbar CLI-grund med Riksarkivet, SQLite och CSV.
+2. Gemensamma geografiska modeller samt GeoJSON- och GPX-export.
+3. Fler myndighetsadaptrar och reproducerbara importflöden.
+4. Interaktiv MapLibre-karta och lokalt API.
+5. Transparent, regelbaserat poängsystem och säkerhetsfilter.
+6. PDF-atlas och desktopdistribution.
