@@ -1,0 +1,89 @@
+"""Provider-independent contracts for collecting source data."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import StrEnum
+from typing import Protocol
+
+from magnetatlas.domain.models import ArchiveRecord
+
+
+class CollectorCapability(StrEnum):
+    """A source-independent operation supported by a collector."""
+
+    TEXT_SEARCH = "text_search"
+    RESULT_LIMIT = "result_limit"
+    CURSOR_PAGINATION = "cursor_pagination"
+
+
+@dataclass(frozen=True, slots=True)
+class CollectorDescriptor:
+    """Stable identity and advertised behavior for a collector plugin."""
+
+    collector_id: str
+    display_name: str
+    version: str
+    capabilities: frozenset[CollectorCapability] = field(default_factory=frozenset)
+
+    def __post_init__(self) -> None:
+        if not self.collector_id.strip():
+            raise ValueError("collector_id får inte vara tomt")
+        if not self.display_name.strip():
+            raise ValueError("display_name får inte vara tomt")
+        if not self.version.strip():
+            raise ValueError("version får inte vara tom")
+
+    def supports(self, capability: CollectorCapability) -> bool:
+        """Return whether the collector advertises a capability."""
+        return capability in self.capabilities
+
+
+@dataclass(frozen=True, slots=True)
+class CollectionRequest:
+    """A provider-independent request sent to a collector."""
+
+    query: str | None = None
+    limit: int = 20
+    cursor: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.query is not None and not self.query.strip():
+            raise ValueError("Sökfrågan får inte vara tom")
+        if not 1 <= self.limit <= 100:
+            raise ValueError("Antal träffar måste vara mellan 1 och 100")
+        if self.cursor is not None and not self.cursor.strip():
+            raise ValueError("cursor får inte vara tom")
+
+    @property
+    def required_capabilities(self) -> frozenset[CollectorCapability]:
+        """Derive capabilities required to satisfy this request."""
+        required = {CollectorCapability.RESULT_LIMIT}
+        if self.query is not None:
+            required.add(CollectorCapability.TEXT_SEARCH)
+        if self.cursor is not None:
+            required.add(CollectorCapability.CURSOR_PAGINATION)
+        return frozenset(required)
+
+
+@dataclass(frozen=True, slots=True)
+class CollectionBatch:
+    """One normalized result batch returned by a collector."""
+
+    records: list[ArchiveRecord]
+    total_hits: int
+    next_cursor: str | None = None
+    warnings: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.total_hits < 0:
+            raise ValueError("total_hits får inte vara negativt")
+
+
+class Collector(Protocol):
+    """Contract implemented by every MagnetAtlas data-source plugin."""
+
+    @property
+    def descriptor(self) -> CollectorDescriptor: ...
+
+    def collect(self, request: CollectionRequest) -> CollectionBatch: ...

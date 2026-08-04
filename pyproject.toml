@@ -36,6 +36,9 @@ dev = [
 [project.scripts]
 magnetatlas = "magnetatlas.cli:app"
 
+[project.entry-points."magnetatlas.collectors"]
+riksarkivet = "magnetatlas.infrastructure.sources.riksarkivet:create_collector"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

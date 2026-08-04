@@ -7,3 +7,7 @@ class MagnetAtlasError(Exception):
 
 class DataSourceError(MagnetAtlasError):
     """Raised when an external data source cannot satisfy a request."""
+
+
+class CollectorRegistryError(MagnetAtlasError):
+    """Raised when collector registration or lookup fails."""

@@ -5,16 +5,16 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from magnetatlas.domain.collectors import (
+    CollectionBatch,
+    CollectionRequest,
+    Collector,
+)
 from magnetatlas.domain.models import ArchiveRecord
 from magnetatlas.domain.repositories import ArchiveRecordRepository
 
-
-@dataclass(frozen=True, slots=True)
-class SourceSearchResult:
-    """Result returned by a source adapter."""
-
-    records: list[ArchiveRecord]
-    total_hits: int
+# Compatibility name retained for integrations built against Sprint 1.
+SourceSearchResult = CollectionBatch
 
 
 class ArchiveSource(Protocol):
@@ -36,7 +36,7 @@ class SearchService:
 
     def __init__(
         self,
-        source: ArchiveSource,
+        source: Collector | ArchiveSource,
         repository: ArchiveRecordRepository,
     ) -> None:
         self._source = source
@@ -49,6 +49,11 @@ class SearchService:
         if not 1 <= limit <= 100:
             raise ValueError("Antal träffar måste vara mellan 1 och 100")
 
-        source_result = self._source.search(normalized_query, limit=limit)
+        request = CollectionRequest(query=normalized_query, limit=limit)
+        collect = getattr(self._source, "collect", None)
+        if callable(collect):
+            source_result = collect(request)
+        else:
+            source_result = self._source.search(normalized_query, limit=limit)  # type: ignore[union-attr]
         saved = self._repository.save_many(source_result.records)
         return SearchResult(records=saved, total_hits=source_result.total_hits)

@@ -2,6 +2,10 @@
 
 from typing import Any
 
+import pytest
+
+from magnetatlas.domain.collectors import CollectionRequest, CollectorCapability
+from magnetatlas.domain.exceptions import DataSourceError
 from magnetatlas.infrastructure.sources.riksarkivet.client import RiksarkivetClient
 
 
@@ -59,3 +63,26 @@ def test_search_uses_documented_records_contract() -> None:
     assert session.timeout == 3.0
     assert result.total_hits == 42
     assert result.records[0].title == "Kvarnby"
+
+
+def test_collector_contract_delegates_to_compatible_search() -> None:
+    client = RiksarkivetClient(
+        "https://data.riksarkivet.se/api",
+        session=FakeSession(),  # type: ignore[arg-type]
+    )
+
+    result = client.collect(CollectionRequest(query="bro", limit=2))
+
+    assert result.total_hits == 42
+    assert client.descriptor.collector_id == "riksarkivet"
+    assert CollectorCapability.TEXT_SEARCH in client.descriptor.capabilities
+
+
+def test_collector_rejects_unsupported_cursor() -> None:
+    client = RiksarkivetClient(
+        "https://data.riksarkivet.se/api",
+        session=FakeSession(),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(DataSourceError, match="cursor_pagination"):
+        client.collect(CollectionRequest(query="bro", cursor="next"))

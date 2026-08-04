@@ -9,7 +9,12 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from magnetatlas.application.search import SourceSearchResult
+from magnetatlas.domain.collectors import (
+    CollectionBatch,
+    CollectionRequest,
+    CollectorCapability,
+    CollectorDescriptor,
+)
 from magnetatlas.domain.exceptions import DataSourceError
 from magnetatlas.infrastructure.sources.riksarkivet.mapper import map_item
 from magnetatlas.infrastructure.sources.riksarkivet.schemas import RiksarkivetItem
@@ -38,6 +43,18 @@ def _default_session() -> requests.Session:
 class RiksarkivetClient:
     """Search and normalize public records from Riksarkivet."""
 
+    descriptor = CollectorDescriptor(
+        collector_id="riksarkivet",
+        display_name="Riksarkivet",
+        version="1.0",
+        capabilities=frozenset(
+            {
+                CollectorCapability.TEXT_SEARCH,
+                CollectorCapability.RESULT_LIMIT,
+            }
+        ),
+    )
+
     def __init__(
         self,
         base_url: str,
@@ -49,7 +66,17 @@ class RiksarkivetClient:
         self._timeout = timeout
         self._session = session or _default_session()
 
-    def search(self, query: str, *, limit: int = 20) -> SourceSearchResult:
+    def collect(self, request: CollectionRequest) -> CollectionBatch:
+        """Collect a normalized batch through the shared collector contract."""
+        unsupported = request.required_capabilities - self.descriptor.capabilities
+        if unsupported:
+            names = ", ".join(sorted(capability.value for capability in unsupported))
+            raise DataSourceError(f"Riksarkivet stöder inte: {names}")
+        if request.query is None:
+            raise DataSourceError("Riksarkivet kräver en textsökning")
+        return self.search(request.query, limit=request.limit)
+
+    def search(self, query: str, *, limit: int = 20) -> CollectionBatch:
         try:
             response = self._session.get(
                 f"{self._base_url}/records",
@@ -77,4 +104,9 @@ class RiksarkivetClient:
         total_hits = payload.get("totalHits", len(records))
         if not isinstance(total_hits, int):
             total_hits = len(records)
-        return SourceSearchResult(records=records, total_hits=total_hits)
+        return CollectionBatch(records=records, total_hits=total_hits)
+
+
+def create_collector() -> RiksarkivetClient:
+    """Create the Riksarkivet collector with safe standalone defaults."""
+    return RiksarkivetClient("https://data.riksarkivet.se/api")

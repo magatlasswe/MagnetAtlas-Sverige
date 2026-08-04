@@ -10,6 +10,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from magnetatlas.application.collectors import CollectorRegistry
 from magnetatlas.application.search import SearchService
 from magnetatlas.config.logging import configure_logging
 from magnetatlas.config.settings import Settings
@@ -60,7 +61,9 @@ def search(
             settings.riksarkivet_base_url,
             timeout=settings.http_timeout,
         )
-        result = SearchService(client, repository).search(query, limit=limit)
+        registry = CollectorRegistry([client])
+        collector = registry.get("riksarkivet")
+        result = SearchService(collector, repository).search(query, limit=limit)
 
         table = Table(title=f"Riksarkivet: {query}")
         table.add_column("ID", style="dim")
