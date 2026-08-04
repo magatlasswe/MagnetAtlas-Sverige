@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Final
 
@@ -9,6 +10,16 @@ from magnetatlas.domain.features import AtlasFeature, FeatureId
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString
 
 DEFAULT_SEARCH_LIMIT: Final = 20
+WORD_PATTERN: Final = re.compile(r"[\wåäöÅÄÖ]+", re.UNICODE)
+
+
+@dataclass(frozen=True, slots=True)
+class FeatureSearchFilters:
+    """Optional, source-independent facets for local feature discovery."""
+
+    feature_types: frozenset[str] = frozenset()
+    periods: frozenset[str] = frozenset()
+    sources: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,6 +28,55 @@ class NavigationTarget:
 
     point: GeoPoint
     approximate: bool
+
+
+def feature_period(feature: AtlasFeature) -> str:
+    """Group a feature into a coarse, explainable time facet."""
+    time_span = feature.time_span
+    if time_span is None:
+        return "unknown"
+    year = time_span.start.year if time_span.start is not None else None
+    text = (time_span.original_text or "").casefold()
+    if year is not None:
+        if year < 1800:
+            return "before_1800"
+        if year < 1900:
+            return "1800s"
+        return "1900s_or_later"
+    if any(value in text for value in ("1600", "1700", "medeltid")):
+        return "before_1800"
+    if "1800" in text:
+        return "1800s"
+    if any(value in text for value in ("1900", "2000")):
+        return "1900s_or_later"
+    return "unknown"
+
+
+def _edit_distance(left: str, right: str) -> int:
+    previous = list(range(len(right) + 1))
+    for left_index, left_character in enumerate(left, start=1):
+        current = [left_index]
+        for right_index, right_character in enumerate(right, start=1):
+            current.append(
+                min(
+                    current[-1] + 1,
+                    previous[right_index] + 1,
+                    previous[right_index - 1] + (left_character != right_character),
+                )
+            )
+        previous = current
+    return previous[-1]
+
+
+def _fuzzy_term_matches(term: str, haystack: str, words: tuple[str, ...]) -> bool:
+    if term in haystack:
+        return True
+    tolerance = 1 if len(term) <= 5 else 2
+    return any(
+        abs(len(term) - len(word)) <= tolerance
+        and _edit_distance(term, word) <= tolerance
+        for word in words
+    )
 
 
 class FeatureCatalog:
@@ -46,17 +106,39 @@ class FeatureCatalog:
             raise KeyError(f"Okänd AtlasFeature: {normalized_id}") from exc
 
     def search(
-        self, query: str, *, limit: int = DEFAULT_SEARCH_LIMIT
+        self,
+        query: str,
+        *,
+        filters: FeatureSearchFilters | None = None,
+        limit: int = DEFAULT_SEARCH_LIMIT,
     ) -> list[AtlasFeature]:
-        """Search local user-facing text using case-insensitive term matching."""
+        """Search with typo tolerance and explicit facets, preserving source order."""
         terms = query.strip().casefold().split()
-        if not terms:
-            return []
         if limit < 1:
             raise ValueError("Sökgränsen måste vara minst 1")
+        active_filters = filters or FeatureSearchFilters()
+        feature_types = {value.casefold() for value in active_filters.feature_types}
+        sources = {value.casefold() for value in active_filters.sources}
+        if not terms and not any(
+            (
+                active_filters.feature_types,
+                active_filters.periods,
+                active_filters.sources,
+            )
+        ):
+            return []
 
         matches = []
         for feature in self._features:
+            if feature_types and feature.feature_type.casefold() not in feature_types:
+                continue
+            if sources and feature.provenance.source.casefold() not in sources:
+                continue
+            if (
+                active_filters.periods
+                and feature_period(feature) not in active_filters.periods
+            ):
+                continue
             haystack = " ".join(
                 value
                 for value in (
@@ -67,7 +149,8 @@ class FeatureCatalog:
                 )
                 if value
             ).casefold()
-            if all(term in haystack for term in terms):
+            words = tuple(WORD_PATTERN.findall(haystack))
+            if all(_fuzzy_term_matches(term, haystack, words) for term in terms):
                 matches.append(feature)
                 if len(matches) == limit:
                     break

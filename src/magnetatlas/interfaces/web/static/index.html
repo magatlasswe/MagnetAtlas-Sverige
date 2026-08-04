@@ -28,7 +28,33 @@
         >
         <div id="search-results" class="search-results" role="listbox" hidden></div>
       </div>
+      <div class="header-actions">
+        <button id="library-button" class="icon-button" type="button" aria-label="Visa favoriter och senast besökta" title="Favoriter">★</button>
+        <button id="theme-button" class="icon-button" type="button" aria-label="Växla mörkt eller ljust läge" title="Byt tema">◐</button>
+      </div>
     </header>
+
+    <section class="filter-bar" aria-label="Filtrera platser">
+      <label>
+        <span>Typ</span>
+        <select id="type-filter"><option value="">Alla typer</option></select>
+      </label>
+      <label>
+        <span>Tidsperiod</span>
+        <select id="period-filter">
+          <option value="">Alla perioder</option>
+          <option value="before_1800">Före 1800</option>
+          <option value="1800s">1800-talet</option>
+          <option value="1900s_or_later">1900 eller senare</option>
+          <option value="unknown">Okänd tid</option>
+        </select>
+      </label>
+      <label>
+        <span>Källa</span>
+        <select id="source-filter"><option value="">Alla källor</option></select>
+      </label>
+      <button id="clear-filters" class="text-button" type="button">Rensa</button>
+    </section>
 
     <main>
       <div id="map" aria-label="Interaktiv karta över Sverige"></div>
@@ -44,12 +70,25 @@
             Kartans första objekt är syntetisk demodata och inte verifierade fyndplatser.
           </p>
         </div>
+        <section id="library-content" hidden>
+          <p class="eyebrow">Din atlas</p>
+          <h2>Favoriter och historik</h2>
+          <h3>Favoriter</h3>
+          <div id="favorite-list" class="saved-list"></div>
+          <h3>Senast besökta</h3>
+          <div id="recent-list" class="saved-list"></div>
+        </section>
         <article id="feature-content" hidden>
           <p id="feature-type" class="eyebrow"></p>
           <h2 id="feature-title"></h2>
           <p id="feature-place" class="feature-place"></p>
           <p id="feature-time" class="feature-time"></p>
           <p id="feature-description"></p>
+
+          <div class="object-actions">
+            <button id="favorite-button" class="secondary-button" type="button">☆ Spara favorit</button>
+            <button id="why-button" class="secondary-button" type="button">Varför visas denna plats?</button>
+          </div>
 
           <dl class="facts">
             <div><dt>Position</dt><dd id="geometry-confidence"></dd></div>
@@ -67,5 +106,17 @@
         </article>
       </aside>
     </main>
+
+    <dialog id="why-dialog" aria-labelledby="why-title">
+      <button id="close-why" class="close-button" type="button" aria-label="Stäng förklaring">×</button>
+      <p class="eyebrow">Transparens</p>
+      <h2 id="why-title">Varför visas denna plats?</h2>
+      <dl class="facts">
+        <div><dt>Stöds av</dt><dd id="why-sources"></dd></div>
+        <div><dt>Uppskattad</dt><dd id="why-estimated"></dd></div>
+        <div><dt>Datakälla</dt><dd id="why-data-source"></dd></div>
+      </dl>
+      <p>MagnetAtlas visar källinformation och osäkerhet utan AI, ranking eller poäng.</p>
+    </dialog>
   </body>
 </html>

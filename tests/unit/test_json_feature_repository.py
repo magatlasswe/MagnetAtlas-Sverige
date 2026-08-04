@@ -119,9 +119,14 @@ def test_load_features_reports_missing_file(tmp_path: Path) -> None:
 def test_bundled_demo_dataset_is_usable_and_explicitly_synthetic() -> None:
     features = load_demo_features()
 
-    assert len(features) == 60
+    assert len(features) == 100
     assert all(feature.properties.get("demo") is True for feature in features)
     assert all("Demo" in feature.title for feature in features)
+    assert {feature.provenance.source for feature in features} == {
+        "magnetatlas-demo",
+        "magnetatlas-demo-arkiv",
+        "magnetatlas-demo-inventering",
+    }
     assert {type(feature.geometry) for feature in features} == {
         GeoPoint,
         BoundingBox,

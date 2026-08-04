@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date
 from typing import Any
 from urllib.parse import urlencode
 
-from magnetatlas.application.features import FeatureCatalog
+from magnetatlas.application.features import FeatureCatalog, feature_period
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 
@@ -99,6 +100,20 @@ def _navigation(
 def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[str, Any]:
     """Serialize one feature without exposing provider raw data."""
     license_info = feature.provenance.license_info
+    navigation = _navigation(feature, catalog)
+    time_certainty = (
+        feature.time_span.certainty.value if feature.time_span is not None else None
+    )
+    estimated = any(
+        (
+            navigation is not None and navigation["approximate"],
+            feature.geometry_confidence.value is None,
+            feature.geometry_confidence.value != 1.0,
+            feature.confidence.value is None,
+            time_certainty is None,
+            time_certainty != 1.0,
+        )
+    )
     return {
         "type": "Feature",
         "id": str(feature.feature_id),
@@ -110,6 +125,7 @@ def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[st
             "description": feature.description,
             "place": feature.place,
             "time_span": _time_span(feature.time_span),
+            "period": feature_period(feature),
             "confidence": _confidence(feature.confidence),
             "geometry_confidence": _confidence(feature.geometry_confidence),
             "source": {
@@ -130,16 +146,25 @@ def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[st
                 else None
             ),
             "relationships": [str(item) for item in feature.relationships],
-            "navigation": _navigation(feature, catalog),
+            "navigation": navigation,
+            "discovery": {
+                "supporting_sources": [feature.provenance.source],
+                "estimated": estimated,
+                "data_source": feature.provenance.source,
+            },
         },
     }
 
 
-def serialize_feature_collection(catalog: FeatureCatalog) -> dict[str, Any]:
+def serialize_feature_collection(
+    catalog: FeatureCatalog,
+    features: Iterable[AtlasFeature] | None = None,
+) -> dict[str, Any]:
     """Serialize all local features as a GeoJSON FeatureCollection."""
     return {
         "type": "FeatureCollection",
         "features": [
-            serialize_feature(feature, catalog) for feature in catalog.list_all()
+            serialize_feature(feature, catalog)
+            for feature in (catalog.list_all() if features is None else features)
         ],
     }

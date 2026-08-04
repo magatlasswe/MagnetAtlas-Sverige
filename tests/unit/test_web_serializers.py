@@ -62,3 +62,9 @@ def test_serializer_supports_geometries_and_omits_raw_data(
     assert serialized["properties"]["navigation"]["url"].startswith(
         "https://www.openstreetmap.org/directions?"
     )
+    assert serialized["properties"]["period"] == "unknown"
+    assert serialized["properties"]["discovery"] == {
+        "supporting_sources": ["demo"],
+        "estimated": True,
+        "data_source": "demo",
+    }

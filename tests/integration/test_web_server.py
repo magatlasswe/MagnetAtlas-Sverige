@@ -39,6 +39,13 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert response.headers.get_content_type() == "text/html"
         assert "MagnetAtlas" in html
         assert "feature-search" in html
+        assert "type-filter" in html
+        assert "period-filter" in html
+        assert "source-filter" in html
+        assert "favorite-button" in html
+        assert "theme-button" in html
+        assert "why-dialog" in html
+        assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
         assert "Content-Security-Policy" in response.headers
@@ -49,6 +56,16 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"maplibregl.Map" in javascript
         assert b"https://tile.openstreetmap.org/{z}/{x}/{y}.png" in javascript
         assert b"OpenStreetMap contributors" in javascript
+        assert b"cluster: true" in javascript
+        assert b"GeolocateControl" in javascript
+        assert b"FullscreenControl" in javascript
+        assert b"ScaleControl" in javascript
+        assert b"localStorage" in javascript
+        assert b"magnetatlas.favorites" in javascript
+        assert b"magnetatlas.recents" in javascript
+        assert b"magnetatlas.theme" in javascript
+        assert b"getClusterExpansionZoom" in javascript
+        assert b"showWhy" in javascript
 
 
 def test_features_api_returns_geojson_without_raw_data(local_server: str) -> None:
@@ -56,8 +73,23 @@ def test_features_api_returns_geojson_without_raw_data(local_server: str) -> Non
         payload = json.load(response)
 
     assert payload["type"] == "FeatureCollection"
-    assert len(payload["features"]) == 60
+    assert len(payload["features"]) == 100
     assert "raw_data" not in json.dumps(payload)
+
+
+def test_search_api_supports_typos_and_facets(local_server: str) -> None:
+    with urlopen(
+        f"{local_server}/api/search?q=historsk&type=bro&period=1800s"
+        "&source=magnetatlas-demo",
+        timeout=2,
+    ) as response:
+        payload = json.load(response)
+
+    assert payload["features"]
+    assert all(
+        item["properties"]["feature_type"] == "bro" for item in payload["features"]
+    )
+    assert all(item["properties"]["period"] == "1800s" for item in payload["features"])
 
 
 def test_health_unknown_route_and_read_only_behavior(local_server: str) -> None:

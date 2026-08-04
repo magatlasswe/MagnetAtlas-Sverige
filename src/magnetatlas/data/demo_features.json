@@ -3189,6 +3189,2144 @@
         "demo": true
       },
       "relationships": []
-    }
+    },
+      {
+        "feature_id": "demo:061",
+        "title": "Demo: Stenvalvsbron vid Kiruna 061",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Kiruna. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Kiruna",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            20.2903,
+            67.8808
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "061",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:062",
+        "title": "Demo: Kvarnplatsen vid Luleå 062",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Luleå. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Luleå",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            22.2217,
+            65.6098
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "062",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:063",
+        "title": "Demo: Gamla färjeläget vid Umeå 063",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Umeå. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Umeå",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            20.328,
+            63.8508
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "063",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:064",
+        "title": "Demo: Kanalslussen vid Östersund 064",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Östersund. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Östersund",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            14.7007,
+            63.2042
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "064",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:065",
+        "title": "Demo: Ångbåtshamnen vid Sundsvall 065",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Sundsvall. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Sundsvall",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.3719,
+            62.4158
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "065",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:066",
+        "title": "Demo: Landsvägspassagen vid Gävle 066",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Gävle. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Gävle",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.2063,
+            60.6999
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "066",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:067",
+        "title": "Demo: Stenvalvsbron vid Falun 067",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Falun. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Falun",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            15.7005,
+            60.6315
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "067",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:068",
+        "title": "Demo: Kvarnplatsen vid Uppsala 068",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Uppsala. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Uppsala",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.7039,
+            59.8836
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "068",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:069",
+        "title": "Demo: Gamla färjeläget vid Västerås 069",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Västerås. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Västerås",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.6098,
+            59.6349
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "069",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:070",
+        "title": "Demo: Kanalslussen vid Örebro 070",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Örebro. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Örebro",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            15.2784,
+            59.3003
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "070",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:071",
+        "title": "Demo: Ångbåtshamnen vid Stockholm 071",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Stockholm. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Stockholm",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.1336,
+            59.3543
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "071",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:072",
+        "title": "Demo: Landsvägspassagen vid Karlstad 072",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Karlstad. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Karlstad",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            13.5686,
+            59.4043
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "072",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:073",
+        "title": "Demo: Stenvalvsbron vid Norrköping 073",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Norrköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Norrköping",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.2574,
+            58.6127
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "073",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:074",
+        "title": "Demo: Kvarnplatsen vid Linköping 074",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Linköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Linköping",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            15.6864,
+            58.4358
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "074",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:075",
+        "title": "Demo: Gamla färjeläget vid Göteborg 075",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Göteborg. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Göteborg",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            12.0396,
+            57.7339
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "075",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:076",
+        "title": "Demo: Kanalslussen vid Jönköping 076",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Jönköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Jönköping",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            14.2268,
+            57.8076
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "076",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:077",
+        "title": "Demo: Ångbåtshamnen vid Visby 077",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Visby. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Visby",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            18.3598,
+            57.6598
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "077",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:078",
+        "title": "Demo: Landsvägspassagen vid Kalmar 078",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Kalmar. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Kalmar",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.4218,
+            56.6884
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "078",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:079",
+        "title": "Demo: Stenvalvsbron vid Halmstad 079",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Halmstad. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Halmstad",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            12.9228,
+            56.6995
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "079",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:080",
+        "title": "Demo: Kvarnplatsen vid Malmö 080",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Malmö. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Malmö",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            13.0688,
+            55.63
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "080",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:081",
+        "title": "Demo: Gamla färjeläget vid Kiruna 081",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Kiruna. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Kiruna",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            20.3123,
+            67.8918
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "081",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:082",
+        "title": "Demo: Kanalslussen vid Luleå 082",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Luleå. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Luleå",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            22.2437,
+            65.6208
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "082",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:083",
+        "title": "Demo: Ångbåtshamnen vid Umeå 083",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Umeå. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Umeå",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            20.35,
+            63.8618
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "083",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:084",
+        "title": "Demo: Landsvägspassagen vid Östersund 084",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Östersund. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Östersund",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            14.7227,
+            63.2152
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "084",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:085",
+        "title": "Demo: Stenvalvsbron vid Sundsvall 085",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Sundsvall. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Sundsvall",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.3939,
+            62.4268
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "085",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:086",
+        "title": "Demo: Kvarnplatsen vid Gävle 086",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Gävle. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Gävle",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.2283,
+            60.7109
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "086",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:087",
+        "title": "Demo: Gamla färjeläget vid Falun 087",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Falun. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Falun",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            15.7225,
+            60.6425
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "087",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:088",
+        "title": "Demo: Kanalslussen vid Uppsala 088",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Uppsala. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Uppsala",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            17.7259,
+            59.8946
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "088",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:089",
+        "title": "Demo: Ångbåtshamnen vid Västerås 089",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Västerås. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Västerås",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            16.6318,
+            59.6459
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "089",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:090",
+        "title": "Demo: Landsvägspassagen vid Örebro 090",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Örebro. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Örebro",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            15.3004,
+            59.3113
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "090",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:091",
+        "title": "Demo: Stenvalvsbron vid Stockholm 091",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Stockholm. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Stockholm",
+        "geometry": {
+          "type": "BoundingBox",
+          "coordinates": [
+            18.1356,
+            59.3533,
+            18.1756,
+            59.3773
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "091",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:092",
+        "title": "Demo: Kvarnplatsen vid Karlstad 092",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Karlstad. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Karlstad",
+        "geometry": {
+          "type": "BoundingBox",
+          "coordinates": [
+            13.5706,
+            59.4033,
+            13.6106,
+            59.4273
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "092",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:093",
+        "title": "Demo: Gamla färjeläget vid Norrköping 093",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Norrköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Norrköping",
+        "geometry": {
+          "type": "BoundingBox",
+          "coordinates": [
+            16.2594,
+            58.6117,
+            16.2994,
+            58.6357
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "093",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:094",
+        "title": "Demo: Kanalslussen vid Linköping 094",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Linköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Linköping",
+        "geometry": {
+          "type": "BoundingBox",
+          "coordinates": [
+            15.6884,
+            58.4348,
+            15.7284,
+            58.4588
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "094",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:095",
+        "title": "Demo: Ångbåtshamnen vid Göteborg 095",
+        "feature_type": "hamn",
+        "description": "Syntetisk historisk miljöbeskrivning av ångbåtshamnen vid Göteborg. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Göteborg",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              12.0366,
+              57.7349
+            ],
+            [
+              12.0616,
+              57.7449
+            ],
+            [
+              12.0866,
+              57.7549
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "095",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:096",
+        "title": "Demo: Landsvägspassagen vid Jönköping 096",
+        "feature_type": "vägsträckning",
+        "description": "Syntetisk historisk miljöbeskrivning av landsvägspassagen vid Jönköping. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Jönköping",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              14.2238,
+              57.8086
+            ],
+            [
+              14.2488,
+              57.8186
+            ],
+            [
+              14.2738,
+              57.8286
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "096",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:097",
+        "title": "Demo: Stenvalvsbron vid Visby 097",
+        "feature_type": "bro",
+        "description": "Syntetisk historisk miljöbeskrivning av stenvalvsbron vid Visby. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Visby",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              18.3568,
+              57.6608
+            ],
+            [
+              18.3818,
+              57.6708
+            ],
+            [
+              18.4068,
+              57.6808
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "097",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:098",
+        "title": "Demo: Kvarnplatsen vid Kalmar 098",
+        "feature_type": "kvarn",
+        "description": "Syntetisk historisk miljöbeskrivning av kvarnplatsen vid Kalmar. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Kalmar",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                16.4238,
+                56.6874
+              ],
+              [
+                16.4638,
+                56.6874
+              ],
+              [
+                16.4638,
+                56.7114
+              ],
+              [
+                16.4238,
+                56.7114
+              ],
+              [
+                16.4238,
+                56.6874
+              ]
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "1800-talet",
+          "precision": "century",
+          "certainty": {
+            "value": 0.3,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "098",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:099",
+        "title": "Demo: Gamla färjeläget vid Halmstad 099",
+        "feature_type": "färjeläge",
+        "description": "Syntetisk historisk miljöbeskrivning av gamla färjeläget vid Halmstad. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Halmstad",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                12.9248,
+                56.6985
+              ],
+              [
+                12.9648,
+                56.6985
+              ],
+              [
+                12.9648,
+                56.7225
+              ],
+              [
+                12.9248,
+                56.7225
+              ],
+              [
+                12.9248,
+                56.6985
+              ]
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "tidigt 1900-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.35,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-arkiv",
+          "source_id": "099",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      },
+      {
+        "feature_id": "demo:100",
+        "title": "Demo: Kanalslussen vid Malmö 100",
+        "feature_type": "sluss",
+        "description": "Syntetisk historisk miljöbeskrivning av kanalslussen vid Malmö. Objektet finns endast för att demonstrera sökning, filter och kartfunktioner och är inte en verifierad plats.",
+        "place": "Malmö",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                13.0708,
+                55.629
+              ],
+              [
+                13.1108,
+                55.629
+              ],
+              [
+                13.1108,
+                55.653
+              ],
+              [
+                13.0708,
+                55.653
+              ],
+              [
+                13.0708,
+                55.629
+              ]
+            ]
+          ]
+        },
+        "time_span": {
+          "original_text": "sent 1700-tal",
+          "precision": "approximate period",
+          "certainty": {
+            "value": 0.25,
+            "rationale": "Syntetisk tidsangivelse för gränssnittsdemonstration."
+          }
+        },
+        "provenance": {
+          "source": "magnetatlas-demo-inventering",
+          "source_id": "100",
+          "source_url": null,
+          "fetched_at": "2026-08-04T00:00:00+02:00",
+          "license_info": {
+            "name": "MagnetAtlas syntetiska demodata – ingen återanvändningslicens fastställd",
+            "url": null,
+            "attribution": "MagnetAtlas-Sverige, syntetisk demonstrationsdata",
+            "usage_notes": "Endast för demonstration. Objekten är inte historiskt verifierade.",
+            "requires_attribution": true,
+            "commercial_use_allowed": false
+          },
+          "raw_data": {
+            "synthetic": true
+          }
+        },
+        "confidence": {
+          "value": 0.25,
+          "rationale": "Syntetiskt demonstrationsobjekt."
+        },
+        "geometry_confidence": {
+          "value": 0.25,
+          "rationale": "Demokoordinat som inte är historiskt verifierad."
+        },
+        "properties": {
+          "demo": true
+        },
+        "relationships": []
+      }
   ]
 }

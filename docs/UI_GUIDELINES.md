@@ -19,6 +19,11 @@ licenser och säkerhet.
 - OpenStreetMap-attribuering ska alltid vara synlig och klickbar.
 - Grundkartan ska vara visuellt underordnad AtlasFeatures.
 - Punkt, yta och linje ska vara klickbara och ha tydligt valt tillstånd.
+- Närliggande punktobjekt ska klustras vid låg zoom och expanderas vid klick.
+- Val av sökresultat eller kartobjekt ska automatiskt visa hela objektet.
+- “Min plats” får endast aktiveras efter en uttrycklig användaråtgärd och
+  webbläsarens behörighetsdialog. Positionen får inte lagras.
+- Skala, kompass och helskärmskontroll ska ha tillgängliga namn.
 - Färg får inte ensam uttrycka objekttyp, säkerhet eller status.
 - Historisk eller osäker position ska beskrivas som ungefärlig.
 - Inga dolda kartlager, högerklicksmenyer eller GIS-verktygsfält införs utan ett
@@ -31,6 +36,10 @@ licenser och säkerhet.
 - Svenska tecken och skiftlägesvariationer ska fungera.
 - Enter väljer första resultatet och Escape stänger resultatlistan.
 - Ett resultatlöst sökresultat ska ge en tydlig tomtext.
+- Stavfelstolerans får avgöra om ett objekt matchar men får inte användas för
+  ranking eller poängsättning. Källordningen ska bevaras.
+- Filter för objekttyp, tidsperiod och källa ska påverka både sökresultat och
+  synliga kartobjekt.
 
 ## Platsinformation
 
@@ -42,17 +51,28 @@ Information visas i följande ordning:
 4. confidence för position och uppgift
 5. källa och käll-ID
 6. licens och attribuering
-7. navigation
-8. ansvarsfullhetsnotis
+7. “Varför visas denna plats?” med stödjande källa och uppskattningsstatus
+8. navigation
+9. ansvarsfullhetsnotis
 
 Källhänvisningar och licenser får inte gömmas bakom avancerade inställningar.
 Leverantörens rådata ska aldrig visas direkt som HTML.
 
 ## Navigation
 
-“Navigera hit” öppnar en extern OpenStreetMap-vy. MagnetAtlas ska inte begära
-eller lagra användarens position i denna fas. Om målet representerar en yta eller
-linje ska det märkas som ungefärligt. Saknad geometri innebär att knappen döljs.
+“Navigera hit” öppnar en extern OpenStreetMap-vy. Om målet representerar en yta
+eller linje ska det märkas som ungefärligt. Saknad geometri innebär att knappen
+döljs. Den separata “Min plats”-kontrollen får fråga webbläsaren om position
+först efter användarens klick; MagnetAtlas lagrar inte positionen.
+
+## Personligt lokalt tillstånd
+
+- Favoriter och högst åtta senast besökta objekt lagras som FeatureId:n i
+  webbläsarens lokala lagring.
+- Tillståndet skickas inte till servern och kräver inget konto.
+- Användaren ska kunna öppna sparade objekt från ett enkelt kort, inte en ny
+  komplex navigationsnivå.
+- Ljust eller mörkt tema ska kunna väljas och sparas lokalt.
 
 ## Tillgänglighet
 
@@ -84,3 +104,5 @@ förväxlas med verifierade historiska objekt.
 - Begränsad typografisk skala och systemtypsnitt för snabb laddning.
 - Kort med måttlig rundning och skugga; kartan ska fortfarande dominera.
 - Mobil först: informationspanel som bottenkort, sidopanel på större skärmar.
+- Popup- och panelanimationer ska vara korta och avaktiveras av
+  `prefers-reduced-motion`.

@@ -41,3 +41,14 @@ MapLibre eller webbläsarens DOM.
 Det befintliga SQLite-schemat lagrar fortsatt `ArchiveRecord`. Det lokala
 AtlasFeature-datasetet är en separat filgräns; Sprint 2.3 gör ingen
 databasmigrering.
+
+Sprint 2.4 utökar samma gränser utan nya datakällor. `FeatureCatalog` utför
+stavfelstolerant boolesk matchning och explicita typ-, tids- och källfilter med
+bibehållen källordning; den beräknar ingen relevanspoäng och rankar inte objekt.
+Det lokala `/api/search` returnerar en filtrerad GeoJSON-samling.
+
+Klienten ansvarar för MapLibre-klustring, kartkontroller och användarens privata
+UI-tillstånd. Favoriter, senast besökta FeatureId:n och temaval lagras i
+webbläsarens `localStorage` och skickas inte till servern. Geolokalisering
+aktiveras bara av användaren genom MapLibre-kontrollen och efter webbläsarens
+behörighetsdialog; positionen lagras inte av MagnetAtlas.

@@ -7,9 +7,9 @@ import logging
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
-from magnetatlas.application.features import FeatureCatalog
+from magnetatlas.application.features import FeatureCatalog, FeatureSearchFilters
 from magnetatlas.interfaces.web.serializers import serialize_feature_collection
 
 LOGGER = logging.getLogger(__name__)
@@ -66,7 +66,8 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
                 self.wfile.write(body)
 
         def _route(self) -> None:
-            path = urlsplit(self.path).path
+            parsed_url = urlsplit(self.path)
+            path = parsed_url.path
             if path in STATIC_FILES:
                 filename, content_type = STATIC_FILES[path]
                 self._send(HTTPStatus.OK, content_type, _static_content(filename))
@@ -74,6 +75,23 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
             if path == "/api/features":
                 body = json.dumps(
                     serialize_feature_collection(catalog),
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+                self._send(HTTPStatus.OK, "application/geo+json; charset=utf-8", body)
+                return
+            if path == "/api/search":
+                parameters = parse_qs(parsed_url.query)
+                filters = FeatureSearchFilters(
+                    feature_types=frozenset(parameters.get("type", [])),
+                    periods=frozenset(parameters.get("period", [])),
+                    sources=frozenset(parameters.get("source", [])),
+                )
+                matches = catalog.search(
+                    parameters.get("q", [""])[0], filters=filters, limit=100
+                )
+                body = json.dumps(
+                    serialize_feature_collection(catalog, matches),
                     ensure_ascii=False,
                     separators=(",", ":"),
                 ).encode("utf-8")

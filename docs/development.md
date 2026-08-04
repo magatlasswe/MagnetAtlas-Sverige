@@ -22,3 +22,12 @@ Statiska resurser ligger i `src/magnetatlas/interfaces/web/static/`. Ändringar 
 HTML ska behålla semantiska element och tangentbordsstöd. Featuretext ska sättas
 med säkra DOM-operationer, inte tolkas som HTML. Se även
 [`UI_GUIDELINES.md`](UI_GUIDELINES.md).
+
+Sökalgoritmens stavfelstolerans och filter testas i applikationslagret och via
+det lokala API:t. Klustring, geolokalisering, skala, kompass, helskärm och lokal
+lagring verifieras även som del av webbgränssnittets kontrakt. Om Node.js finns
+kan JavaScript-syntax kontrolleras separat med:
+
+```powershell
+node --check src/magnetatlas/interfaces/web/static/app.js
+```

@@ -3,7 +3,7 @@
 MagnetAtlas-Sverige är ett historiskt GIS-projekt för att hitta, analysera och
 exportera svenska platser av intresse för ansvarsfullt magnetfiske.
 
-Projektet befinner sig i Sprint 2.3. Den körbara versionen erbjuder en lokal
+Projektet befinner sig i Sprint 2.4. Den körbara versionen erbjuder en lokal
 webbkarta, CLI, SQLite-lagring, sökning mot Riksarkivets öppna söktjänst och
 CSV-export.
 Riksarkivet använder nu projektets gemensamma Collector-kontrakt och plugin
@@ -38,7 +38,7 @@ Som standard sparas databasen under `data/database/` och exporter under
 `output/csv/`. Använd `magnetatlas search --help` för samtliga alternativ.
 
 `magnetatlas serve` startar kartan på `http://localhost:8000/` och öppnar
-standardwebbläsaren. Stoppa den med Ctrl+C. Den bundlade kartan innehåller 60
+standardwebbläsaren. Stoppa den med Ctrl+C. Den bundlade kartan innehåller 100
 tydligt märkta, syntetiska demoobjekt som visar gränssnittets funktioner; de är
 inte verifierade historiska platser eller fyndplatser. Använd en egen lokal fil
 med det versionerade AtlasFeature-formatet så här:
@@ -50,6 +50,11 @@ magnetatlas serve --no-browser
 
 OpenStreetMap används endast som baskarta och kräver internetanslutning. Ingen
 adressökning eller annan AtlasFeature-data hämtas från OpenStreetMap.
+
+Kartvyn klustrar närliggande markörer och har lokal stavfelstolerant sökning,
+filter för typ, tidsperiod och källa, valfri “Min plats”, skala, kompass och
+helskärmsläge. Favoriter, senast besökta objekt och valt ljust eller mörkt tema
+sparas endast lokalt i den aktuella webbläsaren. Ingen ranking eller AI används.
 
 ## Kvalitetskontroller
 
