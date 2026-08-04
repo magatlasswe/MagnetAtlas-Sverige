@@ -15,5 +15,11 @@ En collector ansvarar för källprotokoll, defensiv parsning och översättning 
 domänmodeller. Applikationslagret ansvarar för validering, orkestrering och
 lagring; källadaptrar innehåller inte rankning eller annan affärslogik.
 
+`AtlasFeature` är den gemensamma domänmodellen för geografiska objekt. Modellen
+består av egna värdeobjekt för identitet, geometri, tid, proveniens, licens och
+osäkerhet och har inga beroenden på collectors, SQLAlchemy eller GIS-motorer.
+Den äldre `ArchiveRecord`-modellen finns kvar under en additiv övergång och kan
+konverteras till `AtlasFeature` vid domängränsen.
+
 SQLite är Sprint 1-lagring. Repository-gränsen gör en framtida PostGIS-adapter
 möjlig utan att ändra användningsfallen.

@@ -3,10 +3,12 @@
 MagnetAtlas-Sverige är ett historiskt GIS-projekt för att hitta, analysera och
 exportera svenska platser av intresse för ansvarsfullt magnetfiske.
 
-Projektet befinner sig i Sprint 2.1. Den körbara versionen erbjuder en CLI, lokal
+Projektet befinner sig i Sprint 2.2. Den körbara versionen erbjuder en CLI, lokal
 SQLite-lagring, sökning mot Riksarkivets öppna söktjänst och CSV-export.
 Riksarkivet använder nu projektets gemensamma Collector-kontrakt och plugin
-registry; fler datakällor är ännu inte implementerade.
+registry. En källoberoende `AtlasFeature`-modell beskriver geografiska objekt,
+geometri, tid, proveniens, licens och osäkerhet. Fler datakällor är ännu inte
+implementerade.
 
 ## Krav
 
