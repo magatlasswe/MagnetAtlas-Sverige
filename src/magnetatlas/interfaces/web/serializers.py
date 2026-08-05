@@ -133,6 +133,17 @@ def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[st
                 "id": feature.provenance.source_id,
                 "url": feature.provenance.source_url,
             },
+            "provenance": {
+                "source": feature.provenance.source,
+                "source_id": feature.provenance.source_id,
+                "source_url": feature.provenance.source_url,
+                "fetched_at": feature.provenance.fetched_at.isoformat(),
+            },
+            "source_details": {
+                "raa_id": feature.properties.get("raa_id"),
+                "category": feature.properties.get("category"),
+                "last_updated": feature.properties.get("senast_uppdaterad"),
+            },
             "license": (
                 {
                     "name": license_info.name,

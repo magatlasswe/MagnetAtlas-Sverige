@@ -1,5 +1,6 @@
 """CLI integration tests for the local web experience."""
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -24,6 +25,7 @@ class FakeServer:
 
 def test_serve_starts_local_server_without_opening_browser(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     server = FakeServer()
 
@@ -32,6 +34,7 @@ def test_serve_starts_local_server_without_opening_browser(
         return server
 
     monkeypatch.setattr("magnetatlas.cli.create_server", fake_create_server)
+    monkeypatch.setenv("MAGNETATLAS_DATABASE_URL", f"sqlite:///{tmp_path / 'atlas.db'}")
     monkeypatch.setattr(
         "magnetatlas.cli.webbrowser.open",
         lambda url: pytest.fail(f"Webbläsaren öppnades oväntat: {url}"),
@@ -45,10 +48,13 @@ def test_serve_starts_local_server_without_opening_browser(
     assert server.closed
 
 
-def test_serve_opens_default_browser(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_serve_opens_default_browser(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     server = FakeServer()
     opened: list[str] = []
     monkeypatch.setattr("magnetatlas.cli.create_server", lambda *args, **kwargs: server)
+    monkeypatch.setenv("MAGNETATLAS_DATABASE_URL", f"sqlite:///{tmp_path / 'atlas.db'}")
     monkeypatch.setattr("magnetatlas.cli.webbrowser.open", opened.append)
 
     result = CliRunner().invoke(app, ["serve"])

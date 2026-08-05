@@ -2,17 +2,26 @@
 
 Last updated: **2026-08-05**
 
-Current version: **v0.5.0-alpha (Planning)**
+Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 2.6 – First Official Collector**
+Current sprint: **Sprint 2.6.2 – Polish & Public Alpha (completed)**
+
+Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
+
+Public alpha release: **Sprint 2.6.2 – Polish & Public Alpha (completed)**
 
 ## Project Status
 
-Current Version: **v0.5.0-alpha (Planning)**
+Current Version: **v0.6.0-alpha**
 
 The runnable alpha currently contains the project foundation, Collector
 Framework, shared domain model, local web interface and user-experience
-improvements. The first official Collector is planned but not yet implemented.
+improvements. RAÄ Kulturmiljöregistret is the first implemented official
+Collector, with local SQLite persistence and incremental synchronization.
+
+Sprint 2.6.2 aligns package metadata with v0.6.0-alpha, polishes the responsive
+map interface and provides concise Swedish errors for network, GPS, local data
+and database failures.
 
 ## Current Sprint
 
@@ -22,7 +31,7 @@ Goal: implement the first real Collector using an official Swedish data source.
 
 Target: RAÄ Kulturmiljöregistret (KMR).
 
-Deliverables:
+Completed deliverables:
 
 - Collector
 - Importer
@@ -74,6 +83,12 @@ Deliverables:
 - [x] Light and dark mode
 - [x] Mobile UI
 - [x] Demo dataset
+- [x] GPS-noggrannhet, centrering och valfritt följläge
+- [x] Tydliga laddnings-, tom- och feltillstånd
+- [x] Kompletta spårbara kartpopuper
+- [x] Förindexerad lokal sökning för större dataset
+- [x] Public-alpha polish for phone, tablet and desktop
+- [x] Swedish user-facing errors for offline, timeout and corrupt cache cases
 
 ### Data Source Evaluation
 
@@ -137,7 +152,7 @@ datasets into one easy-to-use map without requiring GIS knowledge.
 - **v0.3.0-alpha:** AtlasFeature
 - **v0.4.0-alpha:** Web Experience
 - **v0.5.0-alpha:** Official Data Source Evaluation
-- **v0.6.0-alpha:** First Official Collector (planned)
+- **v0.6.0-alpha:** First Official Collector
 
 ## Quality Rules
 
@@ -178,4 +193,6 @@ Web
 - Web Interface completed
 - UX completed
 - Official Data Source Evaluation completed
-- First Official Collector (planned)
+- First Official Collector completed
+- Real World Validation completed
+- Public Alpha polish completed

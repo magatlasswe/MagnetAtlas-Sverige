@@ -9,10 +9,15 @@ const STORAGE_KEYS = {
 const state = {
   map: null,
   collection: { type: "FeatureCollection", features: [] },
+  featureIndex: new Map(),
   selectedId: null,
   popup: null,
   searchTimer: null,
   searchController: null,
+  locationWatchId: null,
+  locationMarker: null,
+  lastPosition: null,
+  followLocation: false,
 };
 
 const elements = {};
@@ -35,9 +40,7 @@ function saveIds(key, ids) {
 }
 
 function findFeature(featureId) {
-  return state.collection.features.find(
-    (feature) => String(feature.id) === String(featureId),
-  );
+  return state.featureIndex.get(String(featureId));
 }
 
 function safeExternalLink(container, text, url) {
@@ -72,6 +75,22 @@ function confidenceText(confidence) {
   return confidence.rationale
     ? `${confidence.label} – ${confidence.rationale}`
     : confidence.label;
+}
+
+function coordinatesText(feature) {
+  const navigation = feature.properties.navigation;
+  if (!navigation) return "Koordinater saknas";
+  const suffix = navigation.approximate ? " (ungefärlig punkt)" : "";
+  return `${navigation.latitude.toFixed(6)}, ${navigation.longitude.toFixed(6)}${suffix}`;
+}
+
+function provenanceText(properties) {
+  const provenance = properties.provenance;
+  if (!provenance) return "Proveniensuppgift saknas";
+  const fetched = provenance.fetched_at
+    ? new Date(provenance.fetched_at).toLocaleString("sv-SE")
+    : "okänd hämtningstid";
+  return `${provenance.source}, käll-ID ${provenance.source_id}, hämtad ${fetched}`;
 }
 
 function boundsForGeometry(geometry) {
@@ -165,6 +184,17 @@ function showFeature(feature, { focus = false, remember = true } = {}) {
   const license = properties.license;
   if (license) safeExternalLink(elements.featureLicense, license.name, license.url);
   else elements.featureLicense.textContent = "Licensuppgift saknas";
+  elements.featureProvenance.textContent = provenanceText(properties);
+  elements.featureCoordinates.textContent = coordinatesText(feature);
+  const details = properties.source_details || {};
+  [
+    [elements.raaIdRow, elements.raaId, details.raa_id],
+    [elements.raaCategoryRow, elements.raaCategory, details.category],
+    [elements.raaUpdatedRow, elements.raaUpdated, details.last_updated],
+  ].forEach(([row, target, value]) => {
+    row.hidden = !value;
+    target.textContent = value || "";
+  });
 
   const navigation = properties.navigation;
   elements.navigateButton.hidden = !navigation;
@@ -221,11 +251,17 @@ function showPopup(feature, coordinates) {
   title.className = "popup-title";
   title.textContent = properties.title;
   card.append(title);
-  appendText(card, "popup-meta", `${properties.feature_type} · ${timeText(properties.time_span)}`);
-  appendText(card, "popup-history", properties.description || "Kort historik saknas.");
+  appendText(card, "popup-meta", `Typ: ${properties.feature_type}`);
+  appendText(card, "popup-history", properties.description || "Beskrivning saknas.");
   appendText(card, "popup-meta", `Källa: ${properties.source.name}`);
   appendText(card, "popup-meta", `Licens: ${properties.license?.name || "Okänd"}`);
+  appendText(card, "popup-meta", `Proveniens: ${provenanceText(properties)}`);
   appendText(card, "popup-meta", `Confidence: ${confidenceText(properties.confidence)}`);
+  appendText(card, "popup-meta", `Koordinater (WGS84): ${coordinatesText(feature)}`);
+  const details = properties.source_details || {};
+  appendText(card, "popup-meta", `RAÄ-ID: ${details.raa_id || "Okänt"}`);
+  appendText(card, "popup-meta", `Kategori: ${details.category || "Okänd"}`);
+  appendText(card, "popup-meta", `Senast uppdaterad: ${details.last_updated || "Okänt"}`);
   const actions = document.createElement("div");
   actions.className = "popup-actions";
   actions.append(
@@ -288,12 +324,12 @@ function searchParameters() {
   return parameters;
 }
 
-function renderSearchResults(features) {
+function renderSearchResults(features, message = null) {
   elements.searchResults.replaceChildren();
-  if (!features.length) {
+  if (message || !features.length) {
     const empty = document.createElement("p");
     empty.className = "search-empty";
-    empty.textContent = "Ingen plats hittades i den lokala atlasen.";
+    empty.textContent = message || "Ingen plats matchar din sökning och dina filter.";
     elements.searchResults.append(empty);
   } else {
     features.slice(0, 20).forEach((feature) => {
@@ -340,7 +376,10 @@ async function runSearch() {
     renderSearchResults(result.features);
   } catch (error) {
     if (error.name !== "AbortError") {
-      renderSearchResults([]);
+      renderSearchResults(
+        [],
+        "Sökningen kunde inte genomföras. Kontrollera att servern körs och försök igen.",
+      );
       console.error(error);
     }
   }
@@ -364,6 +403,80 @@ function initializeFacets() {
   const properties = state.collection.features.map((feature) => feature.properties);
   addOptions(elements.typeFilter, new Set(properties.map((item) => item.feature_type)));
   addOptions(elements.sourceFilter, new Set(properties.map((item) => item.source.name)));
+}
+
+function locationErrorMessage(error) {
+  if (error.code === error.PERMISSION_DENIED) {
+    return "Platsåtkomst nekades. Tillåt platsåtkomst i webbläsaren och försök igen.";
+  }
+  if (error.code === error.POSITION_UNAVAILABLE) {
+    return "Din position kunde inte bestämmas. Kontrollera enhetens platstjänster.";
+  }
+  if (error.code === error.TIMEOUT) {
+    return "GPS-positionen tog för lång tid. Försök igen utomhus eller med bättre signal.";
+  }
+  return "Din position kunde inte hämtas.";
+}
+
+function updateLocation(position) {
+  state.lastPosition = position;
+  const { longitude, latitude, accuracy } = position.coords;
+  const coordinates = [longitude, latitude];
+  elements.locationAccuracy.textContent = `Noggrannhet: cirka ${Math.round(accuracy)} meter`;
+  elements.locationHeading.textContent = "Din aktuella position";
+  if (!state.locationMarker) {
+    const marker = document.createElement("div");
+    marker.className = "location-marker";
+    marker.setAttribute("aria-label", "Din aktuella GPS-position");
+    state.locationMarker = new maplibregl.Marker({ element: marker })
+      .setLngLat(coordinates)
+      .addTo(state.map);
+  } else {
+    state.locationMarker.setLngLat(coordinates);
+  }
+  if (state.followLocation) state.map.easeTo({ center: coordinates, zoom: Math.max(state.map.getZoom(), 15) });
+}
+
+function handleLocationError(error) {
+  elements.locationHeading.textContent = "GPS kunde inte startas";
+  elements.locationAccuracy.textContent = locationErrorMessage(error);
+  state.followLocation = false;
+  elements.followLocation.setAttribute("aria-pressed", "false");
+  elements.followLocation.textContent = "Följ mig: av";
+}
+
+function startLocationWatch() {
+  if (state.locationWatchId !== null) return true;
+  if (!navigator.geolocation) {
+    elements.locationHeading.textContent = "GPS stöds inte";
+    elements.locationAccuracy.textContent = "Webbläsaren saknar stöd för platsåtkomst.";
+    return false;
+  }
+  elements.locationHeading.textContent = "Söker efter din position…";
+  elements.locationAccuracy.textContent = "Väntar på GPS-signal";
+  state.locationWatchId = navigator.geolocation.watchPosition(
+    updateLocation,
+    handleLocationError,
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 },
+  );
+  return true;
+}
+
+function centerOnLocation() {
+  if (!startLocationWatch()) return;
+  if (state.lastPosition) {
+    const { longitude, latitude } = state.lastPosition.coords;
+    state.map.easeTo({ center: [longitude, latitude], zoom: Math.max(state.map.getZoom(), 15) });
+  }
+}
+
+function toggleFollowLocation() {
+  const nextValue = !state.followLocation;
+  if (nextValue && !startLocationWatch()) return;
+  state.followLocation = nextValue;
+  elements.followLocation.setAttribute("aria-pressed", String(nextValue));
+  elements.followLocation.textContent = `Följ mig: ${nextValue ? "på" : "av"}`;
+  if (nextValue) centerOnLocation();
 }
 
 function renderSavedList(container, ids, emptyText) {
@@ -515,10 +628,16 @@ function cacheElements() {
     featureTitle: "feature-title", featurePlace: "feature-place", featureTime: "feature-time",
     featureDescription: "feature-description", geometryConfidence: "geometry-confidence",
     featureConfidence: "feature-confidence", featureSource: "feature-source",
-    featureLicense: "feature-license", navigationNote: "navigation-note",
+    featureLicense: "feature-license", featureProvenance: "feature-provenance",
+    featureCoordinates: "feature-coordinates", navigationNote: "navigation-note",
+    raaIdRow: "raa-id-row", raaId: "raa-id", raaCategoryRow: "raa-category-row",
+    raaCategory: "raa-category", raaUpdatedRow: "raa-updated-row", raaUpdated: "raa-updated",
     navigateButton: "navigate-button", favoriteButton: "favorite-button", whyButton: "why-button",
     whyDialog: "why-dialog", closeWhy: "close-why", whySources: "why-sources",
     whyEstimated: "why-estimated", whyDataSource: "why-data-source",
+    emptyState: "empty-state", mapStatusText: "map-status-text",
+    centerLocation: "center-location", followLocation: "follow-location",
+    locationHeading: "location-heading", locationAccuracy: "location-accuracy",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }
@@ -544,6 +663,8 @@ function installInterfaceEvents() {
   elements.favoriteButton.addEventListener("click", toggleFavorite);
   elements.libraryButton.addEventListener("click", showLibrary);
   elements.themeButton.addEventListener("click", toggleTheme);
+  elements.centerLocation.addEventListener("click", centerOnLocation);
+  elements.followLocation.addEventListener("click", toggleFollowLocation);
   elements.whyButton.addEventListener("click", () => {
     const feature = findFeature(state.selectedId);
     if (feature) showWhy(feature);
@@ -567,6 +688,9 @@ async function initialize() {
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     state.collection = await response.json();
+    state.featureIndex = new Map(
+      state.collection.features.map((feature) => [String(feature.id), feature]),
+    );
     initializeFacets();
     state.map = new maplibregl.Map({
       container: "map",
@@ -591,14 +715,6 @@ async function initialize() {
       new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }),
       "top-left",
     );
-    state.map.addControl(
-      new maplibregl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: false },
-        trackUserLocation: false,
-        showAccuracyCircle: true,
-      }),
-      "top-left",
-    );
     state.map.addControl(new maplibregl.FullscreenControl(), "top-left");
     state.map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
     state.map.addControl(
@@ -608,13 +724,20 @@ async function initialize() {
     state.map.on("load", () => {
       installFeatureLayers();
       elements.mapStatus.hidden = true;
-      elements.searchInput.focus();
+      const hasFeatures = state.collection.features.length !== 0;
+      elements.emptyState.hidden = hasFeatures;
+      elements.infoPanel.hidden = !hasFeatures;
     });
-    state.map.on("error", () => {
-      elements.mapStatus.textContent = "Kartan kunde inte ladda alla resurser.";
+    state.map.on("error", (event) => {
+      elements.mapStatus.hidden = false;
+      elements.mapStatus.classList.add("is-error");
+      elements.mapStatusText.textContent = event.error?.message?.includes("tile")
+        ? "Baskartan kunde inte laddas. Kontrollera internetanslutningen."
+        : "Kartan kunde inte ladda alla resurser. Försök att ladda om sidan.";
     });
   } catch (error) {
-    elements.mapStatus.textContent = "MagnetAtlas kunde inte ladda kartan.";
+    elements.mapStatus.classList.add("is-error");
+    elements.mapStatusText.textContent = "Lokala platser kunde inte laddas. Kontrollera att servern körs och ladda om sidan.";
     console.error(error);
   }
 }

@@ -26,6 +26,9 @@ class Settings:
     output_dir: Path = Path("output")
     log_level: str = "INFO"
     riksarkivet_base_url: str = "https://data.riksarkivet.se/api"
+    raa_api_url: str = "https://pub.raa.se/datauttag"
+    raa_download_url: str = "https://pub.raa.se/nedladdning/datauttag/lamningar_v1"
+    raa_work_dir: Path = Path("data/cache/raa")
     http_timeout: float = 20.0
 
     @classmethod
@@ -46,6 +49,14 @@ class Settings:
                 "MAGNETATLAS_RIKSARKIVET_BASE_URL",
                 "https://data.riksarkivet.se/api",
             ).rstrip("/"),
+            raa_api_url=os.getenv(
+                "MAGNETATLAS_RAA_API_URL", "https://pub.raa.se/datauttag"
+            ).rstrip("/"),
+            raa_download_url=os.getenv(
+                "MAGNETATLAS_RAA_DOWNLOAD_URL",
+                "https://pub.raa.se/nedladdning/datauttag/lamningar_v1",
+            ).rstrip("/"),
+            raa_work_dir=Path(os.getenv("MAGNETATLAS_RAA_WORK_DIR", "data/cache/raa")),
             http_timeout=timeout,
         )
         settings.validate()
@@ -56,6 +67,13 @@ class Settings:
         parsed = urlparse(self.riksarkivet_base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("Riksarkivets bas-URL måste vara en giltig HTTP(S)-URL")
+        for label, value in (
+            ("RAÄ API-URL", self.raa_api_url),
+            ("RAÄ nedladdnings-URL", self.raa_download_url),
+        ):
+            parsed = urlparse(value)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                raise ValueError(f"{label} måste vara en giltig HTTP(S)-URL")
         if self.log_level not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
             raise ValueError("MAGNETATLAS_LOG_LEVEL har ett ogiltigt värde")
 

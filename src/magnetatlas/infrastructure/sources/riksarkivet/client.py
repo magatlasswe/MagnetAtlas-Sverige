@@ -16,6 +16,7 @@ from magnetatlas.domain.collectors import (
     CollectorDescriptor,
 )
 from magnetatlas.domain.exceptions import DataSourceError
+from magnetatlas.infrastructure.sources.errors import transport_error_message
 from magnetatlas.infrastructure.sources.riksarkivet.mapper import map_item
 from magnetatlas.infrastructure.sources.riksarkivet.schemas import RiksarkivetItem
 
@@ -34,7 +35,7 @@ def _default_session() -> requests.Session:
     session.headers.update(
         {
             "Accept": "application/json",
-            "User-Agent": "MagnetAtlas-Sverige/0.1 (+https://github.com/)",
+            "User-Agent": "MagnetAtlas-Sverige/0.6 (+https://github.com/)",
         }
     )
     return session
@@ -86,7 +87,11 @@ class RiksarkivetClient:
             response.raise_for_status()
             payload: Any = response.json()
         except (requests.RequestException, ValueError) as exc:
-            raise DataSourceError(f"Riksarkivet kunde inte nås: {exc}") from exc
+            if isinstance(exc, requests.RequestException):
+                message = transport_error_message("Riksarkivet", exc)
+            else:
+                message = "Riksarkivet returnerade ett ogiltigt svar."
+            raise DataSourceError(message) from exc
 
         if not isinstance(payload, dict) or not isinstance(payload.get("items"), list):
             raise DataSourceError("Riksarkivet returnerade ett oväntat svarsformat")

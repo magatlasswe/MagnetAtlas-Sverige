@@ -53,6 +53,11 @@ def test_serializer_supports_geometries_and_omits_raw_data(
             raw_data={"secret": "not for web"},
         ),
         geometry=geometry,
+        properties={
+            "raa_id": "abc",
+            "category": "Fornlämning",
+            "senast_uppdaterad": "2026-01-01",
+        },
     )
     payload = serialize_feature_collection(FeatureCatalog([feature]))
 
@@ -63,6 +68,17 @@ def test_serializer_supports_geometries_and_omits_raw_data(
         "https://www.openstreetmap.org/directions?"
     )
     assert serialized["properties"]["period"] == "unknown"
+    assert serialized["properties"]["provenance"] == {
+        "source": "demo",
+        "source_id": "1",
+        "source_url": None,
+        "fetched_at": "2026-01-01T00:00:00+00:00",
+    }
+    assert serialized["properties"]["source_details"] == {
+        "raa_id": "abc",
+        "category": "Fornlämning",
+        "last_updated": "2026-01-01",
+    }
     assert serialized["properties"]["discovery"] == {
         "supporting_sources": ["demo"],
         "estimated": True,

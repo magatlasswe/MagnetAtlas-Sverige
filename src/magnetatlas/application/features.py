@@ -90,6 +90,24 @@ class FeatureCatalog:
             indexed[feature.feature_id] = feature
         self._features = tuple(features)
         self._indexed = indexed
+        self._search_index = tuple(
+            self._searchable_text(feature) for feature in self._features
+        )
+
+    @staticmethod
+    def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
+        """Build reusable normalized text for repeated interactive searches."""
+        haystack = " ".join(
+            value
+            for value in (
+                feature.title,
+                feature.place,
+                feature.feature_type,
+                feature.description,
+            )
+            if value
+        ).casefold()
+        return haystack, tuple(WORD_PATTERN.findall(haystack))
 
     def list_all(self) -> tuple[AtlasFeature, ...]:
         """Return all features in source order."""
@@ -129,7 +147,9 @@ class FeatureCatalog:
             return []
 
         matches = []
-        for feature in self._features:
+        for feature, (haystack, words) in zip(
+            self._features, self._search_index, strict=True
+        ):
             if feature_types and feature.feature_type.casefold() not in feature_types:
                 continue
             if sources and feature.provenance.source.casefold() not in sources:
@@ -139,17 +159,6 @@ class FeatureCatalog:
                 and feature_period(feature) not in active_filters.periods
             ):
                 continue
-            haystack = " ".join(
-                value
-                for value in (
-                    feature.title,
-                    feature.place,
-                    feature.feature_type,
-                    feature.description,
-                )
-                if value
-            ).casefold()
-            words = tuple(WORD_PATTERN.findall(haystack))
             if all(_fuzzy_term_matches(term, haystack, words) for term in terms):
                 matches.append(feature)
                 if len(matches) == limit:

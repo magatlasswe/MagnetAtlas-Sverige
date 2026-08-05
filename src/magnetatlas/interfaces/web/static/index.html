@@ -58,7 +58,23 @@
 
     <main>
       <div id="map" aria-label="Interaktiv karta över Sverige"></div>
-      <div id="map-status" class="map-status" role="status">Laddar karta…</div>
+      <div id="map-status" class="map-status" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="map-status-text">Laddar platser och karta…</span>
+      </div>
+      <section id="empty-state" class="empty-state" aria-live="polite" hidden>
+        <h2>Atlasen är tom</h2>
+        <p>Det finns inga lokalt importerade objekt att visa ännu.</p>
+        <p>Kör exempelvis <code>magnetatlas import raa --county ostergotland</code> och ladda sedan om sidan.</p>
+      </section>
+      <section class="location-card" aria-label="Din GPS-position">
+        <div>
+          <strong id="location-heading">Min position</strong>
+          <span id="location-accuracy">GPS är inte aktiverad</span>
+        </div>
+        <button id="center-location" type="button" title="Centrera kartan på din GPS-position">Centrera på mig</button>
+        <button id="follow-location" type="button" aria-pressed="false" title="Låt kartan följa din GPS-position">Följ mig: av</button>
+      </section>
 
       <aside id="info-panel" class="info-panel" aria-label="Platsinformation">
         <button id="close-panel" class="close-button" type="button" aria-label="Stäng information" hidden>×</button>
@@ -95,6 +111,11 @@
             <div><dt>Uppgift</dt><dd id="feature-confidence"></dd></div>
             <div><dt>Källa</dt><dd id="feature-source"></dd></div>
             <div><dt>Licens</dt><dd id="feature-license"></dd></div>
+            <div><dt>Proveniens</dt><dd id="feature-provenance"></dd></div>
+            <div><dt>Koordinater</dt><dd id="feature-coordinates"></dd></div>
+            <div id="raa-id-row" hidden><dt>RAÄ-ID</dt><dd id="raa-id"></dd></div>
+            <div id="raa-category-row" hidden><dt>Kategori</dt><dd id="raa-category"></dd></div>
+            <div id="raa-updated-row" hidden><dt>Senast uppdaterad</dt><dd id="raa-updated"></dd></div>
           </dl>
 
           <p id="navigation-note" class="navigation-note"></p>

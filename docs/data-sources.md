@@ -8,7 +8,46 @@ annonserar capabilities för textsökning och resultatbegränsning och returnera
 Planerade adaptrar omfattar OpenStreetMap, Lantmäteriet,
 Riksantikvarieämbetet, SGU och SMHI. Varje integration måste dokumentera API,
 licens, attribueringskrav, uppdateringsfrekvens och kända kvalitetsbegränsningar.
-De är inte implementerade eller registrerade i Sprint 2.3.
+RAÄ Kulturmiljöregistret är implementerat i Sprint 2.6. Övriga källor är ännu
+inte implementerade.
+
+## RAÄ Kulturmiljöregistret
+
+RAÄ-integrationen använder myndighetens rekommenderade tvåstegsmodell:
+
+1. En officiell, nattligt publicerad GeoPackage-bas importeras från
+   `pub.raa.se/nedladdning/datauttag/lamningar_v1`.
+2. Det dokumenterade Datauttag REST API v1.2.0 används endast för förändringar
+   efter basimportens synkmarkör via `GET /lamningar`.
+
+GeoPackage-produktens schema är version 3.0. Collectorn läser punkter, linjer
+och polygoner, konverterar SWEREF 99 TM (EPSG:3006) till intern WGS84 och
+returnerar enbart `AtlasFeature`. RAÄ-specifika fält hålls i adaptern och i
+feature-egenskaper som behövs för spårbar visning.
+
+SQLite-databasen och dess synkmetadata är cache och lokal sanningskälla. En
+basimport ersätter datasetet atomärt; inkrementell synk uppdaterar bara ändrade
+objekt. Misslyckad hämtning eller mappning aktiverar aldrig ett halvfärdigt
+dataset, så senast lyckade databas fortsätter användas.
+
+Datauttaget anges av RAÄ som public domain/CC0. MagnetAtlas bevarar källa,
+käll-ID, hämtningsdatum och originalhänvisning när den finns. Saknade värden
+uppfinns inte. REST-uttaget släpar normalt till nästa nattliga publicering och
+har ingen dokumenterad bbox-, läns- eller kommunparameter; geografiska
+basurval använder därför RAÄ:s publicerade läns- och kommunfiler och bbox
+filtreras lokalt.
+
+Kommandon:
+
+```text
+magnetatlas import raa
+magnetatlas import raa --county ostergotland
+magnetatlas import raa --municipality kinda
+magnetatlas import raa --bbox 14,57,17,59
+magnetatlas cache status
+magnetatlas cache refresh
+magnetatlas cache clear
+```
 
 ## OpenStreetMap-baskarta
 

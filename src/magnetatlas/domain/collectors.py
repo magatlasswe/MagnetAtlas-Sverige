@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from enum import StrEnum
+from pathlib import Path
 from typing import Protocol
 
+from magnetatlas.domain.features import AtlasFeature
+from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.domain.models import ArchiveRecord
 
 
@@ -87,3 +91,24 @@ class Collector(Protocol):
     def descriptor(self) -> CollectorDescriptor: ...
 
     def collect(self, request: CollectionRequest) -> CollectionBatch: ...
+
+
+class AtlasFeatureCollector(Protocol):
+    """Contract for versioned base imports and incremental feature changes."""
+
+    @property
+    def descriptor(self) -> CollectorDescriptor: ...
+
+    @property
+    def base_schema_version(self) -> str: ...
+
+    def fetch_base(
+        self,
+        destination: Path,
+        *,
+        county: str | None = None,
+        municipality: str | None = None,
+        bbox: BoundingBox | None = None,
+    ) -> list[AtlasFeature]: ...
+
+    def collect_changes(self, start: date, end: date) -> list[AtlasFeature]: ...

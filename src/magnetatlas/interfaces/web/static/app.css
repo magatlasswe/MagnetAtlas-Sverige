@@ -5,7 +5,9 @@
   --paper: #fffdf8;
   --accent: #b45309;
   --accent-dark: #873f08;
+  --accent-ink: #fff;
   --forest: #174d35;
+  --forest-ink: #fff;
   --line: #d9ddd8;
   --shadow: 0 10px 35px rgb(23 33 27 / 18%);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,7 +20,9 @@ html[data-theme="dark"] {
   --paper: #17211b;
   --accent: #e8892e;
   --accent-dark: #c96b17;
+  --accent-ink: #17211b;
   --forest: #8fd4ae;
+  --forest-ink: #17211b;
   --line: #3d4d43;
   --shadow: 0 12px 38px rgb(0 0 0 / 40%);
 }
@@ -239,9 +243,12 @@ main,
 }
 
 #map {
-  position: absolute;
-  inset: 0;
-  padding-top: 7.7rem;
+  position: fixed;
+  top: 7.65rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: auto;
 }
 
 .map-status {
@@ -256,8 +263,113 @@ main,
   transform: translateX(-50%);
 }
 
+.map-status:not(.is-error) {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.map-status.is-error {
+  width: min(32rem, calc(100vw - 2rem));
+  color: #fff;
+  text-align: center;
+  background: #8b1e1e;
+  border-radius: 0.65rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgb(255 255 255 / 45%);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .map-status[hidden] {
   display: none;
+}
+
+.empty-state {
+  position: fixed;
+  z-index: 14;
+  top: 50%;
+  left: 50%;
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.25rem;
+  text-align: center;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  transform: translate(-50%, -50%);
+}
+
+.empty-state h2,
+.empty-state p {
+  margin: 0.35rem 0;
+}
+
+.empty-state code {
+  padding: 0.1rem 0.3rem;
+  background: color-mix(in srgb, var(--line) 45%, transparent);
+  border-radius: 0.25rem;
+}
+
+.location-card {
+  position: fixed;
+  z-index: 16;
+  top: 8.5rem;
+  left: 0.65rem;
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) auto auto;
+  gap: 0.4rem;
+  align-items: center;
+  max-width: calc(100vw - 1.3rem);
+  padding: 0.45rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.location-card div,
+.location-card span {
+  display: block;
+}
+
+.location-card span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.location-card button {
+  min-height: 44px;
+  padding: 0 0.7rem;
+  color: var(--ink);
+  font-weight: 650;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  cursor: pointer;
+}
+
+.location-card button[aria-pressed="true"] {
+  color: white;
+  background: var(--forest);
+}
+
+.location-marker {
+  width: 20px;
+  height: 20px;
+  background: #1677ff;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #1259b0, 0 2px 8px rgb(0 0 0 / 35%);
 }
 
 .info-panel {
@@ -380,7 +492,7 @@ main,
 }
 
 .secondary-button[aria-pressed="true"] {
-  color: #fff;
+  color: var(--forest-ink);
   background: var(--forest);
 }
 
@@ -417,7 +529,7 @@ main,
   justify-content: center;
   min-height: 48px;
   padding: 0 1.1rem;
-  color: white;
+  color: var(--accent-ink);
   font-weight: 750;
   text-decoration: none;
   background: var(--accent);
@@ -430,7 +542,9 @@ main,
 
 .maplibregl-popup-content {
   max-width: 17rem;
+  max-height: min(70vh, 32rem);
   padding: 0.85rem;
+  overflow-y: auto;
   color: var(--ink);
   border-radius: 0.65rem;
   box-shadow: var(--shadow);
@@ -462,6 +576,14 @@ html[data-theme="dark"] #map .maplibregl-canvas {
   gap: 0.35rem;
 }
 
+.maplibregl-popup-close-button {
+  width: 44px;
+  height: 44px;
+  color: var(--ink);
+  font-size: 1.35rem;
+  border-radius: 50%;
+}
+
 .popup-card p {
   margin: 0;
 }
@@ -487,14 +609,17 @@ html[data-theme="dark"] #map .maplibregl-canvas {
 
 .popup-title {
   display: block;
+  padding-right: 2rem;
   margin-bottom: 0.2rem;
+  font-size: 1rem;
+  line-height: 1.3;
 }
 
 .popup-button {
   min-height: 44px;
   margin-top: 0.55rem;
   padding: 0 0.8rem;
-  color: white;
+  color: var(--forest-ink);
   font-weight: 700;
   background: var(--forest);
   border: 0;
@@ -533,7 +658,7 @@ dialog .close-button {
     bottom: auto;
     left: auto;
     width: min(24rem, calc(100vw - 2rem));
-    max-height: calc(100vh - 6rem);
+    max-height: calc(100vh - 9.6rem);
     padding: 1.25rem;
   }
 
@@ -563,5 +688,20 @@ dialog .close-button {
 
   .filter-bar {
     scrollbar-width: thin;
+  }
+
+  .location-card {
+    right: 0.65rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .location-card div {
+    grid-column: 1 / -1;
+  }
+
+
+  .info-panel {
+    max-height: min(52vh, calc(100vh - 13rem));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }

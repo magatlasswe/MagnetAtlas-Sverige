@@ -1,6 +1,6 @@
 # MagnetAtlas Sverige
 
-**Status:** Alpha
+**Status:** Public alpha (`v0.6.0-alpha`)
 
 **Python:** 3.13 eller 3.14
 
@@ -14,8 +14,8 @@ normaliserar och visar spårbar geografisk information från öppna datakällor.
 Projektet är en modulär Python-applikation med CLI, SQLite, exportfunktioner och
 ett mobilanpassat webbgränssnitt.
 
-Projektet befinner sig i alpha. Den medföljande datamängden är demonstrationsdata
-och ska inte tolkas som verifierade historiska platser eller fyndplatser.
+Projektet befinner sig i alpha. Demodatan är tydligt märkt, och den första
+officiella datakällan kan importeras lokalt från RAÄ Kulturmiljöregistret.
 
 ## Vision
 
@@ -31,8 +31,10 @@ data.
 - Visning av punkter, områden, linjer och polygoner.
 - Klustring, sökning och filter för typ, tidsperiod och källa.
 - Objektkort med källa, licens, osäkerhet och navigation.
-- Valfri positionering, favoriter, historik samt ljust och mörkt tema.
+- Valfri GPS-positionering med noggrannhet, centrering och följläge.
+- Favoriter, historik samt ljust och mörkt tema.
 - Collector Framework och en gemensam `AtlasFeature`-domänmodell.
+- Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -53,16 +55,35 @@ verktygskonfiguration.
 ```powershell
 magnetatlas --help
 magnetatlas search "bro"
+magnetatlas import raa --county ostergotland
+magnetatlas cache status
 magnetatlas serve
 ```
 
+För en första lokal provkörning:
+
+1. Importera ett begränsat länsuttag, exempelvis
+   `magnetatlas import raa --county ostergotland`.
+2. Kontrollera resultatet med `magnetatlas cache status`.
+3. Starta kartan med `magnetatlas serve`.
+4. Sök eller filtrera platser, öppna ett objekt och läs källinformationen.
+5. Välj **Centrera på mig** om du vill ge webbläsaren tillgång till din position.
+
+Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
+demodata, så att gränssnittet går att prova utan en nätverksimport.
+
 `magnetatlas serve` startar applikationen på `http://localhost:8000/` och öppnar
 standardwebbläsaren. Stoppa servern med Ctrl+C. Baskartan kräver
-internetanslutning; AtlasFeature-datan läses lokalt.
+internetanslutning; AtlasFeature-datan läses lokalt. Vid nätverks-, timeout-,
+data- eller cachefel visas ett kort svenskt felmeddelande utan teknisk traceback.
 
-## Screenshot
+GPS aktiveras först när användaren väljer **Centrera på mig** eller slår på
+**Följ mig** och godkänner webbläsarens platsdialog. Positionen och den visade
+noggrannheten stannar i webbläsaren och lagras inte av MagnetAtlas.
 
-TODO: Lägg till en aktuell skärmdump av kartvyn.
+RAÄ-importen hämtar ett officiellt GeoPackage. Därefter används det dokumenterade
+REST-API:t enbart för förändringar. `magnetatlas serve` läser aldrig direkt från
+RAÄ utan visar den senast lyckade lokala SQLite-versionen.
 
 ## Project Structure
 
@@ -83,7 +104,13 @@ AGENTS.md
 - [Instruktioner för bidragsgivare och agenter](AGENTS.md)
 - [Produktprinciper](docs/product_principles.md)
 - [Arkitektur](docs/architecture.md)
+- [Roadmap](docs/roadmap.md)
 - [Utvärdering av datakällor](docs/data-source-evaluation.md)
+
+## Development Notes
+
+Se [kända begränsningar i byggmiljön](docs/known-environment-limitations.md) om
+verifiering i isolerade miljöer utan Setuptools eller åtkomst till PyPI.
 
 ## Licensstatus
 

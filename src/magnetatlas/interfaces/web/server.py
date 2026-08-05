@@ -48,7 +48,7 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one immutable feature catalog."""
 
     class MagnetAtlasRequestHandler(BaseHTTPRequestHandler):
-        server_version = "MagnetAtlas/0.1"
+        server_version = "MagnetAtlas/0.6"
 
         def _headers(self, status: HTTPStatus, content_type: str, length: int) -> None:
             self.send_response(status)

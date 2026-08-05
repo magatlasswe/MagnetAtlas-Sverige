@@ -3,6 +3,7 @@
 from typing import Any
 
 import pytest
+import requests
 
 from magnetatlas.domain.collectors import CollectionRequest, CollectorCapability
 from magnetatlas.domain.exceptions import DataSourceError
@@ -86,3 +87,19 @@ def test_collector_rejects_unsupported_cursor() -> None:
 
     with pytest.raises(DataSourceError, match="cursor_pagination"):
         client.collect(CollectionRequest(query="bro", cursor="next"))
+
+
+class FailingSession:
+    def get(self, *args: object, **kwargs: object) -> object:
+        raise requests.Timeout("technical")
+
+
+def test_timeout_has_a_swedish_user_facing_message() -> None:
+    client = RiksarkivetClient(
+        "https://example.test", session=FailingSession()  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(DataSourceError, match="tidsgränsen") as raised:
+        client.search("bro")
+
+    assert "technical" not in str(raised.value)

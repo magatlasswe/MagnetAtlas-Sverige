@@ -171,7 +171,8 @@ def _provenance(value: object) -> Provenance:
     )
 
 
-def _feature(data: dict[str, Any]) -> AtlasFeature:
+def feature_from_document(data: dict[str, Any]) -> AtlasFeature:
+    """Create a validated AtlasFeature from its local document representation."""
     relationships = data.get("relationships", [])
     if not isinstance(relationships, list):
         raise ValueError("relationships måste vara en lista")
@@ -196,6 +197,89 @@ def _feature(data: dict[str, Any]) -> AtlasFeature:
     )
 
 
+def _geometry_document(geometry: Geometry | None) -> dict[str, Any] | None:
+    if geometry is None:
+        return None
+    if isinstance(geometry, GeoPoint):
+        return {"type": "Point", "coordinates": [geometry.longitude, geometry.latitude]}
+    if isinstance(geometry, BoundingBox):
+        return {
+            "type": "BoundingBox",
+            "coordinates": [
+                geometry.west,
+                geometry.south,
+                geometry.east,
+                geometry.north,
+            ],
+        }
+    if isinstance(geometry, LineString):
+        return {
+            "type": "LineString",
+            "coordinates": [
+                [point.longitude, point.latitude] for point in geometry.points
+            ],
+        }
+    return {
+        "type": "Polygon",
+        "coordinates": [
+            [[point.longitude, point.latitude] for point in ring]
+            for ring in geometry.rings
+        ],
+    }
+
+
+def _confidence_document(confidence: Confidence) -> dict[str, Any]:
+    return {"value": confidence.value, "rationale": confidence.rationale}
+
+
+def feature_to_document(feature: AtlasFeature) -> dict[str, Any]:
+    """Serialize an AtlasFeature completely for local persistence."""
+    license_info = feature.provenance.license_info
+    time_span = feature.time_span
+    return {
+        "feature_id": str(feature.feature_id),
+        "title": feature.title,
+        "feature_type": feature.feature_type,
+        "description": feature.description,
+        "place": feature.place,
+        "geometry": _geometry_document(feature.geometry),
+        "time_span": (
+            {
+                "start": time_span.start.isoformat() if time_span.start else None,
+                "end": time_span.end.isoformat() if time_span.end else None,
+                "original_text": time_span.original_text,
+                "precision": time_span.precision,
+                "certainty": _confidence_document(time_span.certainty),
+            }
+            if time_span is not None
+            else None
+        ),
+        "confidence": _confidence_document(feature.confidence),
+        "geometry_confidence": _confidence_document(feature.geometry_confidence),
+        "properties": feature.properties,
+        "relationships": [str(item) for item in feature.relationships],
+        "provenance": {
+            "source": feature.provenance.source,
+            "source_id": feature.provenance.source_id,
+            "source_url": feature.provenance.source_url,
+            "fetched_at": feature.provenance.fetched_at.isoformat(),
+            "raw_data": feature.provenance.raw_data,
+            "license_info": (
+                {
+                    "name": license_info.name,
+                    "url": license_info.url,
+                    "attribution": license_info.attribution,
+                    "usage_notes": license_info.usage_notes,
+                    "requires_attribution": license_info.requires_attribution,
+                    "commercial_use_allowed": license_info.commercial_use_allowed,
+                }
+                if license_info is not None
+                else None
+            ),
+        },
+    }
+
+
 def load_features(path: Path) -> list[AtlasFeature]:
     """Load and validate a versioned local AtlasFeature JSON document."""
     try:
@@ -209,7 +293,9 @@ def load_features(path: Path) -> list[AtlasFeature]:
         features = []
         for index, item in enumerate(items):
             try:
-                features.append(_feature(_object(item, f"feature {index}")))
+                features.append(
+                    feature_from_document(_object(item, f"feature {index}"))
+                )
             except (TypeError, ValueError) as exc:
                 raise ValueError(f"Feature {index}: {exc}") from exc
         return features

@@ -45,6 +45,12 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "favorite-button" in html
         assert "theme-button" in html
         assert "why-dialog" in html
+        assert "center-location" in html
+        assert "follow-location" in html
+        assert "location-accuracy" in html
+        assert "empty-state" in html
+        assert "feature-provenance" in html
+        assert "feature-coordinates" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -53,11 +59,16 @@ def test_server_serves_html_static_assets_and_security_headers(
     with urlopen(f"{local_server}/static/app.js", timeout=2) as response:
         assert response.headers.get_content_type() == "text/javascript"
         javascript = response.read()
+        javascript_text = javascript.decode("utf-8")
         assert b"maplibregl.Map" in javascript
         assert b"https://tile.openstreetmap.org/{z}/{x}/{y}.png" in javascript
         assert b"OpenStreetMap contributors" in javascript
         assert b"cluster: true" in javascript
-        assert b"GeolocateControl" in javascript
+        assert b"navigator.geolocation.watchPosition" in javascript
+        assert b"enableHighAccuracy: true" in javascript
+        assert b"locationMarker" in javascript
+        assert b"followLocation" in javascript
+        assert "Noggrannhet:" in javascript_text
         assert b"FullscreenControl" in javascript
         assert b"ScaleControl" in javascript
         assert b"localStorage" in javascript
@@ -66,6 +77,8 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"magnetatlas.theme" in javascript
         assert b"getClusterExpansionZoom" in javascript
         assert b"showWhy" in javascript
+        assert "Koordinater (WGS84)" in javascript_text
+        assert "Proveniens:" in javascript_text
 
 
 def test_features_api_returns_geojson_without_raw_data(local_server: str) -> None:

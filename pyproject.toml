@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "magnetatlas-sverige"
-version = "0.1.0"
+version = "0.6.0a0"
 description = "Historiskt GIS-verktyg för ansvarsfullt magnetfiske i Sverige"
 readme = "README.md"
 requires-python = ">=3.13,<3.15"
@@ -12,7 +12,7 @@ license = { text = "License not yet selected" }
 authors = [{ name = "MagnetAtlas-Sverige contributors" }]
 keywords = ["gis", "history", "magnet-fishing", "sweden"]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
