@@ -51,6 +51,13 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "empty-state" in html
         assert "feature-provenance" in html
         assert "feature-coordinates" in html
+        assert "nearest-content" in html
+        assert "nearest-list" in html
+        assert "demo-notice" in html
+        assert "dataset-status" in html
+        assert "dataset-count" in html
+        assert "dataset-import" in html
+        assert "dataset-source" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -68,6 +75,11 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"enableHighAccuracy: true" in javascript
         assert b"locationMarker" in javascript
         assert b"followLocation" in javascript
+        assert b"startAtGrantedLocation" in javascript
+        assert b"navigator.permissions.query" in javascript
+        assert b"renderNearestFeatures" in javascript
+        assert b"distanceKilometers" in javascript
+        assert b"renderDatasetSummary" in javascript
         assert "Noggrannhet:" in javascript_text
         assert b"FullscreenControl" in javascript
         assert b"ScaleControl" in javascript
@@ -77,8 +89,8 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"magnetatlas.theme" in javascript
         assert b"getClusterExpansionZoom" in javascript
         assert b"showWhy" in javascript
-        assert "Koordinater (WGS84)" in javascript_text
-        assert "Proveniens:" in javascript_text
+        assert "Visa detaljer" in javascript_text
+        assert "popup-history" not in javascript_text
 
 
 def test_features_api_returns_geojson_without_raw_data(local_server: str) -> None:
@@ -86,6 +98,9 @@ def test_features_api_returns_geojson_without_raw_data(local_server: str) -> Non
         payload = json.load(response)
 
     assert payload["type"] == "FeatureCollection"
+    assert payload["is_demo"] is True
+    assert payload["summary"]["status"] == "Demo"
+    assert payload["summary"]["count"] == 100
     assert len(payload["features"]) == 100
     assert "raw_data" not in json.dumps(payload)
 

@@ -25,6 +25,12 @@ och polygoner, konverterar SWEREF 99 TM (EPSG:3006) till intern WGS84 och
 returnerar enbart `AtlasFeature`. RAÄ-specifika fält hålls i adaptern och i
 feature-egenskaper som behövs för spårbar visning.
 
+Den kompletta kedjan verifierades 2026-08-05 mot RAÄ:s aktuella officiella
+kommunuttag för Vaxholm. Aktuella fullständiga vyer identifierar lämningen med
+`uuid`, medan kvalitetslagret använder `lamning_uuid`; collectorn hanterar båda
+formerna och kopplar lägesosäkerhet till rätt objekt utan att skapa en separat
+kartgeometri. Ett uttag som inte kan normaliseras får inte ersätta aktiv cache.
+
 SQLite-databasen och dess synkmetadata är cache och lokal sanningskälla. En
 basimport ersätter datasetet atomärt; inkrementell synk uppdaterar bara ändrade
 objekt. Misslyckad hämtning eller mappning aktiverar aldrig ett halvfärdigt

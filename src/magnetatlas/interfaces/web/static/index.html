@@ -82,9 +82,20 @@
           <p class="eyebrow">Välkommen</p>
           <h1>Utforska historiska platser</h1>
           <p>Sök efter en plats eller klicka på ett objekt på kartan.</p>
-          <p class="demo-notice">
-            Kartans första objekt är syntetisk demodata och inte verifierade fyndplatser.
+          <dl class="dataset-summary" aria-label="Lokal datastatus">
+            <div><dt>Status</dt><dd id="dataset-status">Laddar…</dd></div>
+            <div><dt>Objekt</dt><dd id="dataset-count">–</dd></div>
+            <div><dt>Senaste import</dt><dd id="dataset-import">–</dd></div>
+            <div><dt>Datakälla</dt><dd id="dataset-source">–</dd></div>
+          </dl>
+          <p id="demo-notice" class="demo-notice" hidden>
+            Kartan visar syntetisk demodata, inte verifierade historiska platser eller fyndplatser.
           </p>
+          <section id="nearest-content" class="nearest-content" hidden>
+            <h2>Närmast dig</h2>
+            <p>Historiska objekt sorterade efter ungefärligt fågelvägsavstånd.</p>
+            <div id="nearest-list" class="nearest-list"></div>
+          </section>
         </div>
         <section id="library-content" hidden>
           <p class="eyebrow">Din atlas</p>

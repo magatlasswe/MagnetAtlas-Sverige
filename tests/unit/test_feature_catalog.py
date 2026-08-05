@@ -31,6 +31,7 @@ def make_feature(
     geometry: GeoPoint | BoundingBox | LineString | Polygon | None = None,
     source: str = "test",
     time_span: TimeSpan | None = None,
+    properties: dict[str, object] | None = None,
 ) -> AtlasFeature:
     return AtlasFeature(
         feature_id=FeatureId(feature_id),
@@ -45,6 +46,7 @@ def make_feature(
         description=description,
         geometry=geometry,
         time_span=time_span,
+        properties=properties or {},
     )
 
 
@@ -76,6 +78,18 @@ def test_search_is_swedish_case_insensitive_and_checks_user_facing_fields() -> N
     assert catalog.search("uppsala kvarn") == [features[1]]
     assert catalog.search("fyrisån") == [features[1]]
     assert catalog.search("  ") == []
+
+
+@pytest.mark.parametrize("query", ["L1947:8930", "raa-uuid", "fångstgrop"])
+def test_search_finds_raa_identity_and_object_type(query: str) -> None:
+    feature = make_feature(
+        "raa:1",
+        title="Lämning",
+        feature_type="Fångstgrop",
+        properties={"raa_id": "raa-uuid", "lamningsnummer": "L1947:8930"},
+    )
+
+    assert FeatureCatalog([feature]).search(query) == [feature]
 
 
 def test_search_preserves_source_order_and_applies_limit() -> None:

@@ -160,6 +160,8 @@ class RAACollector:
             raise DataSourceError(f"RAÄ GeoPackage saknas: {path}")
         grouped: dict[str, dict[str, Any]] = {}
         geometries: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        geometry_blobs: dict[str, set[bytes]] = defaultdict(set)
+        quality: dict[str, dict[str, Any]] = {}
         try:
             connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
             connection.row_factory = sqlite3.Row
@@ -179,14 +181,33 @@ class RAACollector:
                     for row in rows:
                         record = dict(row)
                         blob = record.pop(geometry_column, None)
-                        source_id = record.get("lamning_uuid") or record.get("id")
+                        source_id = (
+                            record.get("uuid")
+                            or record.get("lamning_uuid")
+                            or record.get("id")
+                        )
                         if not isinstance(source_id, str) or not source_id.strip():
+                            continue
+                        if "inmatningskvalitet" in record:
+                            quality[source_id] = {
+                                key: record.get(key)
+                                for key in (
+                                    "inmatningskvalitet",
+                                    "definition_av_kvalitet",
+                                    "lagesosakerhet_i_meter",
+                                )
+                                if record.get(key) is not None
+                            }
                             continue
                         current = grouped.setdefault(source_id, {})
                         for key, value in record.items():
                             if value is not None and current.get(key) is None:
                                 current[key] = value
-                        if isinstance(blob, bytes):
+                        if (
+                            isinstance(blob, bytes)
+                            and blob not in geometry_blobs[source_id]
+                        ):
+                            geometry_blobs[source_id].add(blob)
                             geometries[source_id].append(
                                 parse_geopackage_geometry(blob)
                             )
@@ -196,8 +217,10 @@ class RAACollector:
             raise DataSourceError(f"RAÄ GeoPackage kunde inte läsas: {exc}") from exc
 
         features: list[AtlasFeature] = []
+        mapped_feature_count = 0
         for source_id, raw in grouped.items():
             raw["id"] = source_id
+            raw.update(quality.get(source_id, {}))
             documents = geometries.get(source_id, [])
             if documents:
                 raw["geometri"] = {
@@ -211,10 +234,15 @@ class RAACollector:
                 mapped = map_raa_record(raw)
             except ValueError:
                 continue
+            mapped_feature_count += len(mapped)
             features.extend(
                 feature
                 for feature in mapped
                 if bbox is None or _intersects(feature, bbox)
+            )
+        if not grouped or mapped_feature_count == 0:
+            raise DataSourceError(
+                "RAÄ GeoPackage innehåller inga objekt som kunde normaliseras"
             )
         return features
 

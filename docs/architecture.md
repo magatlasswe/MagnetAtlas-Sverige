@@ -56,6 +56,12 @@ GPS-noggrannhet men skickar eller lagrar aldrig positionen. Kartklustring sker i
 MapLibre, popupinnehåll skapas först vid val och `FeatureCatalog` förindexerar
 söktext för att undvika upprepad normalisering vid interaktiv sökning.
 
+När platsbehörighet redan är beviljad startar klienten GPS-bevakningen utan en ny
+dialog och sorterar lokalt de fem närmaste serialiserade objekten med ett enkelt
+WGS84-fågelvägsavstånd. Positionen lämnar aldrig webbläsaren. Popupen innehåller
+bara snabb identifiering och åtgärder; full proveniens, licens, confidence och
+koordinater visas i sidopanelen.
+
 Webbklienten skiljer mellan tom lokal data, resultatlösa filter, API-fel,
 baskartefel och nekad eller otillgänglig GPS. Meddelandena är svenska och
 användarinriktade. CLI-kompositionsroten översätter på motsvarande sätt förväntade
@@ -111,6 +117,11 @@ Collectorn läser källformatet, använder sin källspecifika mapper och returne
 endast validerade `AtlasFeature`. RAÄ-specifika attribut och geometrier hanteras
 i adaptern och mappern. Saknad information lämnas tom och ingen confidence,
 datering eller beskrivning konstrueras.
+
+GeoPackage-adaptern förenar geometritabeller, fullständiga vyer och
+kvalitetslagret via RAÄ:s `uuid`/`lamning_uuid`. Dubbletter av samma WKB-geometri
+tas bort innan mappning. Kvalitetsuppgifter bevaras som confidence-underlag men
+kvalitetslagrets hjälpgeometri publiceras inte som ett eget historiskt objekt.
 
 När hela uttaget har lästs skriver `SyncService` resultatet atomärt genom
 repository-gränsen och sparar synkmetadata först efter en lyckad import. En

@@ -102,6 +102,7 @@ html[data-theme="dark"] .app-header {
 .search {
   position: relative;
   flex: 1;
+  min-width: 0;
   max-width: 38rem;
 }
 
@@ -122,6 +123,7 @@ html[data-theme="dark"] .search input {
 
 .header-actions {
   display: flex;
+  flex: 0 0 auto;
   gap: 0.3rem;
 }
 
@@ -348,6 +350,7 @@ main,
 }
 
 .location-card button {
+  min-width: 0;
   min-height: 44px;
   padding: 0 0.7rem;
   color: var(--ink);
@@ -432,6 +435,34 @@ main,
   font-size: 0.9rem;
 }
 
+.dataset-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.9rem 0;
+}
+
+.dataset-summary div {
+  min-width: 0;
+  padding: 0.55rem;
+  background: color-mix(in srgb, var(--paper) 88%, var(--line));
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+}
+
+.dataset-summary dt {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.dataset-summary dd {
+  margin: 0.15rem 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
 .close-button {
   position: absolute;
   top: 0.55rem;
@@ -500,6 +531,48 @@ main,
   display: grid;
   gap: 0.4rem;
   margin-bottom: 1rem;
+}
+
+.nearest-content {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+
+.nearest-content h2,
+.nearest-content p {
+  margin: 0 0 0.55rem;
+}
+
+.nearest-content p {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.nearest-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.nearest-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0.55rem 0.7rem;
+  color: var(--ink);
+  text-align: left;
+  background: color-mix(in srgb, var(--paper) 88%, var(--line));
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+.nearest-item span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
 .saved-item {
@@ -588,14 +661,6 @@ html[data-theme="dark"] #map .maplibregl-canvas {
   margin: 0;
 }
 
-.popup-history {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--muted);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
 .popup-meta {
   color: var(--muted);
   font-size: 0.82rem;
@@ -603,7 +668,7 @@ html[data-theme="dark"] #map .maplibregl-canvas {
 
 .popup-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.35rem;
 }
 
@@ -684,24 +749,75 @@ dialog .close-button {
 
   .app-header {
     gap: 0.4rem;
+    padding-right: 0.4rem;
+    padding-left: 0.4rem;
   }
 
   .filter-bar {
-    scrollbar-width: thin;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 0.2rem;
+    overflow: visible;
+    padding-right: 0.25rem;
+    padding-left: 0.25rem;
+  }
+
+  .filter-bar label {
+    min-width: 0;
+  }
+
+  .filter-bar select {
+    width: 100%;
+    min-width: 0;
+    padding-right: 1.25rem;
+    padding-left: 0.35rem;
+    font-size: 0.78rem;
+  }
+
+  .filter-bar .text-button {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 0.7rem;
   }
 
   .location-card {
-    right: 0.65rem;
+    top: 8.15rem;
+    right: auto;
+    left: 0.4rem;
+    width: calc(100% - 0.8rem);
+    max-width: none;
     grid-template-columns: 1fr 1fr;
+    gap: 0.3rem;
+    padding: 0.35rem;
   }
 
   .location-card div {
     grid-column: 1 / -1;
   }
 
+  .location-card button {
+    width: 100%;
+    padding: 0 0.35rem;
+    overflow-wrap: anywhere;
+    font-size: 0.9rem;
+  }
 
   .info-panel {
-    max-height: min(52vh, calc(100vh - 13rem));
+    right: auto;
+    bottom: 0.4rem;
+    left: 0.4rem;
+    width: calc(100% - 0.8rem);
+    max-height: min(46vh, calc(100vh - 12.5rem));
+    padding: 0.9rem;
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .facts div {
+    grid-template-columns: 5.3rem minmax(0, 1fr);
+  }
+
+  .maplibregl-popup-content {
+    max-width: min(17rem, calc(100vw - 3rem));
   }
 }

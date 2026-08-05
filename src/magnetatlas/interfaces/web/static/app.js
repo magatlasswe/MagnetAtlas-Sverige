@@ -18,6 +18,7 @@ const state = {
   locationMarker: null,
   lastPosition: null,
   followLocation: false,
+  centerOnNextLocation: false,
 };
 
 const elements = {};
@@ -114,7 +115,7 @@ function boundsForGeometry(geometry) {
 function focusFeature(feature) {
   if (!state.map || !feature.geometry) return;
   if (feature.geometry.type === "Point") {
-    state.map.flyTo({ center: feature.geometry.coordinates, zoom: 14 });
+    state.map.flyTo({ center: feature.geometry.coordinates, zoom: 15, duration: 550 });
     return;
   }
   const bounds = boundsForGeometry(feature.geometry);
@@ -251,23 +252,16 @@ function showPopup(feature, coordinates) {
   title.className = "popup-title";
   title.textContent = properties.title;
   card.append(title);
-  appendText(card, "popup-meta", `Typ: ${properties.feature_type}`);
-  appendText(card, "popup-history", properties.description || "Beskrivning saknas.");
-  appendText(card, "popup-meta", `Källa: ${properties.source.name}`);
-  appendText(card, "popup-meta", `Licens: ${properties.license?.name || "Okänd"}`);
-  appendText(card, "popup-meta", `Proveniens: ${provenanceText(properties)}`);
-  appendText(card, "popup-meta", `Confidence: ${confidenceText(properties.confidence)}`);
-  appendText(card, "popup-meta", `Koordinater (WGS84): ${coordinatesText(feature)}`);
+  appendText(
+    card,
+    "popup-meta",
+    [properties.feature_type, properties.place].filter(Boolean).join(" · "),
+  );
   const details = properties.source_details || {};
-  appendText(card, "popup-meta", `RAÄ-ID: ${details.raa_id || "Okänt"}`);
-  appendText(card, "popup-meta", `Kategori: ${details.category || "Okänd"}`);
-  appendText(card, "popup-meta", `Senast uppdaterad: ${details.last_updated || "Okänt"}`);
+  if (details.raa_id) appendText(card, "popup-meta", `RAÄ-ID: ${details.raa_id}`);
   const actions = document.createElement("div");
   actions.className = "popup-actions";
-  actions.append(
-    popupAction("Visa mer", () => showFeature(feature)),
-    popupAction("Varför?", () => showWhy(feature)),
-  );
+  actions.append(popupAction("Visa detaljer", () => showFeature(feature)));
   card.append(actions);
   if (properties.navigation) {
     const navigate = document.createElement("a");
@@ -340,7 +334,11 @@ function renderSearchResults(features, message = null) {
       const title = document.createElement("strong");
       title.textContent = feature.properties.title;
       const detail = document.createElement("small");
-      detail.textContent = feature.properties.place || feature.properties.feature_type;
+      detail.textContent = [
+        feature.properties.feature_type,
+        feature.properties.place,
+        feature.properties.source_details?.raa_id,
+      ].filter(Boolean).join(" · ");
       button.append(title, detail);
       button.addEventListener("click", () => selectFeature(feature));
       elements.searchResults.append(button);
@@ -405,6 +403,62 @@ function initializeFacets() {
   addOptions(elements.sourceFilter, new Set(properties.map((item) => item.source.name)));
 }
 
+function renderDatasetSummary(summary) {
+  elements.datasetStatus.textContent = summary.status;
+  elements.datasetCount.textContent = summary.count.toLocaleString("sv-SE");
+  elements.datasetImport.textContent = summary.latest_import
+    ? new Date(summary.latest_import).toLocaleString("sv-SE")
+    : "Ingen import registrerad";
+  elements.datasetSource.textContent = summary.source || "Ingen datakälla";
+}
+
+function distanceKilometers(latitude, longitude, targetLatitude, targetLongitude) {
+  const radians = (degrees) => degrees * Math.PI / 180;
+  const latitudeDelta = radians(targetLatitude - latitude);
+  const longitudeDelta = radians(targetLongitude - longitude);
+  const startLatitude = radians(latitude);
+  const endLatitude = radians(targetLatitude);
+  const value = Math.sin(latitudeDelta / 2) ** 2
+    + Math.cos(startLatitude) * Math.cos(endLatitude)
+    * Math.sin(longitudeDelta / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+}
+
+function renderNearestFeatures(latitude, longitude) {
+  const nearest = state.collection.features
+    .filter((feature) => feature.properties.navigation)
+    .map((feature) => {
+      const target = feature.properties.navigation;
+      return {
+        feature,
+        distance: distanceKilometers(
+          latitude,
+          longitude,
+          target.latitude,
+          target.longitude,
+        ),
+      };
+    })
+    .sort((left, right) => left.distance - right.distance)
+    .slice(0, 5);
+  elements.nearestList.replaceChildren();
+  nearest.forEach(({ feature, distance }) => {
+    const button = document.createElement("button");
+    button.className = "nearest-item";
+    button.type = "button";
+    const title = document.createElement("strong");
+    title.textContent = feature.properties.title;
+    const detail = document.createElement("span");
+    detail.textContent = distance < 1
+      ? `${Math.round(distance * 1000)} m bort`
+      : `${distance.toFixed(1)} km bort`;
+    button.append(title, detail);
+    button.addEventListener("click", () => selectFeature(feature));
+    elements.nearestList.append(button);
+  });
+  elements.nearestContent.hidden = nearest.length === 0;
+}
+
 function locationErrorMessage(error) {
   if (error.code === error.PERMISSION_DENIED) {
     return "Platsåtkomst nekades. Tillåt platsåtkomst i webbläsaren och försök igen.";
@@ -434,7 +488,11 @@ function updateLocation(position) {
   } else {
     state.locationMarker.setLngLat(coordinates);
   }
-  if (state.followLocation) state.map.easeTo({ center: coordinates, zoom: Math.max(state.map.getZoom(), 15) });
+  renderNearestFeatures(latitude, longitude);
+  if (state.followLocation || state.centerOnNextLocation) {
+    state.map.easeTo({ center: coordinates, zoom: Math.max(state.map.getZoom(), 15) });
+    state.centerOnNextLocation = false;
+  }
 }
 
 function handleLocationError(error) {
@@ -463,10 +521,25 @@ function startLocationWatch() {
 }
 
 function centerOnLocation() {
+  state.centerOnNextLocation = true;
   if (!startLocationWatch()) return;
   if (state.lastPosition) {
     const { longitude, latitude } = state.lastPosition.coords;
     state.map.easeTo({ center: [longitude, latitude], zoom: Math.max(state.map.getZoom(), 15) });
+    state.centerOnNextLocation = false;
+  }
+}
+
+async function startAtGrantedLocation() {
+  if (!navigator.permissions || !navigator.geolocation) return;
+  try {
+    const permission = await navigator.permissions.query({ name: "geolocation" });
+    if (permission.state === "granted") {
+      state.centerOnNextLocation = true;
+      startLocationWatch();
+    }
+  } catch {
+    // Older browsers can use the explicit location buttons instead.
   }
 }
 
@@ -550,10 +623,10 @@ function installFeatureLayers() {
     source: "atlas-features",
     filter: ["has", "point_count"],
     paint: {
-      "circle-color": "#174d35",
+      "circle-color": "#6f3028",
       "circle-radius": ["step", ["get", "point_count"], 18, 10, 23, 30, 29],
-      "circle-stroke-color": "#fffdf8",
-      "circle-stroke-width": 2,
+      "circle-stroke-color": "#d4a84f",
+      "circle-stroke-width": 3,
     },
   });
   state.map.addLayer({
@@ -586,15 +659,28 @@ function installFeatureLayers() {
     },
   });
   state.map.addLayer({
+    id: "atlas-point-halos",
+    type: "circle",
+    source: "atlas-features",
+    filter: ["!", ["has", "point_count"]],
+    paint: {
+      "circle-radius": ["case", ["boolean", ["feature-state", "selected"], false], 14, 11],
+      "circle-color": "#f4ead2",
+      "circle-opacity": 0.92,
+      "circle-stroke-color": "#6f3028",
+      "circle-stroke-width": 1.5,
+    },
+  });
+  state.map.addLayer({
     id: "atlas-points",
     type: "circle",
     source: "atlas-features",
     filter: ["!", ["has", "point_count"]],
     paint: {
-      "circle-radius": ["case", ["boolean", ["feature-state", "selected"], false], 10, 7],
-      "circle-color": ["case", ["boolean", ["feature-state", "selected"], false], "#b45309", "#174d35"],
-      "circle-stroke-color": "#fffdf8",
-      "circle-stroke-width": 2,
+      "circle-radius": ["case", ["boolean", ["feature-state", "selected"], false], 8, 6],
+      "circle-color": ["case", ["boolean", ["feature-state", "selected"], false], "#c47a2c", "#6f3028"],
+      "circle-stroke-color": "#f4ead2",
+      "circle-stroke-width": 1.5,
     },
   });
 
@@ -638,6 +724,10 @@ function cacheElements() {
     emptyState: "empty-state", mapStatusText: "map-status-text",
     centerLocation: "center-location", followLocation: "follow-location",
     locationHeading: "location-heading", locationAccuracy: "location-accuracy",
+    demoNotice: "demo-notice", nearestContent: "nearest-content",
+    nearestList: "nearest-list",
+    datasetStatus: "dataset-status", datasetCount: "dataset-count",
+    datasetImport: "dataset-import", datasetSource: "dataset-source",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }
@@ -692,6 +782,7 @@ async function initialize() {
       state.collection.features.map((feature) => [String(feature.id), feature]),
     );
     initializeFacets();
+    renderDatasetSummary(state.collection.summary);
     state.map = new maplibregl.Map({
       container: "map",
       center: [16.5, 62.0],
@@ -727,6 +818,8 @@ async function initialize() {
       const hasFeatures = state.collection.features.length !== 0;
       elements.emptyState.hidden = hasFeatures;
       elements.infoPanel.hidden = !hasFeatures;
+      elements.demoNotice.hidden = !state.collection.is_demo;
+      startAtGrantedLocation();
     });
     state.map.on("error", (event) => {
       elements.mapStatus.hidden = false;

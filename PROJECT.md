@@ -4,11 +4,15 @@ Last updated: **2026-08-05**
 
 Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 2.6.2 – Polish & Public Alpha (completed)**
+Current sprint: **Sprint 2.6.4 – First Real RAÄ Dataset (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
 Public alpha release: **Sprint 2.6.2 – Polish & Public Alpha (completed)**
+
+Real user release: **Sprint 2.6.3 – First Real User Experience (completed)**
+
+First real dataset: **Sprint 2.6.4 – First Real RAÄ Dataset (completed)**
 
 ## Project Status
 
@@ -22,6 +26,11 @@ Collector, with local SQLite persistence and incremental synchronization.
 Sprint 2.6.2 aligns package metadata with v0.6.0-alpha, polishes the responsive
 map interface and provides concise Swedish errors for network, GPS, local data
 and database failures.
+
+Sprint 2.6.4 verifies the complete official RAÄ GeoPackage-to-SQLite chain
+against the current municipality schema. The web interface uses imported RAÄ
+features exclusively whenever the local cache contains real data and reports
+dataset count, source, latest import and Demo/RAÄ status.
 
 ## Current Sprint
 
@@ -89,6 +98,12 @@ Completed deliverables:
 - [x] Förindexerad lokal sökning för större dataset
 - [x] Public-alpha polish for phone, tablet and desktop
 - [x] Swedish user-facing errors for offline, timeout and corrupt cache cases
+- [x] Imported RAÄ data preferred over synthetic demo data
+- [x] Previously granted GPS start and nearest-object list
+- [x] Compact popup with complete details in the information panel
+- [x] Faster RAÄ-ID, place, municipality and object-type discovery
+- [x] Current official RAÄ municipality GeoPackage schema verified end to end
+- [x] Dataset count, source, latest import and Demo/RAÄ status in the web view
 
 ### Data Source Evaluation
 

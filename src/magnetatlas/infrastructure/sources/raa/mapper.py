@@ -194,7 +194,7 @@ def map_raa_record(
     feature_type = _name(raw.get("lamningstyp")) or _string(raw, "lamningstyp")
     if source_id is None or number is None or feature_type is None:
         raise ValueError("RAÄ-posten saknar id, lämningsnummer eller lämningstyp")
-    title = _string(raw, "namn") or number
+    title = _string(raw, "namn", "lamningsnamn") or number
     description = _string(raw, "beskrivning")
     counties = raw.get("lan")
     municipalities = raw.get("kommun")
@@ -232,6 +232,8 @@ def map_raa_record(
         "senast_uppdaterad": publication,
         "source_version": str(version) if version is not None else publication,
         "aktualitetstatus": status,
+        "definition_av_kvalitet": _string(raw, "definition_av_kvalitet"),
+        "lagesosakerhet_i_meter": raw.get("lagesosakerhet_i_meter"),
         "update_types": normalized_updates,
         "deleted": "UTGAR" in normalized_updates,
     }

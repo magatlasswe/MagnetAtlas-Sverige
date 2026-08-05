@@ -32,6 +32,7 @@ data.
 - Klustring, sökning och filter för typ, tidsperiod och källa.
 - Objektkort med källa, licens, osäkerhet och navigation.
 - Valfri GPS-positionering med noggrannhet, centrering och följläge.
+- Lokal lista över närmaste historiska objekt när GPS används.
 - Favoriter, historik samt ljust och mörkt tema.
 - Collector Framework och en gemensam `AtlasFeature`-domänmodell.
 - Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
@@ -63,7 +64,8 @@ magnetatlas serve
 För en första lokal provkörning:
 
 1. Importera ett begränsat länsuttag, exempelvis
-   `magnetatlas import raa --county ostergotland`.
+   `magnetatlas import raa --county ostergotland`, eller ett kommunuttag som
+   `magnetatlas import raa --municipality vaxholm`.
 2. Kontrollera resultatet med `magnetatlas cache status`.
 3. Starta kartan med `magnetatlas serve`.
 4. Sök eller filtrera platser, öppna ett objekt och läs källinformationen.
@@ -71,6 +73,8 @@ För en första lokal provkörning:
 
 Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
 demodata, så att gränssnittet går att prova utan en nätverksimport.
+När minst ett riktigt RAÄ-objekt finns används enbart den lokala RAÄ-cachen;
+kartan visar då antal objekt, senaste import, datakälla och status **RAÄ**.
 
 `magnetatlas serve` startar applikationen på `http://localhost:8000/` och öppnar
 standardwebbläsaren. Stoppa servern med Ctrl+C. Baskartan kräver
@@ -79,7 +83,8 @@ data- eller cachefel visas ett kort svenskt felmeddelande utan teknisk traceback
 
 GPS aktiveras först när användaren väljer **Centrera på mig** eller slår på
 **Följ mig** och godkänner webbläsarens platsdialog. Positionen och den visade
-noggrannheten stannar i webbläsaren och lagras inte av MagnetAtlas.
+noggrannheten stannar i webbläsaren och lagras inte av MagnetAtlas. Om
+platsåtkomst redan är godkänd startar kartan vid användarens position.
 
 RAÄ-importen hämtar ett officiellt GeoPackage. Därefter används det dokumenterade
 REST-API:t enbart för förändringar. `magnetatlas serve` läser aldrig direkt från

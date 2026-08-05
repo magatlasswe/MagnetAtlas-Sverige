@@ -11,6 +11,15 @@ from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString
 
 DEFAULT_SEARCH_LIMIT: Final = 20
 WORD_PATTERN: Final = re.compile(r"[\wåäöÅÄÖ]+", re.UNICODE)
+SEARCHABLE_PROPERTY_KEYS: Final = (
+    "raa_id",
+    "lamningsnummer",
+    "category",
+    "kommun",
+    "municipality",
+    "ort",
+    "locality",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,6 +106,9 @@ class FeatureCatalog:
     @staticmethod
     def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
         """Build reusable normalized text for repeated interactive searches."""
+        property_values = (
+            feature.properties.get(key) for key in SEARCHABLE_PROPERTY_KEYS
+        )
         haystack = " ".join(
             value
             for value in (
@@ -104,8 +116,10 @@ class FeatureCatalog:
                 feature.place,
                 feature.feature_type,
                 feature.description,
+                feature.provenance.source_id,
+                *property_values,
             )
-            if value
+            if isinstance(value, str) and value
         ).casefold()
         return haystack, tuple(WORD_PATTERN.findall(haystack))
 

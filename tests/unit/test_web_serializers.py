@@ -68,6 +68,13 @@ def test_serializer_supports_geometries_and_omits_raw_data(
         "https://www.openstreetmap.org/directions?"
     )
     assert serialized["properties"]["period"] == "unknown"
+    assert payload["is_demo"] is False
+    assert payload["summary"] == {
+        "count": 1,
+        "latest_import": "2026-01-01T00:00:00+00:00",
+        "source": "demo",
+        "status": "RAÄ",
+    }
     assert serialized["properties"]["provenance"] == {
         "source": "demo",
         "source_id": "1",

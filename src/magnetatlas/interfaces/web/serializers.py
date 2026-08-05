@@ -172,10 +172,22 @@ def serialize_feature_collection(
     features: Iterable[AtlasFeature] | None = None,
 ) -> dict[str, Any]:
     """Serialize all local features as a GeoJSON FeatureCollection."""
+    selected = tuple(catalog.list_all() if features is None else features)
+    is_demo = bool(selected) and all(
+        feature.properties.get("demo") is True for feature in selected
+    )
+    sources = sorted({feature.provenance.source for feature in selected})
+    latest_import = max(
+        (feature.provenance.fetched_at for feature in selected), default=None
+    )
     return {
         "type": "FeatureCollection",
-        "features": [
-            serialize_feature(feature, catalog)
-            for feature in (catalog.list_all() if features is None else features)
-        ],
+        "is_demo": is_demo,
+        "summary": {
+            "count": len(selected),
+            "latest_import": latest_import.isoformat() if latest_import else None,
+            "source": ", ".join(sources) if sources else None,
+            "status": "Demo" if is_demo else "RAÄ" if selected else "Tom",
+        },
+        "features": [serialize_feature(feature, catalog) for feature in selected],
     }
