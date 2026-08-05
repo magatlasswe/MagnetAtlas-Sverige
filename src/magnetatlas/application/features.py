@@ -39,6 +39,38 @@ class NavigationTarget:
     approximate: bool
 
 
+def navigation_target(feature: AtlasFeature) -> NavigationTarget | None:
+    """Return a deterministic navigation point for one feature."""
+    geometry = feature.geometry
+    if geometry is None:
+        return None
+    if isinstance(geometry, GeoPoint):
+        return NavigationTarget(geometry, approximate=False)
+    if isinstance(geometry, BoundingBox):
+        return NavigationTarget(
+            GeoPoint(
+                longitude=(geometry.west + geometry.east) / 2,
+                latitude=(geometry.south + geometry.north) / 2,
+            ),
+            approximate=True,
+        )
+    if isinstance(geometry, LineString):
+        return NavigationTarget(
+            geometry.points[len(geometry.points) // 2], approximate=True
+        )
+
+    exterior_ring = geometry.rings[0]
+    longitudes = [point.longitude for point in exterior_ring]
+    latitudes = [point.latitude for point in exterior_ring]
+    return NavigationTarget(
+        GeoPoint(
+            longitude=(min(longitudes) + max(longitudes)) / 2,
+            latitude=(min(latitudes) + max(latitudes)) / 2,
+        ),
+        approximate=True,
+    )
+
+
 def feature_period(feature: AtlasFeature) -> str:
     """Group a feature into a coarse, explainable time facet."""
     time_span = feature.time_span
@@ -88,6 +120,44 @@ def _fuzzy_term_matches(term: str, haystack: str, words: tuple[str, ...]) -> boo
     )
 
 
+def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
+    property_values = (feature.properties.get(key) for key in SEARCHABLE_PROPERTY_KEYS)
+    haystack = " ".join(
+        value
+        for value in (
+            feature.title,
+            feature.place,
+            feature.feature_type,
+            feature.description,
+            feature.provenance.source_id,
+            *property_values,
+        )
+        if isinstance(value, str) and value
+    ).casefold()
+    return haystack, tuple(WORD_PATTERN.findall(haystack))
+
+
+def feature_matches_search(
+    feature: AtlasFeature,
+    query: str,
+    filters: FeatureSearchFilters,
+    *,
+    searchable: tuple[str, tuple[str, ...]] | None = None,
+) -> bool:
+    """Apply the existing deterministic search behavior to one feature."""
+    terms = query.strip().casefold().split()
+    feature_types = {value.casefold() for value in filters.feature_types}
+    sources = {value.casefold() for value in filters.sources}
+    if feature_types and feature.feature_type.casefold() not in feature_types:
+        return False
+    if sources and feature.provenance.source.casefold() not in sources:
+        return False
+    if filters.periods and feature_period(feature) not in filters.periods:
+        return False
+    haystack, words = searchable or _searchable_text(feature)
+    return all(_fuzzy_term_matches(term, haystack, words) for term in terms)
+
+
 class FeatureCatalog:
     """Provide deterministic local lookup and search over atlas features."""
 
@@ -106,22 +176,7 @@ class FeatureCatalog:
     @staticmethod
     def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
         """Build reusable normalized text for repeated interactive searches."""
-        property_values = (
-            feature.properties.get(key) for key in SEARCHABLE_PROPERTY_KEYS
-        )
-        haystack = " ".join(
-            value
-            for value in (
-                feature.title,
-                feature.place,
-                feature.feature_type,
-                feature.description,
-                feature.provenance.source_id,
-                *property_values,
-            )
-            if isinstance(value, str) and value
-        ).casefold()
-        return haystack, tuple(WORD_PATTERN.findall(haystack))
+        return _searchable_text(feature)
 
     def list_all(self) -> tuple[AtlasFeature, ...]:
         """Return all features in source order."""
@@ -145,13 +200,10 @@ class FeatureCatalog:
         limit: int = DEFAULT_SEARCH_LIMIT,
     ) -> list[AtlasFeature]:
         """Search with typo tolerance and explicit facets, preserving source order."""
-        terms = query.strip().casefold().split()
         if limit < 1:
             raise ValueError("Sökgränsen måste vara minst 1")
         active_filters = filters or FeatureSearchFilters()
-        feature_types = {value.casefold() for value in active_filters.feature_types}
-        sources = {value.casefold() for value in active_filters.sources}
-        if not terms and not any(
+        if not query.strip() and not any(
             (
                 active_filters.feature_types,
                 active_filters.periods,
@@ -164,16 +216,12 @@ class FeatureCatalog:
         for feature, (haystack, words) in zip(
             self._features, self._search_index, strict=True
         ):
-            if feature_types and feature.feature_type.casefold() not in feature_types:
-                continue
-            if sources and feature.provenance.source.casefold() not in sources:
-                continue
-            if (
-                active_filters.periods
-                and feature_period(feature) not in active_filters.periods
+            if feature_matches_search(
+                feature,
+                query,
+                active_filters,
+                searchable=(haystack, words),
             ):
-                continue
-            if all(_fuzzy_term_matches(term, haystack, words) for term in terms):
                 matches.append(feature)
                 if len(matches) == limit:
                     break
@@ -181,31 +229,4 @@ class FeatureCatalog:
 
     def navigation_target(self, feature_id: FeatureId | str) -> NavigationTarget | None:
         """Return a deterministic destination without performing GIS analysis."""
-        geometry = self.get(feature_id).geometry
-        if geometry is None:
-            return None
-        if isinstance(geometry, GeoPoint):
-            return NavigationTarget(geometry, approximate=False)
-        if isinstance(geometry, BoundingBox):
-            return NavigationTarget(
-                GeoPoint(
-                    longitude=(geometry.west + geometry.east) / 2,
-                    latitude=(geometry.south + geometry.north) / 2,
-                ),
-                approximate=True,
-            )
-        if isinstance(geometry, LineString):
-            return NavigationTarget(
-                geometry.points[len(geometry.points) // 2], approximate=True
-            )
-
-        exterior_ring = geometry.rings[0]
-        longitudes = [point.longitude for point in exterior_ring]
-        latitudes = [point.latitude for point in exterior_ring]
-        return NavigationTarget(
-            GeoPoint(
-                longitude=(min(longitudes) + max(longitudes)) / 2,
-                latitude=(min(latitudes) + max(latitudes)) / 2,
-            ),
-            approximate=True,
-        )
+        return navigation_target(self.get(feature_id))

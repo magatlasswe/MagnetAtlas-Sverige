@@ -36,6 +36,12 @@ basimport ersätter datasetet atomärt; inkrementell synk uppdaterar bara ändra
 objekt. Misslyckad hämtning eller mappning aktiverar aldrig ett halvfärdigt
 dataset, så senast lyckade databas fortsätter användas.
 
+Basimporten läser GeoPackage-vyerna i begränsade batchar. Normaliserade
+`AtlasFeature` skrivs fortlöpande till ett isolerat stagingdataset i SQLite och
+hålls inte samlade i arbetsminnet. När hela källfilen har validerats aktiveras
+stagingdatasetet i en kort transaktion. Vid avbrott tas endast stagingraderna
+bort och den tidigare cachen förblir tillgänglig.
+
 Datauttaget anges av RAÄ som public domain/CC0. MagnetAtlas bevarar källa,
 käll-ID, hämtningsdatum och originalhänvisning när den finns. Saknade värden
 uppfinns inte. REST-uttaget släpar normalt till nästa nattliga publicering och

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date
 from enum import StrEnum
@@ -102,13 +103,13 @@ class AtlasFeatureCollector(Protocol):
     @property
     def base_schema_version(self) -> str: ...
 
-    def fetch_base(
+    def fetch_base_batches(
         self,
         destination: Path,
         *,
         county: str | None = None,
         municipality: str | None = None,
         bbox: BoundingBox | None = None,
-    ) -> list[AtlasFeature]: ...
+    ) -> Iterator[tuple[AtlasFeature, ...]]: ...
 
     def collect_changes(self, start: date, end: date) -> list[AtlasFeature]: ...

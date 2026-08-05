@@ -6,6 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from time import perf_counter
 
 from magnetatlas.domain.collectors import AtlasFeatureCollector
 from magnetatlas.domain.features import AtlasFeature
@@ -25,6 +26,7 @@ class SyncResult:
     imported: int
     deleted: int
     marker: str | None
+    duration_seconds: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,12 +116,14 @@ class SyncService:
         county: str | None = None,
         municipality: str | None = None,
         bbox: BoundingBox | None = None,
+        progress: Callable[[int], None] | None = None,
     ) -> SyncResult:
         """Build and atomically activate an official base dataset."""
+        started = perf_counter()
         now = self._clock()
         self._work_dir.mkdir(parents=True, exist_ok=True)
         destination = self._work_dir / f"{self._dataset_id}.gpkg"
-        features = self._collector.fetch_base(
+        batches = self._collector.fetch_base_batches(
             destination,
             county=county,
             municipality=municipality,
@@ -133,11 +137,29 @@ class SyncService:
             sync_marker=marker,
             cache_valid_until=now + self._cache_ttl,
         )
-        self._repository.replace_dataset(
-            metadata,
-            [StoredFeature(feature, _source_version(feature)) for feature in features],
-        )
-        return SyncResult("base", len(features), 0, marker)
+        import_session = self._repository.begin_dataset_replace(metadata)
+        imported = 0
+        try:
+            for batch in batches:
+                stored = tuple(
+                    StoredFeature(feature, _source_version(feature))
+                    for feature in batch
+                )
+                import_session.write_batch(stored)
+                imported += len(stored)
+                if progress is not None:
+                    progress(imported)
+            if imported == 0:
+                raise ValueError("Importen innehöll inga giltiga objekt")
+            import_session.commit()
+        except BaseException:
+            import_session.rollback()
+            raise
+        finally:
+            close = getattr(batches, "close", None)
+            if callable(close):
+                close()
+        return SyncResult("base", imported, 0, marker, perf_counter() - started)
 
     def incremental_sync(self) -> SyncResult:
         """Apply all changes after the last completed marker atomically."""

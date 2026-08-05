@@ -7,12 +7,21 @@ import logging
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
-from magnetatlas.application.features import FeatureCatalog, FeatureSearchFilters
-from magnetatlas.interfaces.web.serializers import serialize_feature_collection
+from magnetatlas.application.feature_queries import FeatureQuerySource
+from magnetatlas.application.features import FeatureSearchFilters
+from magnetatlas.domain.geography import BoundingBox
+from magnetatlas.interfaces.web.serializers import (
+    serialize_dataset_summary,
+    serialize_feature,
+    serialize_search_results,
+    serialize_viewport,
+)
 
 LOGGER = logging.getLogger(__name__)
+MAX_VIEWPORT_FEATURES = 5_000
+DEFAULT_VIEWPORT_FEATURES = 2_000
 
 STATIC_FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
@@ -44,8 +53,30 @@ def _static_content(filename: str) -> bytes:
     )
 
 
-def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
-    """Build a request handler bound to one immutable feature catalog."""
+def _bounds(parameters: dict[str, list[str]]) -> BoundingBox:
+    values = parameters.get("bbox", [""])[0].split(",")
+    if len(values) != 4:
+        raise ValueError("bbox ska anges som west,south,east,north")
+    try:
+        west, south, east, north = (float(value) for value in values)
+    except ValueError as exc:
+        raise ValueError("bbox måste innehålla numeriska koordinater") from exc
+    return BoundingBox(west=west, south=south, east=east, north=north)
+
+
+def _limit(parameters: dict[str, list[str]]) -> int:
+    raw = parameters.get("limit", [str(DEFAULT_VIEWPORT_FEATURES)])[0]
+    try:
+        limit = int(raw)
+    except ValueError as exc:
+        raise ValueError("limit måste vara ett heltal") from exc
+    if not 1 <= limit <= MAX_VIEWPORT_FEATURES:
+        raise ValueError(f"limit måste vara mellan 1 och {MAX_VIEWPORT_FEATURES}")
+    return limit
+
+
+def make_handler(source: FeatureQuerySource) -> type[BaseHTTPRequestHandler]:
+    """Build a request handler bound to one bounded feature query source."""
 
     class MagnetAtlasRequestHandler(BaseHTTPRequestHandler):
         server_version = "MagnetAtlas/0.6"
@@ -65,6 +96,18 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
             if self.command != "HEAD":
                 self.wfile.write(body)
 
+        def _json(
+            self,
+            status: HTTPStatus,
+            payload: object,
+            *,
+            content_type: str = "application/json; charset=utf-8",
+        ) -> None:
+            body = json.dumps(
+                payload, ensure_ascii=False, separators=(",", ":")
+            ).encode("utf-8")
+            self._send(status, content_type, body)
+
         def _route(self) -> None:
             parsed_url = urlsplit(self.path)
             path = parsed_url.path
@@ -72,30 +115,57 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
                 filename, content_type = STATIC_FILES[path]
                 self._send(HTTPStatus.OK, content_type, _static_content(filename))
                 return
+            parameters = parse_qs(parsed_url.query)
+            if path == "/api/dataset":
+                self._json(HTTPStatus.OK, serialize_dataset_summary(source.summary()))
+                return
             if path == "/api/features":
-                body = json.dumps(
-                    serialize_feature_collection(catalog),
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ).encode("utf-8")
-                self._send(HTTPStatus.OK, "application/geo+json; charset=utf-8", body)
+                try:
+                    result = source.in_bounds(
+                        _bounds(parameters), limit=_limit(parameters)
+                    )
+                except ValueError as exc:
+                    self._json(
+                        HTTPStatus.BAD_REQUEST,
+                        {"error": "invalid_request", "message": str(exc)},
+                    )
+                    return
+                self._json(
+                    HTTPStatus.OK,
+                    serialize_viewport(result),
+                    content_type="application/geo+json; charset=utf-8",
+                )
+                return
+            if path.startswith("/api/features/"):
+                feature_id = unquote(path.removeprefix("/api/features/"))
+                try:
+                    feature = source.get(feature_id)
+                except (KeyError, ValueError):
+                    self._json(
+                        HTTPStatus.NOT_FOUND,
+                        {"error": "not_found", "message": "Objektet hittades inte."},
+                    )
+                    return
+                self._json(
+                    HTTPStatus.OK,
+                    serialize_feature(feature),
+                    content_type="application/geo+json; charset=utf-8",
+                )
                 return
             if path == "/api/search":
-                parameters = parse_qs(parsed_url.query)
                 filters = FeatureSearchFilters(
                     feature_types=frozenset(parameters.get("type", [])),
                     periods=frozenset(parameters.get("period", [])),
                     sources=frozenset(parameters.get("source", [])),
                 )
-                matches = catalog.search(
+                matches = source.search(
                     parameters.get("q", [""])[0], filters=filters, limit=100
                 )
-                body = json.dumps(
-                    serialize_feature_collection(catalog, matches),
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ).encode("utf-8")
-                self._send(HTTPStatus.OK, "application/geo+json; charset=utf-8", body)
+                self._json(
+                    HTTPStatus.OK,
+                    serialize_search_results(matches),
+                    content_type="application/geo+json; charset=utf-8",
+                )
                 return
             if path == "/health":
                 self._send(
@@ -133,10 +203,10 @@ def make_handler(catalog: FeatureCatalog) -> type[BaseHTTPRequestHandler]:
 
 
 def create_server(
-    catalog: FeatureCatalog,
+    source: FeatureQuerySource,
     *,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
     """Create a local threaded HTTP server without starting its event loop."""
-    return ThreadingHTTPServer((host, port), make_handler(catalog))
+    return ThreadingHTTPServer((host, port), make_handler(source))

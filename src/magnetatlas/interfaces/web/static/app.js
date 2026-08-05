@@ -14,6 +14,9 @@ const state = {
   popup: null,
   searchTimer: null,
   searchController: null,
+  viewportTimer: null,
+  viewportController: null,
+  searchActive: false,
   locationWatchId: null,
   locationMarker: null,
   lastPosition: null,
@@ -261,7 +264,7 @@ function showPopup(feature, coordinates) {
   if (details.raa_id) appendText(card, "popup-meta", `RAÄ-ID: ${details.raa_id}`);
   const actions = document.createElement("div");
   actions.className = "popup-actions";
-  actions.append(popupAction("Visa detaljer", () => showFeature(feature)));
+  actions.append(popupAction("Visa detaljer", () => loadFeatureDetails(feature.id)));
   card.append(actions);
   if (properties.navigation) {
     const navigate = document.createElement("a");
@@ -278,9 +281,33 @@ function showPopup(feature, coordinates) {
     .addTo(state.map);
 }
 
-function selectFeature(feature, { focus = true, popup = false, coordinates = null } = {}) {
-  showFeature(feature, { focus });
+async function loadFeatureDetails(featureId, { focus = false } = {}) {
+  const known = findFeature(featureId);
+  if (known?.properties?.provenance) {
+    showFeature(known, { focus });
+    return known;
+  }
+  try {
+    const response = await fetch(`/api/features/${encodeURIComponent(featureId)}`, {
+      headers: { Accept: "application/geo+json" },
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const feature = await response.json();
+    state.featureIndex.set(String(feature.id), feature);
+    showFeature(feature, { focus });
+    return feature;
+  } catch (error) {
+    elements.mapStatus.hidden = false;
+    elements.mapStatus.classList.add("is-error");
+    elements.mapStatusText.textContent = "Objektets detaljer kunde inte laddas.";
+    console.error(error);
+    return null;
+  }
+}
+
+async function selectFeature(feature, { focus = true, popup = false, coordinates = null } = {}) {
   if (popup && coordinates) showPopup(feature, coordinates);
+  await loadFeatureDetails(feature.id, { focus });
   closeSearch();
 }
 
@@ -353,13 +380,73 @@ function updateVisibleFeatures(collection) {
   if (source) source.setData(collection);
 }
 
+function replaceViewport(collection) {
+  state.collection = collection;
+  state.featureIndex = new Map(
+    collection.features.map((feature) => [String(feature.id), feature]),
+  );
+  initializeFacets();
+  updateVisibleFeatures(collection);
+  if (state.lastPosition) {
+    const { latitude, longitude } = state.lastPosition.coords;
+    renderNearestFeatures(latitude, longitude);
+  }
+}
+
+function viewportParameters() {
+  const bounds = state.map.getBounds();
+  let west = Math.max(-180, bounds.getWest());
+  let east = Math.min(180, bounds.getEast());
+  if (west > east) [west, east] = [-180, 180];
+  return new URLSearchParams({
+    bbox: [west, bounds.getSouth(), east, bounds.getNorth()].join(","),
+    limit: "5000",
+  });
+}
+
+async function loadViewport() {
+  if (!state.map || state.searchActive) return;
+  if (state.viewportController) state.viewportController.abort();
+  state.viewportController = new AbortController();
+  elements.mapStatus.hidden = false;
+  elements.mapStatus.classList.remove("is-error");
+  elements.mapStatusText.textContent = "Laddar synligt kartutsnitt…";
+  try {
+    const response = await fetch(`/api/features?${viewportParameters()}`, {
+      signal: state.viewportController.signal,
+      headers: { Accept: "application/geo+json" },
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const collection = await response.json();
+    replaceViewport(collection);
+    if (collection.summary.truncated) {
+      elements.mapStatusText.textContent = "Många objekt finns här. Zooma in för att se alla.";
+    } else {
+      elements.mapStatus.hidden = true;
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      elements.mapStatus.classList.add("is-error");
+      elements.mapStatusText.textContent = "Kartutsnittet kunde inte laddas. Försök igen.";
+      console.error(error);
+    }
+  }
+}
+
+function scheduleViewportLoad() {
+  window.clearTimeout(state.viewportTimer);
+  state.viewportTimer = window.setTimeout(loadViewport, 180);
+}
+
 async function runSearch() {
   const parameters = searchParameters();
   if (!parameters.toString()) {
-    updateVisibleFeatures(state.collection);
+    state.searchActive = false;
+    loadViewport();
     closeSearch();
     return;
   }
+  state.searchActive = true;
   if (state.searchController) state.searchController.abort();
   state.searchController = new AbortController();
   try {
@@ -389,7 +476,9 @@ function scheduleSearch() {
 }
 
 function addOptions(select, values) {
+  const existing = new Set([...select.options].map((option) => option.value));
   [...values].sort((left, right) => left.localeCompare(right, "sv-SE")).forEach((value) => {
+    if (existing.has(value)) return;
     const option = document.createElement("option");
     option.value = value;
     option.textContent = value;
@@ -746,7 +835,8 @@ function installInterfaceEvents() {
     elements.typeFilter.value = "";
     elements.periodFilter.value = "";
     elements.sourceFilter.value = "";
-    updateVisibleFeatures(state.collection);
+    state.searchActive = false;
+    loadViewport();
     closeSearch();
   });
   elements.closePanel.addEventListener("click", closePanel);
@@ -773,16 +863,12 @@ async function initialize() {
   installInterfaceEvents();
   applyTheme(initialTheme());
   try {
-    const response = await fetch("/api/features", {
-      headers: { Accept: "application/geo+json" },
+    const response = await fetch("/api/dataset", {
+      headers: { Accept: "application/json" },
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    state.collection = await response.json();
-    state.featureIndex = new Map(
-      state.collection.features.map((feature) => [String(feature.id), feature]),
-    );
-    initializeFacets();
-    renderDatasetSummary(state.collection.summary);
+    const dataset = await response.json();
+    renderDatasetSummary(dataset);
     state.map = new maplibregl.Map({
       container: "map",
       center: [16.5, 62.0],
@@ -814,13 +900,14 @@ async function initialize() {
     );
     state.map.on("load", () => {
       installFeatureLayers();
-      elements.mapStatus.hidden = true;
-      const hasFeatures = state.collection.features.length !== 0;
+      const hasFeatures = dataset.count !== 0;
       elements.emptyState.hidden = hasFeatures;
       elements.infoPanel.hidden = !hasFeatures;
-      elements.demoNotice.hidden = !state.collection.is_demo;
+      elements.demoNotice.hidden = !dataset.is_demo;
+      loadViewport();
       startAtGrantedLocation();
     });
+    state.map.on("moveend", scheduleViewportLoad);
     state.map.on("error", (event) => {
       elements.mapStatus.hidden = false;
       elements.mapStatus.classList.add("is-error");

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from datetime import UTC, datetime
+from uuid import uuid4
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from magnetatlas.domain.features import AtlasFeature, FeatureId
@@ -155,15 +156,19 @@ class SqlAlchemyAtlasFeatureRepository:
         metadata: DatasetMetadata,
         features: Sequence[StoredFeature],
     ) -> None:
-        with self._session_factory() as session, session.begin():
-            session.execute(
-                delete(AtlasFeatureRow).where(
-                    AtlasFeatureRow.dataset_id == metadata.dataset_id
-                )
-            )
-            for stored in features:
-                self._upsert(session, metadata.dataset_id, stored)
-            self._set_metadata(session, metadata)
+        import_session = self.begin_dataset_replace(metadata)
+        try:
+            import_session.write_batch(features)
+            import_session.commit()
+        except BaseException:
+            import_session.rollback()
+            raise
+
+    def begin_dataset_replace(
+        self, metadata: DatasetMetadata
+    ) -> SqlAlchemyDatasetImportSession:
+        """Create an isolated staging dataset for an incremental base import."""
+        return SqlAlchemyDatasetImportSession(self._session_factory, metadata)
 
     def apply_changes(
         self,
@@ -244,3 +249,72 @@ class SqlAlchemyAtlasFeatureRepository:
                 )
             )
             return result.rowcount or 0
+
+
+class SqlAlchemyDatasetImportSession:
+    """Write batches to staging and expose them through one atomic activation."""
+
+    def __init__(
+        self,
+        session_factory: sessionmaker[Session],
+        metadata: DatasetMetadata,
+    ) -> None:
+        self._session_factory = session_factory
+        self._metadata = metadata
+        self._staging_id = f"{metadata.dataset_id}::staging::{uuid4().hex}"
+        self._finished = False
+        prefix = f"{metadata.dataset_id}::staging::%"
+        with self._session_factory() as session, session.begin():
+            session.execute(
+                delete(AtlasFeatureRow).where(AtlasFeatureRow.dataset_id.like(prefix))
+            )
+
+    def _ensure_open(self) -> None:
+        if self._finished:
+            raise RuntimeError("Importsessionen är redan avslutad")
+
+    def write_batch(self, features: Sequence[StoredFeature]) -> None:
+        """Persist one bounded batch without touching the active dataset."""
+        self._ensure_open()
+        if not features:
+            return
+        rows = [
+            {
+                "dataset_id": self._staging_id,
+                "feature_id": str(stored.feature.feature_id),
+                "source_version": stored.version,
+                "document": feature_to_document(stored.feature),
+            }
+            for stored in features
+        ]
+        with self._session_factory() as session, session.begin():
+            session.execute(insert(AtlasFeatureRow), rows)
+
+    def commit(self) -> None:
+        """Atomically replace the active dataset with completed staging rows."""
+        self._ensure_open()
+        with self._session_factory() as session, session.begin():
+            session.execute(
+                delete(AtlasFeatureRow).where(
+                    AtlasFeatureRow.dataset_id == self._metadata.dataset_id
+                )
+            )
+            session.execute(
+                update(AtlasFeatureRow)
+                .where(AtlasFeatureRow.dataset_id == self._staging_id)
+                .values(dataset_id=self._metadata.dataset_id)
+            )
+            SqlAlchemyAtlasFeatureRepository._set_metadata(session, self._metadata)
+        self._finished = True
+
+    def rollback(self) -> None:
+        """Discard staging rows while preserving the active dataset."""
+        if self._finished:
+            return
+        with self._session_factory() as session, session.begin():
+            session.execute(
+                delete(AtlasFeatureRow).where(
+                    AtlasFeatureRow.dataset_id == self._staging_id
+                )
+            )
+        self._finished = True

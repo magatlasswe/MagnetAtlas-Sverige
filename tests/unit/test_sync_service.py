@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
@@ -37,12 +38,22 @@ class FakeCollector:
         self.base_calls = 0
         self.change_calls: list[tuple[date, date]] = []
         self.fail_base = False
+        self.fail_after_first = False
 
-    def fetch_base(self, destination: Path, **kwargs: object) -> list[AtlasFeature]:
+    def fetch_base_batches(
+        self, destination: Path, **kwargs: object
+    ) -> Iterator[tuple[AtlasFeature, ...]]:
         self.base_calls += 1
         if self.fail_base:
             raise RuntimeError("avbruten")
-        return self.base_features
+
+        def batches() -> Iterator[tuple[AtlasFeature, ...]]:
+            for item in self.base_features:
+                yield (item,)
+                if self.fail_after_first:
+                    raise RuntimeError("avbruten efter batch")
+
+        return batches()
 
     def collect_changes(self, start: date, end: date) -> list[AtlasFeature]:
         self.change_calls.append((start, end))
@@ -129,6 +140,23 @@ def test_failed_base_import_preserves_last_successful_dataset(tmp_path: Path) ->
     with pytest.raises(RuntimeError, match="avbruten"):
         sync.base_import(county="ostergotland")
 
+    assert [item.provenance.source_id for item in repo.list_features()] == ["base"]
+
+
+def test_failed_stream_discards_staging_and_reports_completed_batches(
+    tmp_path: Path,
+) -> None:
+    collector = FakeCollector()
+    sync, repo = service(tmp_path, collector)
+    sync.refresh()
+    collector.base_features = [feature("new-1"), feature("new-2")]
+    collector.fail_after_first = True
+    progress: list[int] = []
+
+    with pytest.raises(RuntimeError, match="efter batch"):
+        sync.base_import(county="ostergotland", progress=progress.append)
+
+    assert progress == [1]
     assert [item.provenance.source_id for item in repo.list_features()] == ["base"]
 
 

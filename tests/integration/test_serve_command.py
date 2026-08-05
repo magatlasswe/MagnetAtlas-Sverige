@@ -1,14 +1,13 @@
 """CLI integration tests for the local web experience."""
 
-from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
 import pytest
 from typer.testing import CliRunner
 
+from magnetatlas.application.feature_queries import DatasetSummary
 from magnetatlas.cli import app
-from magnetatlas.infrastructure.features import load_demo_features
 
 
 class FakeServer:
@@ -69,26 +68,20 @@ def test_serve_prefers_imported_features_over_demo_data(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     server = FakeServer()
-    imported = replace(
-        load_demo_features()[0],
-        properties={"raa_id": "L1947:8930"},
-    )
 
-    class FakeRepository:
+    class FakeQuerySource:
         def __init__(self, *args: object, **kwargs: object) -> None:
             pass
 
-        def list_features(self) -> list[object]:
-            return [imported]
+        def summary(self) -> DatasetSummary:
+            return DatasetSummary(1, None, "RAÄ", "RAÄ")
 
-    def fake_create_server(catalog: object, **kwargs: object) -> FakeServer:
-        assert catalog.list_all() == (imported,)  # type: ignore[attr-defined]
+    def fake_create_server(source: object, **kwargs: object) -> FakeServer:
+        assert source.summary().count == 1  # type: ignore[attr-defined]
         return server
 
     monkeypatch.setenv("MAGNETATLAS_DATABASE_URL", f"sqlite:///{tmp_path / 'atlas.db'}")
-    monkeypatch.setattr(
-        "magnetatlas.cli.SqlAlchemyAtlasFeatureRepository", FakeRepository
-    )
+    monkeypatch.setattr("magnetatlas.cli.SqlAlchemyFeatureQuerySource", FakeQuerySource)
     monkeypatch.setattr("magnetatlas.cli.create_server", fake_create_server)
     monkeypatch.setattr(
         "magnetatlas.cli.load_demo_features",

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 import struct
-from collections import defaultdict
+from collections.abc import Iterator
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -19,6 +19,111 @@ from magnetatlas.infrastructure.sources.raa.client import (
     RAAClient,
 )
 from magnetatlas.infrastructure.sources.raa.mapper import map_raa_record
+
+DEFAULT_IMPORT_BATCH_SIZE = 500
+SOURCE_FIELDS = (
+    "lamningsnummer",
+    "raa_nummer",
+    "lamningstyp",
+    "lamningsnamn",
+    "namn",
+    "beskrivning",
+    "publiceringsdatum",
+    "uttagsdatum",
+    "antikvariskbedomning",
+    "aktualitetstatus",
+    "lan",
+    "kommun",
+    "socken",
+    "url",
+)
+QUALITY_FIELDS = (
+    "inmatningskvalitet",
+    "definition_av_kvalitet",
+    "lagesosakerhet_i_meter",
+)
+
+
+def _quote_identifier(value: str) -> str:
+    return f'"{value.replace(chr(34), chr(34) * 2)}"'
+
+
+def _table_columns(connection: sqlite3.Connection, table: str) -> frozenset[str]:
+    quoted = _quote_identifier(table)
+    return frozenset(
+        row["name"] for row in connection.execute(f"PRAGMA table_info({quoted})")
+    )
+
+
+def _source_query(connection: sqlite3.Connection) -> str:
+    """Build one ordered stream over complete GeoPackage feature layers."""
+    layers = connection.execute(
+        "SELECT table_name, column_name FROM gpkg_geometry_columns"
+    ).fetchall()
+    quality_table: str | None = None
+    quality_columns: frozenset[str] = frozenset()
+    candidates: list[tuple[str, str, str, frozenset[str]]] = []
+    for layer in layers:
+        table = layer["table_name"]
+        geometry_column = layer["column_name"]
+        if not isinstance(table, str) or not isinstance(geometry_column, str):
+            continue
+        columns = _table_columns(connection, table)
+        if "inmatningskvalitet" in columns and "lamning_uuid" in columns:
+            quality_table = table
+            quality_columns = columns
+            continue
+        id_column = next(
+            (name for name in ("uuid", "lamning_uuid", "id") if name in columns),
+            None,
+        )
+        if (
+            id_column is not None
+            and "lamningsnummer" in columns
+            and "lamningstyp" in columns
+        ):
+            candidates.append((table, geometry_column, id_column, columns))
+    if not candidates:
+        raise DataSourceError(
+            "RAÄ GeoPackage innehåller inga objektlager med komplett schema"
+        )
+
+    selects: list[str] = []
+    for table, geometry_column, id_column, columns in candidates:
+        source_columns = [
+            (
+                f"t.{_quote_identifier(field)} AS {_quote_identifier(field)}"
+                if field in columns
+                else f"NULL AS {_quote_identifier(field)}"
+            )
+            for field in SOURCE_FIELDS
+        ]
+        join = ""
+        quality_selects = [
+            f"NULL AS {_quote_identifier(field)}" for field in QUALITY_FIELDS
+        ]
+        if quality_table is not None:
+            quality_selects = [
+                (
+                    f"q.{_quote_identifier(field)} AS {_quote_identifier(field)}"
+                    if field in quality_columns
+                    else f"NULL AS {_quote_identifier(field)}"
+                )
+                for field in QUALITY_FIELDS
+            ]
+            join = (
+                f" LEFT JOIN {_quote_identifier(quality_table)} q"
+                f" ON q.{_quote_identifier('lamning_uuid')} ="
+                f" t.{_quote_identifier(id_column)}"
+            )
+        selects.append(
+            "SELECT "
+            f"t.{_quote_identifier(id_column)} AS source_id, "
+            f"t.{_quote_identifier(geometry_column)} AS geometry_blob, "
+            + ", ".join((*source_columns, *quality_selects))
+            + f" FROM {_quote_identifier(table)} t{join}"
+        )
+    return "SELECT * FROM (" + " UNION ALL ".join(selects) + ") ORDER BY source_id"
 
 
 def _read_uint(data: bytes, offset: int, endian: str) -> tuple[int, int]:
@@ -130,6 +235,28 @@ class RAACollector:
         """Return the documented GeoPackage product schema version."""
         return GEOPACKAGE_SCHEMA_VERSION
 
+    def fetch_base_batches(
+        self,
+        destination: Path,
+        *,
+        county: str | None = None,
+        municipality: str | None = None,
+        bbox: BoundingBox | None = None,
+        batch_size: int = DEFAULT_IMPORT_BATCH_SIZE,
+    ) -> Iterator[tuple[AtlasFeature, ...]]:
+        """Download and lazily normalize one official base package in batches."""
+        download = self._client.download_geopackage(
+            destination,
+            county=county,
+            municipality=municipality,
+        )
+        try:
+            yield from self.collect_base_batches(
+                download.path, bbox=bbox, batch_size=batch_size
+            )
+        finally:
+            download.path.unlink(missing_ok=True)
+
     def fetch_base(
         self,
         destination: Path,
@@ -138,16 +265,17 @@ class RAACollector:
         municipality: str | None = None,
         bbox: BoundingBox | None = None,
     ) -> list[AtlasFeature]:
-        """Download, normalize and discard one official base package."""
-        download = self._client.download_geopackage(
-            destination,
-            county=county,
-            municipality=municipality,
-        )
-        try:
-            return self.collect_base(download.path, bbox=bbox)
-        finally:
-            download.path.unlink(missing_ok=True)
+        """Compatibility helper that materializes a complete base import."""
+        return [
+            feature
+            for batch in self.fetch_base_batches(
+                destination,
+                county=county,
+                municipality=municipality,
+                bbox=bbox,
+            )
+            for feature in batch
+        ]
 
     def collect_base(
         self,
@@ -155,96 +283,100 @@ class RAACollector:
         *,
         bbox: BoundingBox | None = None,
     ) -> list[AtlasFeature]:
-        """Read and normalize every feature from an official GeoPackage."""
+        """Compatibility helper that materializes a local GeoPackage."""
+        return [
+            feature
+            for batch in self.collect_base_batches(path, bbox=bbox)
+            for feature in batch
+        ]
+
+    def collect_base_batches(
+        self,
+        path: Path,
+        *,
+        bbox: BoundingBox | None = None,
+        batch_size: int = DEFAULT_IMPORT_BATCH_SIZE,
+    ) -> Iterator[tuple[AtlasFeature, ...]]:
+        """Read a GeoPackage lazily while retaining at most one output batch."""
         if not path.is_file():
             raise DataSourceError(f"RAÄ GeoPackage saknas: {path}")
-        grouped: dict[str, dict[str, Any]] = {}
-        geometries: dict[str, list[dict[str, Any]]] = defaultdict(list)
-        geometry_blobs: dict[str, set[bytes]] = defaultdict(set)
-        quality: dict[str, dict[str, Any]] = {}
+        if batch_size < 1:
+            raise ValueError("Importens batchstorlek måste vara minst 1")
+        batch: list[AtlasFeature] = []
+        mapped_feature_count = 0
         try:
             connection = sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
             connection.row_factory = sqlite3.Row
             try:
-                layers = connection.execute(
-                    "SELECT table_name, column_name FROM gpkg_geometry_columns"
-                ).fetchall()
-                for layer in layers:
-                    table = layer["table_name"]
-                    geometry_column = layer["column_name"]
-                    if not isinstance(table, str) or not isinstance(
-                        geometry_column, str
-                    ):
+                rows = connection.execute(_source_query(connection))
+                current_id: str | None = None
+                current_raw: dict[str, Any] = {}
+                current_blobs: set[bytes] = set()
+
+                def map_current() -> list[AtlasFeature]:
+                    if current_id is None:
+                        return []
+                    raw = dict(current_raw)
+                    raw["id"] = current_id
+                    if current_blobs:
+                        raw["geometri"] = {
+                            "type": "FeatureCollection",
+                            "features": [
+                                {
+                                    "type": "Feature",
+                                    "geometry": parse_geopackage_geometry(blob),
+                                }
+                                for blob in current_blobs
+                            ],
+                        }
+                    try:
+                        return map_raa_record(raw)
+                    except ValueError:
+                        return []
+
+                for row in rows:
+                    record = dict(row)
+                    source_id = record.pop("source_id", None)
+                    blob = record.pop("geometry_blob", None)
+                    if not isinstance(source_id, str) or not source_id.strip():
                         continue
-                    quoted_table = table.replace('"', '""')
-                    rows = connection.execute(f'SELECT * FROM "{quoted_table}"')
-                    for row in rows:
-                        record = dict(row)
-                        blob = record.pop(geometry_column, None)
-                        source_id = (
-                            record.get("uuid")
-                            or record.get("lamning_uuid")
-                            or record.get("id")
+                    if current_id is not None and source_id != current_id:
+                        mapped = map_current()
+                        mapped_feature_count += len(mapped)
+                        batch.extend(
+                            feature
+                            for feature in mapped
+                            if bbox is None or _intersects(feature, bbox)
                         )
-                        if not isinstance(source_id, str) or not source_id.strip():
-                            continue
-                        if "inmatningskvalitet" in record:
-                            quality[source_id] = {
-                                key: record.get(key)
-                                for key in (
-                                    "inmatningskvalitet",
-                                    "definition_av_kvalitet",
-                                    "lagesosakerhet_i_meter",
-                                )
-                                if record.get(key) is not None
-                            }
-                            continue
-                        current = grouped.setdefault(source_id, {})
-                        for key, value in record.items():
-                            if value is not None and current.get(key) is None:
-                                current[key] = value
-                        if (
-                            isinstance(blob, bytes)
-                            and blob not in geometry_blobs[source_id]
-                        ):
-                            geometry_blobs[source_id].add(blob)
-                            geometries[source_id].append(
-                                parse_geopackage_geometry(blob)
-                            )
+                        if len(batch) >= batch_size:
+                            yield tuple(batch)
+                            batch.clear()
+                        current_raw.clear()
+                        current_blobs.clear()
+                    current_id = source_id
+                    for key, value in record.items():
+                        if value is not None and current_raw.get(key) is None:
+                            current_raw[key] = value
+                    if isinstance(blob, bytes):
+                        current_blobs.add(blob)
+
+                mapped = map_current()
+                mapped_feature_count += len(mapped)
+                batch.extend(
+                    feature
+                    for feature in mapped
+                    if bbox is None or _intersects(feature, bbox)
+                )
             finally:
                 connection.close()
         except (sqlite3.Error, ValueError) as exc:
             raise DataSourceError(f"RAÄ GeoPackage kunde inte läsas: {exc}") from exc
-
-        features: list[AtlasFeature] = []
-        mapped_feature_count = 0
-        for source_id, raw in grouped.items():
-            raw["id"] = source_id
-            raw.update(quality.get(source_id, {}))
-            documents = geometries.get(source_id, [])
-            if documents:
-                raw["geometri"] = {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {"type": "Feature", "geometry": document}
-                        for document in documents
-                    ],
-                }
-            try:
-                mapped = map_raa_record(raw)
-            except ValueError:
-                continue
-            mapped_feature_count += len(mapped)
-            features.extend(
-                feature
-                for feature in mapped
-                if bbox is None or _intersects(feature, bbox)
-            )
-        if not grouped or mapped_feature_count == 0:
+        if mapped_feature_count == 0:
             raise DataSourceError(
                 "RAÄ GeoPackage innehåller inga objekt som kunde normaliseras"
             )
-        return features
+        if batch:
+            yield tuple(batch)
 
     def collect_changes(self, start: date, end: date) -> list[AtlasFeature]:
         """Fetch and normalize all official changes for an inclusive interval."""

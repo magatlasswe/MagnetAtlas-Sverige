@@ -7,7 +7,12 @@ from datetime import date
 from typing import Any
 from urllib.parse import urlencode
 
-from magnetatlas.application.features import FeatureCatalog, feature_period
+from magnetatlas.application.feature_queries import DatasetSummary, ViewportResult
+from magnetatlas.application.features import (
+    FeatureCatalog,
+    feature_period,
+    navigation_target,
+)
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 
@@ -81,10 +86,8 @@ def _time_span(time_span: TimeSpan | None) -> dict[str, Any] | None:
     }
 
 
-def _navigation(
-    feature: AtlasFeature, catalog: FeatureCatalog
-) -> dict[str, Any] | None:
-    target = catalog.navigation_target(feature.feature_id)
+def _navigation(feature: AtlasFeature) -> dict[str, Any] | None:
+    target = navigation_target(feature)
     if target is None:
         return None
     point = target.point
@@ -97,10 +100,12 @@ def _navigation(
     }
 
 
-def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[str, Any]:
+def serialize_feature(
+    feature: AtlasFeature, catalog: FeatureCatalog | None = None
+) -> dict[str, Any]:
     """Serialize one feature without exposing provider raw data."""
     license_info = feature.provenance.license_info
-    navigation = _navigation(feature, catalog)
+    navigation = _navigation(feature)
     time_certainty = (
         feature.time_span.certainty.value if feature.time_span is not None else None
     )
@@ -164,6 +169,58 @@ def serialize_feature(feature: AtlasFeature, catalog: FeatureCatalog) -> dict[st
                 "data_source": feature.provenance.source,
             },
         },
+    }
+
+
+def serialize_map_feature(feature: AtlasFeature) -> dict[str, Any]:
+    """Serialize only properties required for map rendering and compact popups."""
+    return {
+        "type": "Feature",
+        "id": str(feature.feature_id),
+        "geometry": _geometry(feature),
+        "properties": {
+            "feature_id": str(feature.feature_id),
+            "title": feature.title,
+            "feature_type": feature.feature_type,
+            "place": feature.place,
+            "source_details": {"raa_id": feature.properties.get("raa_id")},
+            "navigation": _navigation(feature),
+        },
+    }
+
+
+def serialize_dataset_summary(summary: DatasetSummary) -> dict[str, Any]:
+    """Serialize dataset status independently from map features."""
+    return {
+        "count": summary.count,
+        "latest_import": (
+            summary.latest_import.isoformat() if summary.latest_import else None
+        ),
+        "source": summary.source,
+        "status": summary.status,
+        "is_demo": summary.is_demo,
+    }
+
+
+def serialize_viewport(result: ViewportResult) -> dict[str, Any]:
+    """Serialize one bounded viewport response as compact GeoJSON."""
+    return {
+        "type": "FeatureCollection",
+        "summary": {
+            "count": len(result.features),
+            "truncated": result.truncated,
+        },
+        "features": [serialize_map_feature(feature) for feature in result.features],
+    }
+
+
+def serialize_search_results(features: Iterable[AtlasFeature]) -> dict[str, Any]:
+    """Serialize one already bounded search result."""
+    selected = tuple(features)
+    return {
+        "type": "FeatureCollection",
+        "summary": {"count": len(selected), "truncated": False},
+        "features": [serialize_feature(feature) for feature in selected],
     }
 
 

@@ -4,7 +4,7 @@ Last updated: **2026-08-05**
 
 Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 2.6.4 – First Real RAÄ Dataset (completed)**
+Current sprint: **Sprint 2.8 – Viewport API (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -31,6 +31,14 @@ Sprint 2.6.4 verifies the complete official RAÄ GeoPackage-to-SQLite chain
 against the current municipality schema. The web interface uses imported RAÄ
 features exclusively whenever the local cache contains real data and reports
 dataset count, source, latest import and Demo/RAÄ status.
+
+Sprint 2.7 replaces full in-memory base imports with bounded GeoPackage batches
+and an isolated SQLite staging dataset. The previous cache remains active until
+the final atomic activation and is preserved if any batch fails.
+
+Sprint 2.8 removes global SQLite materialization from the web composition root.
+The map requests bounded GeoJSON for its current viewport, dataset metadata is
+served separately and complete feature details are loaded only when selected.
 
 ## Current Sprint
 
@@ -122,27 +130,36 @@ API becomes available.
 
 ## Future Roadmap
 
-### Sprint 2.7 – SGU
+### Sprint 2.7 – Streaming Import
 
-- Geological context
+- [x] Bounded RAÄ GeoPackage batches
+- [x] Incremental SQLite staging writes
+- [x] Atomic activation and rollback
+- [x] Import progress and elapsed time
 
-### Sprint 2.8 – Historical Maps
+### Sprint 2.8 – Viewport API
 
-Only if an official machine-readable API becomes available.
+- [x] Bounding-box API
+- [x] Bounded compact GeoJSON responses
+- [x] Separate dataset metadata
+- [x] On-demand feature details
+- [x] Debounced and cancellable client viewport requests
+- [x] No global SQLite materialization at server start
 
-### Sprint 2.9 – OpenStreetMap Collector
+### Sprint 2.9 – SQLite Optimization
 
-- Historic bridges
-- Historic ferries
-- Harbours
-- Mills
-- Locks
+- Indexed viewport queries
+- Indexed search and filters
+- Measured SQLite tuning
 
-### Sprint 3.0 – Advanced Map Layers
+### Sprint 3.0 – Nationwide RAÄ
 
-- Multiple overlays
-- Layer manager
-- Offline cache
+- Explicit Sweden, county and municipality imports
+- Nationwide import and web benchmarks
+- Memory, storage and latency validation
+
+New data sources and map layers are postponed until the nationwide RAÄ chain
+meets its scalability targets.
 
 ### Sprint 3.5 – Search Engine
 

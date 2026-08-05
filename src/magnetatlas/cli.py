@@ -13,13 +13,16 @@ from rich.table import Table
 from sqlalchemy.exc import SQLAlchemyError
 
 from magnetatlas.application.collectors import CollectorRegistry
-from magnetatlas.application.features import FeatureCatalog
+from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.application.search import SearchService
 from magnetatlas.application.sync import SyncService
 from magnetatlas.config.logging import configure_logging
 from magnetatlas.config.settings import Settings
 from magnetatlas.domain.exceptions import MagnetAtlasError
 from magnetatlas.domain.geography import BoundingBox
+from magnetatlas.infrastructure.database.feature_queries import (
+    SqlAlchemyFeatureQuerySource,
+)
 from magnetatlas.infrastructure.database.repositories import (
     SqlAlchemyArchiveRecordRepository,
     SqlAlchemyAtlasFeatureRepository,
@@ -99,10 +102,24 @@ def import_raa(
             raise ValueError("Välj antingen --county eller --municipality")
         settings = Settings.from_env()
         settings.prepare_directories()
+        last_reported = 0
+
+        def report_progress(imported: int) -> None:
+            nonlocal last_reported
+            if imported - last_reported >= 5_000:
+                console.print(f"Bearbetade {imported} RAÄ-objekt…")
+                last_reported = imported
+
         result = RAAImporter(_create_raa_sync_service(settings)).run(
-            county=county, municipality=municipality, bbox=_parse_bbox(bbox)
+            county=county,
+            municipality=municipality,
+            bbox=_parse_bbox(bbox),
+            progress=report_progress,
         )
-        console.print(f"Importerade [bold]{result.imported}[/bold] RAÄ-objekt.")
+        console.print(
+            f"Importerade [bold]{result.imported}[/bold] RAÄ-objekt på "
+            f"{result.duration_seconds:.1f} sekunder."
+        )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("RAÄ-importen misslyckades", exc)
 
@@ -231,16 +248,14 @@ def serve(
         settings = Settings.from_env()
         configure_logging(settings.log_level)
         if features_path is not None:
-            features = load_features(features_path)
+            source = CatalogFeatureQuerySource(load_features(features_path))
         else:
-            repository = SqlAlchemyAtlasFeatureRepository(
-                create_session_factory(settings.database_url)
+            source = SqlAlchemyFeatureQuerySource(
+                create_session_factory(settings.database_url), "raa-kmr"
             )
-            features = repository.list_features()
-            if not features:
-                features = load_demo_features()
-        catalog = FeatureCatalog(features)
-        server = create_server(catalog, host=host, port=port)
+            if source.summary().count == 0:
+                source = CatalogFeatureQuerySource(load_demo_features())
+        server = create_server(source, host=host, port=port)
         actual_host, actual_port = server.server_address
         display_host = (
             "localhost" if actual_host in {"127.0.0.1", "::1"} else actual_host

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from magnetatlas.application.sync import CacheStatus, SyncResult, SyncService
 from magnetatlas.domain.geography import BoundingBox
 
@@ -18,12 +20,14 @@ class RAAImporter:
         county: str | None = None,
         municipality: str | None = None,
         bbox: BoundingBox | None = None,
+        progress: Callable[[int], None] | None = None,
     ) -> SyncResult:
         """Request an official base import through SyncService."""
         return self._service.base_import(
             county=county,
             municipality=municipality,
             bbox=bbox,
+            progress=progress,
         )
 
 

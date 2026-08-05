@@ -89,6 +89,42 @@ def test_collector_applies_bbox_after_wgs84_conversion(tmp_path: Path) -> None:
     assert not collector.collect_base(path, bbox=BoundingBox(10.0, 55.0, 11.0, 56.0))
 
 
+def test_collector_streams_bounded_batches(tmp_path: Path) -> None:
+    path = tmp_path / "stream.gpkg"
+    make_geopackage(path)
+    connection = sqlite3.connect(path)
+    for number in range(2, 6):
+        connection.execute(
+            "INSERT INTO lamningar_point VALUES (?, ?, ?, ?, ?)",
+            (
+                f"uuid-{number}",
+                f"L2026:{number}",
+                "Röse",
+                f"Beskrivning {number}",
+                point_blob(674571.866 + number, 6580743.008),
+            ),
+        )
+    connection.commit()
+    connection.close()
+    collector = RAACollector(FakeClient())  # type: ignore[arg-type]
+
+    batches = collector.collect_base_batches(path, batch_size=2)
+
+    assert [len(batch) for batch in batches] == [2, 2, 1]
+
+
+def test_collector_does_not_start_reading_until_iterator_is_consumed(
+    tmp_path: Path,
+) -> None:
+    missing = tmp_path / "missing.gpkg"
+    collector = RAACollector(FakeClient())  # type: ignore[arg-type]
+
+    batches = collector.collect_base_batches(missing)
+
+    with pytest.raises(DataSourceError, match="saknas"):
+        next(batches)
+
+
 def test_collector_maps_rest_changes_to_features() -> None:
     collector = RAACollector(FakeClient())  # type: ignore[arg-type]
 

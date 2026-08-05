@@ -57,10 +57,29 @@ MapLibre, popupinnehåll skapas först vid val och `FeatureCatalog` förindexera
 söktext för att undvika upprepad normalisering vid interaktiv sökning.
 
 När platsbehörighet redan är beviljad startar klienten GPS-bevakningen utan en ny
-dialog och sorterar lokalt de fem närmaste serialiserade objekten med ett enkelt
-WGS84-fågelvägsavstånd. Positionen lämnar aldrig webbläsaren. Popupen innehåller
-bara snabb identifiering och åtgärder; full proveniens, licens, confidence och
-koordinater visas i sidopanelen.
+dialog och sorterar lokalt de fem närmaste objekten i det synliga kartutsnittet
+med ett enkelt WGS84-fågelvägsavstånd. Positionen lämnar aldrig webbläsaren.
+Popupen innehåller bara snabb identifiering och åtgärder; full proveniens,
+licens, confidence och koordinater hämtas först när objektet väljs och visas i
+sidopanelen.
+
+Sprint 2.8 inför en källneutral `FeatureQuerySource` för webbens läsmodell.
+SQLite-adaptern itererar lagrade dokument och materialiserar endast matchande
+features upp till en fast svarsgräns. Den bygger aldrig en global
+`FeatureCatalog`. Den första implementationen gör en minnesbegränsad skanning;
+bbox- och sökindex tillkommer i Sprint 2.9 utan att HTTP-kontraktet ändras.
+
+Webb-API:t delar upp läsningen i tre ansvar:
+
+- `/api/dataset` returnerar endast antal, importtid, källa och datasetstatus.
+- `/api/features?bbox=west,south,east,north` returnerar ett kompakt och hårt
+  begränsat GeoJSON-svar för aktuell viewport.
+- `/api/features/<feature-id>` returnerar fullständig information för ett valt
+  objekt.
+
+Klienten debounce:ar `moveend`, avbryter inaktuella HTTP-anrop och ersätter
+MapLibre-källan med det senaste synliga utsnittet. MapLibre fortsätter ansvara
+för klustring i klienten; servern returnerar aldrig serverkluster.
 
 Webbklienten skiljer mellan tom lokal data, resultatlösa filter, API-fel,
 baskartefel och nekad eller otillgänglig GPS. Meddelandena är svenska och
@@ -123,10 +142,13 @@ kvalitetslagret via RAÄ:s `uuid`/`lamning_uuid`. Dubbletter av samma WKB-geomet
 tas bort innan mappning. Kvalitetsuppgifter bevaras som confidence-underlag men
 kvalitetslagrets hjälpgeometri publiceras inte som ett eget historiskt objekt.
 
-När hela uttaget har lästs skriver `SyncService` resultatet atomärt genom
-repository-gränsen och sparar synkmetadata först efter en lyckad import. En
-avbruten grundimport får inte göra ett ofullständigt dataset till aktiv lokal
-sanningskälla.
+Collectorn strömmar normaliserade objekt i begränsade batchar. `SyncService`
+skriver varje batch genom en källneutral importsessionsgräns till ett isolerat
+stagingdataset i SQLite; varken Collector, applikationstjänst eller repository
+behöver materialisera hela uttaget i arbetsminnet. När hela uttaget har lästs
+och validerats aktiveras stagingdatasetet och synkmetadata atomärt. En avbruten
+grundimport tar bort stagingraderna och lämnar den tidigare lokala sanningskällan
+oförändrad.
 
 ### Inkrementell synkronisering
 
@@ -246,3 +268,24 @@ Varje adapter isolerar sin leverantörs protokoll, schema, licensmetadata och
 koordinatsystem och returnerar endast `AtlasFeature`. Kärnan importerar aldrig
 en konkret Collector, och repositoryt behöver inte ändras när en ny datakälla
 läggs till.
+
+## Långsiktiga arkitekturprinciper
+
+Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i
+den nuvarande versionen:
+
+1. Alla framtida datakällor implementeras som lager ovanpå `AtlasFeature`.
+   Leverantörsspecifika modeller, protokoll och geometrier stannar i respektive
+   Collector och adapter.
+2. Kartan arbetar alltid viewport-baserat och hämtar endast det aktuella
+   kartutsnittet. Klustring är ett presentationsansvar och sker i klienten, inte
+   på servern.
+3. Offline-användning är ett långsiktigt designmål. Importerade dataset och
+   deras metadata ska kunna användas utan internet; externa baskartor kan ha
+   separata tillgänglighetsbegränsningar.
+4. Framtida användarprofiler, exempelvis Magnetfiske, Metalldetektering,
+   Släktforskning, Arkeologi och Utflykt, ska endast aktivera lager och filter.
+   De får inte skapa alternativa domänmodeller eller ändra lagrad källdata.
+5. Framtida Collectors läggs till som plugins genom publicerade kontrakt. En ny
+   Collector får inte kräva ändringar i kärnans domän- eller
+   applikationsarkitektur.

@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from magnetatlas.application.features import FeatureCatalog
+from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.infrastructure.features import load_demo_features
 from magnetatlas.interfaces.web.server import create_server
 
@@ -17,7 +17,7 @@ from magnetatlas.interfaces.web.server import create_server
 @pytest.fixture
 def local_server() -> Iterator[str]:
     server = create_server(
-        FeatureCatalog(load_demo_features()), host="127.0.0.1", port=0
+        CatalogFeatureQuerySource(load_demo_features()), host="127.0.0.1", port=0
     )
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -80,6 +80,11 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"renderNearestFeatures" in javascript
         assert b"distanceKilometers" in javascript
         assert b"renderDatasetSummary" in javascript
+        assert b"/api/dataset" in javascript
+        assert b"viewportParameters" in javascript
+        assert b"scheduleViewportLoad" in javascript
+        assert b"AbortController" in javascript
+        assert b"encodeURIComponent(featureId)" in javascript
         assert "Noggrannhet:" in javascript_text
         assert b"FullscreenControl" in javascript
         assert b"ScaleControl" in javascript
@@ -93,16 +98,51 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "popup-history" not in javascript_text
 
 
-def test_features_api_returns_geojson_without_raw_data(local_server: str) -> None:
-    with urlopen(f"{local_server}/api/features", timeout=2) as response:
+def test_dataset_and_viewport_apis_are_separate_and_bounded(
+    local_server: str,
+) -> None:
+    with urlopen(f"{local_server}/api/dataset", timeout=2) as response:
+        dataset = json.load(response)
+    with urlopen(
+        f"{local_server}/api/features?bbox=10,55,25,70&limit=10", timeout=2
+    ) as response:
         payload = json.load(response)
 
+    assert dataset["is_demo"] is True
+    assert dataset["status"] == "Demo"
+    assert dataset["count"] == 100
     assert payload["type"] == "FeatureCollection"
-    assert payload["is_demo"] is True
-    assert payload["summary"]["status"] == "Demo"
-    assert payload["summary"]["count"] == 100
-    assert len(payload["features"]) == 100
+    assert payload["summary"]["count"] == 10
+    assert payload["summary"]["truncated"] is True
+    assert len(payload["features"]) == 10
     assert "raw_data" not in json.dumps(payload)
+    assert "description" not in payload["features"][0]["properties"]
+
+
+def test_feature_details_are_loaded_on_demand(local_server: str) -> None:
+    with urlopen(
+        f"{local_server}/api/features?bbox=10,55,25,70&limit=1", timeout=2
+    ) as response:
+        feature_id = json.load(response)["features"][0]["id"]
+    with urlopen(f"{local_server}/api/features/{feature_id}", timeout=2) as response:
+        feature = json.load(response)
+
+    assert feature["id"] == feature_id
+    assert "description" in feature["properties"]
+    assert "provenance" in feature["properties"]
+
+
+@pytest.mark.parametrize(
+    "query",
+    ["", "?bbox=10,55,25", "?bbox=x,55,25,70", "?bbox=10,55,25,70&limit=5001"],
+)
+def test_viewport_api_rejects_unbounded_or_invalid_requests(
+    local_server: str, query: str
+) -> None:
+    with pytest.raises(HTTPError) as error:
+        urlopen(f"{local_server}/api/features{query}", timeout=2)
+
+    assert error.value.code == HTTPStatus.BAD_REQUEST
 
 
 def test_search_api_supports_typos_and_facets(local_server: str) -> None:

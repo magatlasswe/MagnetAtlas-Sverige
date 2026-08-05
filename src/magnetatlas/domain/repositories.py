@@ -52,6 +52,16 @@ class DatasetMetadata:
                 raise ValueError("Metadata-tidpunkter måste innehålla tidszon")
 
 
+class DatasetImportSession(Protocol):
+    """Incrementally build and atomically activate one dataset replacement."""
+
+    def write_batch(self, features: Sequence[StoredFeature]) -> None: ...
+
+    def commit(self) -> None: ...
+
+    def rollback(self) -> None: ...
+
+
 class AtlasFeatureRepository(Protocol):
     """Domain-neutral atomic persistence contract for atlas datasets."""
 
@@ -60,6 +70,10 @@ class AtlasFeatureRepository(Protocol):
         metadata: DatasetMetadata,
         features: Sequence[StoredFeature],
     ) -> None: ...
+
+    def begin_dataset_replace(
+        self, metadata: DatasetMetadata
+    ) -> DatasetImportSession: ...
 
     def apply_changes(
         self,
