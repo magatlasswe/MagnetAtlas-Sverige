@@ -1,10 +1,10 @@
 # MagnetAtlas Sverige – Project Overview
 
-Last updated: **2026-08-05**
+Last updated: **2026-08-07**
 
 Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 2.8 – Viewport API (completed)**
+Current sprint: **Sprint 3.0 – Nationwide RAÄ (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -39,6 +39,16 @@ the final atomic activation and is preserved if any batch fails.
 Sprint 2.8 removes global SQLite materialization from the web composition root.
 The map requests bounded GeoJSON for its current viewport, dataset metadata is
 served separately and complete feature details are loaded only when selected.
+
+Sprint 2.9 adds additive query projections, RTree spatial lookup, FTS5 search
+and measured SQLite indexes. Viewport queries now start in RTree instead of
+scanning every stored feature document, while base and incremental writes keep
+all indexes synchronized in batches.
+
+Sprint 3.0 validates the complete nationwide RAÄ chain with 838,178 normalized
+features. Country, county and municipality scopes are explicit, nationwide
+imports are protected by a free-space preflight, and bounded web queries have
+been measured against the full local dataset.
 
 ## Current Sprint
 
@@ -148,15 +158,19 @@ API becomes available.
 
 ### Sprint 2.9 – SQLite Optimization
 
-- Indexed viewport queries
-- Indexed search and filters
-- Measured SQLite tuning
+- [x] RTree-indexed viewport queries
+- [x] FTS5-indexed text candidates
+- [x] Source, source-ID, feature-type and search indexes
+- [x] Batch migration of existing JSON documents
+- [x] Batched SQLite insert/upsert
+- [x] EXPLAIN QUERY PLAN regression tests
+- [x] Before/after benchmarks
 
 ### Sprint 3.0 – Nationwide RAÄ
 
-- Explicit Sweden, county and municipality imports
-- Nationwide import and web benchmarks
-- Memory, storage and latency validation
+- [x] Explicit Sweden, county and municipality imports
+- [x] Nationwide import and web benchmarks
+- [x] Memory, storage and latency validation
 
 New data sources and map layers are postponed until the nationwide RAÄ chain
 meets its scalability targets.

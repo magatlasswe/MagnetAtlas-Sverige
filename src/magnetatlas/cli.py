@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import shutil
 import webbrowser
 from pathlib import Path
 from typing import Annotated, Never
@@ -50,6 +51,7 @@ app.add_typer(import_app, name="import")
 app.add_typer(cache_app, name="cache")
 
 EXPECTED_ERRORS = (MagnetAtlasError, ValueError, OSError, SQLAlchemyError)
+NATIONWIDE_MIN_FREE_BYTES = 12 * 1024**3
 
 
 def _abort_with_error(context: str, error: Exception) -> Never:
@@ -90,18 +92,43 @@ def _parse_bbox(value: str | None) -> BoundingBox | None:
     return BoundingBox(west=west, south=south, east=east, north=north)
 
 
+def _validate_raa_scope(
+    country: str | None,
+    county: str | None,
+    municipality: str | None,
+) -> None:
+    selected = sum(value is not None for value in (country, county, municipality))
+    if selected > 1:
+        raise ValueError("Välj endast ett av --country, --county eller --municipality")
+    if country is not None and country.strip().casefold() != "sweden":
+        raise ValueError("--country stöder endast värdet sweden")
+
+
+def _ensure_nationwide_disk_space(path: Path) -> None:
+    free = shutil.disk_usage(path).free
+    if free < NATIONWIDE_MIN_FREE_BYTES:
+        required_gib = NATIONWIDE_MIN_FREE_BYTES // 1024**3
+        available_gib = free / 1024**3
+        raise ValueError(
+            f"Sverigeimport kräver minst {required_gib} GiB ledigt diskutrymme; "
+            f"endast {available_gib:.1f} GiB är tillgängligt."
+        )
+
+
 @import_app.command("raa")
 def import_raa(
+    country: Annotated[str | None, typer.Option("--country")] = None,
     county: Annotated[str | None, typer.Option("--county")] = None,
     municipality: Annotated[str | None, typer.Option("--municipality")] = None,
     bbox: Annotated[str | None, typer.Option("--bbox")] = None,
 ) -> None:
     """Importera en officiell KMR-bas till lokal SQLite."""
     try:
-        if county and municipality:
-            raise ValueError("Välj antingen --county eller --municipality")
+        _validate_raa_scope(country, county, municipality)
         settings = Settings.from_env()
         settings.prepare_directories()
+        if country is not None:
+            _ensure_nationwide_disk_space(settings.raa_work_dir)
         last_reported = 0
 
         def report_progress(imported: int) -> None:

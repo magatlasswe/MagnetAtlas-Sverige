@@ -1,6 +1,7 @@
 """CLI tests for RAÄ import and cache commands."""
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from sqlalchemy.exc import DatabaseError
@@ -54,6 +55,22 @@ def test_import_raa_passes_geographic_scope(fake_service: FakeSyncService) -> No
     assert fake_service.import_args["bbox"] is not None
 
 
+def test_import_country_sweden_uses_official_total_package(
+    fake_service: FakeSyncService,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "magnetatlas.cli._ensure_nationwide_disk_space", lambda path: None
+    )
+
+    result = CliRunner().invoke(app, ["import", "raa", "--country", "sweden"])
+
+    assert result.exit_code == 0, result.output
+    assert fake_service.import_args is not None
+    assert fake_service.import_args["county"] is None
+    assert fake_service.import_args["municipality"] is None
+
+
 @pytest.mark.parametrize(
     ("command", "expected"),
     [
@@ -73,11 +90,36 @@ def test_cache_commands(
 
 def test_import_rejects_conflicting_scope(fake_service: FakeSyncService) -> None:
     result = CliRunner().invoke(
-        app, ["import", "raa", "--county", "x", "--municipality", "y"]
+        app,
+        ["import", "raa", "--country", "sweden", "--municipality", "y"],
     )
 
     assert result.exit_code == 1
-    assert "antingen" in result.output
+    assert "endast ett" in result.output
+    assert fake_service.import_args is None
+
+
+def test_import_rejects_unknown_country(fake_service: FakeSyncService) -> None:
+    result = CliRunner().invoke(app, ["import", "raa", "--country", "finland"])
+
+    assert result.exit_code == 1
+    assert "endast värdet sweden" in result.output
+    assert fake_service.import_args is None
+
+
+def test_country_import_checks_disk_before_source_call(
+    fake_service: FakeSyncService,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "magnetatlas.cli.shutil.disk_usage",
+        lambda path: SimpleNamespace(free=1),
+    )
+
+    result = CliRunner().invoke(app, ["import", "raa", "--country", "sweden"])
+
+    assert result.exit_code == 1
+    assert "12 GiB" in result.output
     assert fake_service.import_args is None
 
 

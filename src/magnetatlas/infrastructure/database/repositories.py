@@ -6,7 +6,8 @@ from collections.abc import Sequence
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy import delete, func, insert, select, text, update
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, sessionmaker
 
 from magnetatlas.domain.features import AtlasFeature, FeatureId
@@ -17,6 +18,7 @@ from magnetatlas.infrastructure.database.models import (
     AtlasFeatureRow,
     DatasetMetadataRow,
 )
+from magnetatlas.infrastructure.database.projections import feature_projection
 from magnetatlas.infrastructure.features.json_repository import (
     feature_from_document,
     feature_to_document,
@@ -138,6 +140,7 @@ class SqlAlchemyAtlasFeatureRepository:
         if row is not None and row.source_version == stored.version:
             return
         document = feature_to_document(stored.feature)
+        projection = feature_projection(stored.feature)
         if row is None:
             session.add(
                 AtlasFeatureRow(
@@ -145,11 +148,58 @@ class SqlAlchemyAtlasFeatureRepository:
                     feature_id=feature_id,
                     source_version=stored.version,
                     document=document,
+                    **projection,
                 )
             )
             return
         row.source_version = stored.version
         row.document = document
+        for name, value in projection.items():
+            setattr(row, name, value)
+
+    @staticmethod
+    def _stored_row(dataset_id: str, stored: StoredFeature) -> dict[str, object]:
+        return {
+            "dataset_id": dataset_id,
+            "feature_id": str(stored.feature.feature_id),
+            "source_version": stored.version,
+            "document": feature_to_document(stored.feature),
+            **feature_projection(stored.feature),
+        }
+
+    @classmethod
+    def _upsert_batch(
+        cls,
+        session: Session,
+        dataset_id: str,
+        features: Sequence[StoredFeature],
+    ) -> None:
+        if not features:
+            return
+        if session.bind is None or session.bind.dialect.name != "sqlite":
+            for stored in features:
+                cls._upsert(session, dataset_id, stored)
+            return
+        rows = [cls._stored_row(dataset_id, stored) for stored in features]
+        statement = sqlite_insert(AtlasFeatureRow).values(rows)
+        excluded = statement.excluded
+        session.execute(
+            statement.on_conflict_do_update(
+                index_elements=("dataset_id", "feature_id"),
+                set_={
+                    "source_version": excluded.source_version,
+                    "document": excluded.document,
+                    "source": excluded.source,
+                    "source_id": excluded.source_id,
+                    "feature_type": excluded.feature_type,
+                    "search_text": excluded.search_text,
+                    "min_longitude": excluded.min_longitude,
+                    "max_longitude": excluded.max_longitude,
+                    "min_latitude": excluded.min_latitude,
+                    "max_latitude": excluded.max_latitude,
+                },
+            )
+        )
 
     def replace_dataset(
         self,
@@ -184,8 +234,7 @@ class SqlAlchemyAtlasFeatureRepository:
                         AtlasFeatureRow.feature_id.in_(str(item) for item in deletes),
                     )
                 )
-            for stored in upserts:
-                self._upsert(session, metadata.dataset_id, stored)
+            self._upsert_batch(session, metadata.dataset_id, upserts)
             self._set_metadata(session, metadata)
 
     def list_features(self, *, dataset_id: str | None = None) -> list[AtlasFeature]:
@@ -279,12 +328,7 @@ class SqlAlchemyDatasetImportSession:
         if not features:
             return
         rows = [
-            {
-                "dataset_id": self._staging_id,
-                "feature_id": str(stored.feature.feature_id),
-                "source_version": stored.version,
-                "document": feature_to_document(stored.feature),
-            }
+            SqlAlchemyAtlasFeatureRepository._stored_row(self._staging_id, stored)
             for stored in features
         ]
         with self._session_factory() as session, session.begin():
@@ -305,6 +349,7 @@ class SqlAlchemyDatasetImportSession:
                 .values(dataset_id=self._metadata.dataset_id)
             )
             SqlAlchemyAtlasFeatureRepository._set_metadata(session, self._metadata)
+            session.execute(text("ANALYZE atlas_features"))
         self._finished = True
 
     def rollback(self) -> None:

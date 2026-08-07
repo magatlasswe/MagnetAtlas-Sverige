@@ -53,6 +53,7 @@ Kommandon:
 
 ```text
 magnetatlas import raa
+magnetatlas import raa --country sweden
 magnetatlas import raa --county ostergotland
 magnetatlas import raa --municipality kinda
 magnetatlas import raa --bbox 14,57,17,59
@@ -60,6 +61,14 @@ magnetatlas cache status
 magnetatlas cache refresh
 magnetatlas cache clear
 ```
+
+`--country sweden` väljer uttryckligen RAÄ:s rikstäckande totaluttag och gör en
+kontroll av att arbetskatalogen har minst 12 GiB ledigt innan hämtningen börjar.
+Land, län och kommun är ömsesidigt uteslutande importomfång. Utan geografiskt
+alternativ finns det äldre totaluttagsbeteendet kvar för bakåtkompatibilitet.
+
+Se [Sprint 3.0-valideringen](sprint-3.0-validation.md) för verifierad datamängd,
+lagringskostnad, minnesprofil och lokala frågelatenser.
 
 ## OpenStreetMap-baskarta
 

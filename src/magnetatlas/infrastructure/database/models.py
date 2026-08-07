@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, String, Text, UniqueConstraint
+from sqlalchemy import JSON, DateTime, Float, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from magnetatlas.infrastructure.database.base import Base
@@ -47,6 +47,14 @@ class AtlasFeatureRow(Base):
     dataset_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     feature_id: Mapped[str] = mapped_column(String(512), nullable=False, index=True)
     source_version: Mapped[str | None] = mapped_column(String(255))
+    source: Mapped[str | None] = mapped_column(String(255))
+    source_id: Mapped[str | None] = mapped_column(String(512))
+    feature_type: Mapped[str | None] = mapped_column(String(255))
+    search_text: Mapped[str | None] = mapped_column(Text)
+    min_longitude: Mapped[float | None] = mapped_column(Float)
+    max_longitude: Mapped[float | None] = mapped_column(Float)
+    min_latitude: Mapped[float | None] = mapped_column(Float)
+    max_latitude: Mapped[float | None] = mapped_column(Float)
     document: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
 

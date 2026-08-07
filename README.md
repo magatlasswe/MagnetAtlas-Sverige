@@ -71,6 +71,12 @@ För en första lokal provkörning:
 4. Sök eller filtrera platser, öppna ett objekt och läs källinformationen.
 5. Välj **Centrera på mig** om du vill ge webbläsaren tillgång till din position.
 
+En rikstäckande import startas uttryckligen med
+`magnetatlas import raa --country sweden`. Den hämtar RAÄ:s totaluttag, kräver
+minst 12 GiB ledigt i arbetskatalogen och kan ta lång tid. Börja normalt med ett
+län eller en kommun. Endast ett av `--country`, `--county` och `--municipality`
+får anges per import.
+
 Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
 demodata, så att gränssnittet går att prova utan en nätverksimport.
 När minst ett riktigt RAÄ-objekt finns används enbart den lokala RAÄ-cachen;

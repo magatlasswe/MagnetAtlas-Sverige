@@ -6,6 +6,7 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from magnetatlas.infrastructure.database.base import Base
+from magnetatlas.infrastructure.database.migrations import migrate_sqlite
 
 
 def create_session_factory(database_url: str) -> sessionmaker[Session]:
@@ -15,4 +16,5 @@ def create_session_factory(database_url: str) -> sessionmaker[Session]:
     )
     engine: Engine = create_engine(database_url, connect_args=connect_args)
     Base.metadata.create_all(engine)
+    migrate_sqlite(engine)
     return sessionmaker(bind=engine, expire_on_commit=False)

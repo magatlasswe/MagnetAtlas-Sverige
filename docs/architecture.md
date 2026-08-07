@@ -24,6 +24,25 @@ konverteras till `AtlasFeature` vid domängränsen.
 SQLite är Sprint 1-lagring. Repository-gränsen gör en framtida PostGIS-adapter
 möjlig utan att ändra användningsfallen.
 
+Sprint 2.9 behåller det fullständiga `AtlasFeature`-dokumentet som källneutral
+lagringsrepresentation men projicerar ofta efterfrågade värden till separata
+SQLite-kolumner: feature-ID, source, source-ID, feature-typ, normaliserad söktext
+och geometrins WGS84-bounding-box. Projektionerna är ett databasindex och aldrig
+en alternativ domänmodell.
+
+Geografiska projektioner synkroniseras till en virtuell SQLite RTree-tabell via
+triggers. Viewportfrågan börjar uttryckligen i RTree och slår därefter upp endast
+matchande dokument via rowid och dataset-ID. Textkandidater hämtas genom FTS5;
+source, source-ID och feature-typ har sammansatta B-tree-index med dataset-ID.
+Stavfelstolerans bevaras genom en minnesbegränsad linjär kompatibilitetsväg när
+FTS saknar direkta kandidater; exakt och prefixbaserad sökning använder indexet.
+
+En additiv, versionsmärkt migration backfillar befintliga JSON-dokument i
+batchar. Nya basimporter skriver alla projektioner tillsammans med dokumentet,
+och inkrementella förändringar använder ett batchat SQLite-upsert. RTree och FTS
+uppdateras i samma transaktionsgräns som feature-raden. `ANALYZE` körs efter
+atomisk stagingaktivering så att query planner har aktuell statistik.
+
 ## Lokalt webbgränssnitt
 
 Sprint 2.3 lägger till ett läsande webbgränssnitt under `interfaces.web`.
