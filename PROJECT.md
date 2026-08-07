@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.6 – Unified Map Layer Framework (completed)**
+Current sprint: **Sprint 3.7 – Evidence Engine (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -79,6 +79,13 @@ into one bounded map response, while vector and raster definitions share
 opacity, order, legend, attribution, licence and renderer metadata. Historical
 maps is the first disabled raster-family declaration; no raster provider,
 importer or renderer is included.
+
+Sprint 3.7 adds a deterministic Evidence Engine above AtlasFeature and composed
+dataset queries. Versioned rules create immutable evidence that retains exact
+feature identity, snapshot, confidence, provenance and licence. Bounded
+EvidenceReports are available through a generic API and contain no generated
+claims, ranking, machine learning or AI. Future AI is contractually restricted
+to EvidenceReport and must not consume raw features or provider data.
 
 ## Current Sprint
 

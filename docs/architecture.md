@@ -391,6 +391,47 @@ Render metadata ─ LayerCompositionService ── lager-API ── Renderer
 samma metadataavtal men förutsätter inte AtlasFeature. Historiska kartor är den
 första rasterfamiljen och har status disabled samt `render_mode=future`.
 
+## Evidence Engine
+
+Evidence Engine ligger ovanpå `AtlasFeature`, `DatasetInstance` och det
+sammansatta bounded query-flödet. Motorn ändrar aldrig källfeatures. Ett
+`EvidenceRule` har stabilt regel-ID, explicit version och dokumenterad
+beskrivning; registret kör regler i deterministiskt sorterad ordning.
+
+```text
+Providers → AtlasFeature
+                ↓
+        versionerade EvidenceRule
+                ↓
+             Evidence
+                ↓
+         EvidenceCollection
+                ↓
+          EvidenceReport
+                ↓
+          Future Search
+                ↓
+         Future Ranking
+                ↓
+            Future AI
+```
+
+`Evidence` bevarar exakt `feature_id`, geometri, provider, datasetinstans,
+snapshot, confidence, proveniens, licens, source URL, explanation och det
+versionsmärkta regel-ID som skapade objektet. ID:t är en deterministisk SHA-256
+över regelversion, feature, dataset, snapshot och evidenstyp. `created_at` kommer
+från en injicerbar klocka så tester och rapportkörningar är reproducerbara.
+
+`EvidenceReport` innehåller område, bbox, skapad tid, använda dataset,
+evidensantal, statisk sammanfattning, explicit icke-aggregerad confidence,
+proveniens och en `EvidenceCollection`. Motorn kombinerar aldrig confidence
+probabilistiskt och genererar ingen fri text.
+
+AI-kontraktet är en enkelriktad säkerhetsgräns: en framtida AI-adapter får endast
+läsa `EvidenceReport`. Den får inte läsa råa `AtlasFeature`, providerobjekt,
+rådata eller datasetfiler. Sprint 3.7 innehåller ingen AI-, ranking- eller
+maskininlärningsimplementation.
+
 ## Långsiktiga arkitekturprinciper
 
 Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i

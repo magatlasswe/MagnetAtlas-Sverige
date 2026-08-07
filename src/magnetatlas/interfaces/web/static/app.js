@@ -99,6 +99,39 @@ async function loadLayers() {
   renderLayers(payload.layers);
 }
 
+function renderEvidence(report) {
+  elements.evidenceCount.textContent = report.evidence_count.toLocaleString("sv-SE");
+  elements.evidenceList.replaceChildren();
+  if (!report.evidence.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "Inga evidensobjekt i kartutsnittet.";
+    elements.evidenceList.append(empty);
+    return;
+  }
+  report.evidence.slice(0, 100).forEach((evidence) => {
+    const item = document.createElement("div");
+    item.className = "layer-item is-available";
+    const content = document.createElement("span");
+    const heading = document.createElement("strong");
+    heading.textContent = `${evidence.type} · ${evidence.provider}`;
+    const details = document.createElement("small");
+    details.textContent = `${evidence.strength} · ${evidence.provenance.source} · ${evidence.provenance.source_id}`;
+    content.append(heading, details);
+    item.append(content);
+    elements.evidenceList.append(item);
+  });
+}
+
+async function loadEvidence() {
+  const parameters = viewportParameters();
+  parameters.set("area", "visible-map");
+  const response = await fetch(`/api/evidence-report?${parameters}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  renderEvidence(await response.json());
+}
+
 function safeExternalLink(container, text, url) {
   container.textContent = "";
   if (!url) {
@@ -482,6 +515,7 @@ async function loadViewport() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const collection = await response.json();
     replaceViewport(collection);
+    await loadEvidence();
     if (collection.summary.truncated) {
       elements.mapStatusText.textContent = "Många objekt finns här. Zooma in för att se alla.";
     } else {
@@ -882,6 +916,7 @@ function cacheElements() {
     datasetStatus: "dataset-status", datasetCount: "dataset-count",
     datasetImport: "dataset-import", datasetSource: "dataset-source",
     layerList: "layer-list",
+    evidenceCount: "evidence-count", evidenceList: "evidence-list",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }

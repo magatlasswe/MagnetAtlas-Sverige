@@ -31,7 +31,9 @@ def test_serve_starts_local_server_without_opening_browser(
     server = FakeServer()
 
     def fake_create_server(*args: Any, **kwargs: Any) -> FakeServer:
-        assert kwargs == {"host": "127.0.0.1", "port": 8123}
+        assert kwargs["host"] == "127.0.0.1"
+        assert kwargs["port"] == 8123
+        assert kwargs["evidence_service"] is not None
         return server
 
     monkeypatch.setattr("magnetatlas.cli.create_server", fake_create_server)

@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 from urllib.parse import parse_qs, unquote, urlsplit
 
+from magnetatlas.application.evidence import EvidenceReportService
 from magnetatlas.application.feature_queries import FeatureQuerySource
 from magnetatlas.application.features import FeatureSearchFilters
 from magnetatlas.application.layer_composition import LayerCompositionService
@@ -19,6 +20,8 @@ from magnetatlas.interfaces.web.layer_composition import (
 )
 from magnetatlas.interfaces.web.serializers import (
     serialize_dataset_summary,
+    serialize_evidence,
+    serialize_evidence_report,
     serialize_feature,
     serialize_layer,
     serialize_search_results,
@@ -85,6 +88,7 @@ def make_handler(
     source: FeatureQuerySource,
     layer_service: LayerService,
     composition_service: LayerCompositionService | None = None,
+    evidence_service: EvidenceReportService | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one bounded feature query source."""
     composition = composition_service or create_layer_composition_service(layer_service)
@@ -129,6 +133,54 @@ def make_handler(
             parameters = parse_qs(parsed_url.query)
             if path == "/api/dataset":
                 self._json(HTTPStatus.OK, serialize_dataset_summary(source.summary()))
+                return
+            if path in {"/api/evidence-report", "/api/evidence"}:
+                if evidence_service is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "evidence_unavailable"},
+                    )
+                    return
+                try:
+                    bounds = _bounds(parameters)
+                    report = evidence_service.create_report(
+                        area=parameters.get("area", ["bbox"])[0],
+                        bbox=bounds,
+                        limit=_limit(parameters),
+                    )
+                except ValueError as exc:
+                    self._json(
+                        HTTPStatus.BAD_REQUEST,
+                        {"error": "invalid_request", "message": str(exc)},
+                    )
+                    return
+                payload = serialize_evidence_report(report)
+                self._json(
+                    HTTPStatus.OK,
+                    (
+                        payload
+                        if path.endswith("report")
+                        else {"evidence": payload["evidence"]}
+                    ),
+                )
+                return
+            if path.startswith("/api/evidence/"):
+                if evidence_service is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "evidence_unavailable"},
+                    )
+                    return
+                evidence_id = unquote(path.removeprefix("/api/evidence/"))
+                try:
+                    evidence = evidence_service.get_evidence(evidence_id)
+                except KeyError:
+                    self._json(
+                        HTTPStatus.NOT_FOUND,
+                        {"error": "not_found", "message": "Evidensen hittades inte."},
+                    )
+                    return
+                self._json(HTTPStatus.OK, serialize_evidence(evidence))
                 return
             if path == "/api/layers":
                 self._json(
@@ -263,11 +315,12 @@ def create_server(
     layer_service: LayerService,
     *,
     composition_service: LayerCompositionService | None = None,
+    evidence_service: EvidenceReportService | None = None,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
     """Create a local threaded HTTP server without starting its event loop."""
     return ThreadingHTTPServer(
         (host, port),
-        make_handler(source, layer_service, composition_service),
+        make_handler(source, layer_service, composition_service, evidence_service),
     )

@@ -9,6 +9,12 @@ from urllib.request import Request, urlopen
 
 import pytest
 
+from magnetatlas.application.evidence import (
+    EvidenceEngine,
+    EvidenceReportService,
+    EvidenceRuleRegistry,
+    FeatureEvidenceRule,
+)
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.application.layers import LayerFeatureQuerySource
 from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
@@ -27,7 +33,17 @@ def local_server() -> Iterator[str]:
     source = LayerFeatureQuerySource(
         CatalogFeatureQuerySource(load_demo_features()), layer_service, instance
     )
-    server = create_server(source, layer_service, host="127.0.0.1", port=0)
+    evidence_service = EvidenceReportService(
+        ((instance, CatalogFeatureQuerySource(load_demo_features())),),
+        EvidenceEngine(EvidenceRuleRegistry((FeatureEvidenceRule(),))),
+    )
+    server = create_server(
+        source,
+        layer_service,
+        evidence_service=evidence_service,
+        host="127.0.0.1",
+        port=0,
+    )
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     host, port = server.server_address
@@ -67,6 +83,8 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "dataset-count" in html
         assert "dataset-import" in html
         assert "dataset-source" in html
+        assert "evidence-count" in html
+        assert "evidence-list" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -139,6 +157,30 @@ def test_feature_details_are_loaded_on_demand(local_server: str) -> None:
     assert feature["id"] == feature_id
     assert "description" in feature["properties"]
     assert "provenance" in feature["properties"]
+
+
+def test_evidence_api_serves_reports_lists_and_traceable_items(
+    local_server: str,
+) -> None:
+    query = "bbox=10,55,25,70&limit=10&area=test-area"
+    with urlopen(f"{local_server}/api/evidence-report?{query}", timeout=2) as response:
+        report = json.load(response)
+
+    assert report["area"] == "test-area"
+    assert report["evidence_count"] == 10
+    assert report["confidence"] == "unknown"
+    assert report["provenance"]
+    assert all(item["feature_id"] for item in report["evidence"])
+    assert all(item["provider"] for item in report["evidence"])
+
+    evidence_id = report["evidence"][0]["id"]
+    with urlopen(f"{local_server}/api/evidence/{evidence_id}", timeout=2) as response:
+        evidence = json.load(response)
+    assert evidence["id"] == evidence_id
+    assert evidence["provenance"]["source_id"]
+
+    with urlopen(f"{local_server}/api/evidence?{query}", timeout=2) as response:
+        assert len(json.load(response)["evidence"]) == 10
 
 
 def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) -> None:

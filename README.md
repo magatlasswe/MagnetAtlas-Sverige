@@ -47,6 +47,8 @@ data.
   dokumenterade STAC-vektorkatalogen och GeoPackage.
 - Gemensamt lagerkompositionsramverk för vektor- och rastermetadata, ritordning,
   opacitet, synlighet, legend och attribution ovanpå Layer Engine.
+- Deterministisk Evidence Engine som omvandlar spårbara `AtlasFeature` till
+  versionsmärkta evidensobjekt och bounded `EvidenceReport` utan AI eller ranking.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -112,6 +114,33 @@ installerade `DatasetInstance`. `LayerCompositionService` kombinerar aktiva
 vektordataset till samma bounded kartfråga och dekorerar lagren med
 renderingsmetadata. En framtida renderer omsätter metadata till MapLibre-källor
 och lager; renderingslogik ingår inte i Layer Engine.
+
+## Evidence Engine
+
+Evidence Engine läser normaliserade `AtlasFeature` genom versionshanterade,
+deterministiska regler. Varje `Evidence` pekar på exakt ett feature-ID och
+bevarar dataset, snapshot, geometri, confidence, proveniens, licens, källänk och
+regel-ID. Den inbyggda grundregeln bekräftar endast att ett spårbart källobjekt
+finns; den tolkar inte objekttypen och skapar inga historiska fakta.
+
+```text
+AtlasFeature
+    ↓
+Evidence
+    ↓
+EvidenceReport
+    ↓
+Future Search
+    ↓
+Future Ranking
+    ↓
+Future AI
+```
+
+`GET /api/evidence-report?bbox=west,south,east,north` levererar rapporten och
+`GET /api/evidence/{id}` levererar ett enskilt spårbart evidensobjekt. Det finns
+ingen AI- eller ranking-endpoint. Framtida AI får endast läsa `EvidenceReport`;
+den får aldrig läsa råa providers, råa dataset eller råa `AtlasFeature`.
 
 SGU Jordarter importeras från den officiella samlingen `grundlager`:
 

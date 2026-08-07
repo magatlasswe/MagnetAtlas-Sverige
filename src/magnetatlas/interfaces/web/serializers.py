@@ -13,6 +13,7 @@ from magnetatlas.application.features import (
     feature_period,
     navigation_target,
 )
+from magnetatlas.domain.evidence import Evidence, EvidenceReport, EvidenceSource
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 from magnetatlas.domain.map_layers import ComposedLayer
@@ -52,8 +53,68 @@ def serialize_layer(layer: ComposedLayer) -> dict[str, Any]:
     }
 
 
-def _geometry(feature: AtlasFeature) -> dict[str, Any] | None:
-    geometry = feature.geometry
+def _evidence_source(source: EvidenceSource) -> dict[str, Any]:
+    license_info = source.license
+    return {
+        "provider": source.provider,
+        "dataset": source.dataset,
+        "snapshot": source.snapshot,
+        "source_url": source.source_url,
+        "provenance": {
+            "source": source.provenance.source,
+            "source_id": source.provenance.source_id,
+            "source_url": source.provenance.source_url,
+            "fetched_at": source.provenance.fetched_at.isoformat(),
+        },
+        "license": (
+            {
+                "name": license_info.name,
+                "url": license_info.url,
+                "attribution": license_info.attribution,
+            }
+            if license_info is not None
+            else None
+        ),
+    }
+
+
+def serialize_evidence(evidence: Evidence) -> dict[str, Any]:
+    """Serialize traceable evidence without exposing provider raw data."""
+    return {
+        "id": evidence.id,
+        "type": evidence.type.value,
+        **_evidence_source(evidence.source),
+        "feature_id": str(evidence.feature_id),
+        "geometry": _geometry_value(evidence.geometry),
+        "created_at": evidence.created_at.isoformat(),
+        "confidence": _confidence(evidence.confidence),
+        "strength": evidence.strength.value,
+        "explanation": evidence.explanation,
+        "rule_id": evidence.rule_id,
+    }
+
+
+def serialize_evidence_report(report: EvidenceReport) -> dict[str, Any]:
+    """Serialize a deterministic EvidenceReport for API and future consumers."""
+    return {
+        "area": report.area,
+        "bbox": {
+            "west": report.bbox.west,
+            "south": report.bbox.south,
+            "east": report.bbox.east,
+            "north": report.bbox.north,
+        },
+        "created_at": report.created_at.isoformat(),
+        "datasets": list(report.datasets),
+        "evidence_count": report.evidence_count,
+        "summary": report.summary,
+        "confidence": report.confidence.value,
+        "provenance": [_evidence_source(item) for item in report.provenance],
+        "evidence": [serialize_evidence(item) for item in report.evidence.items],
+    }
+
+
+def _geometry_value(geometry: object) -> dict[str, Any] | None:
     if geometry is None:
         return None
     if isinstance(geometry, GeoPoint):
@@ -90,6 +151,10 @@ def _geometry(feature: AtlasFeature) -> dict[str, Any] | None:
             ],
         }
     raise TypeError(f"Geometritypen stöds inte: {type(geometry).__name__}")
+
+
+def _geometry(feature: AtlasFeature) -> dict[str, Any] | None:
+    return _geometry_value(feature.geometry)
 
 
 def _confidence(confidence: Confidence) -> dict[str, object | None]:

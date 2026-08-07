@@ -14,6 +14,12 @@ from rich.table import Table
 from sqlalchemy.exc import SQLAlchemyError
 
 from magnetatlas.application.collectors import CollectorRegistry
+from magnetatlas.application.evidence import (
+    EvidenceEngine,
+    EvidenceReportService,
+    EvidenceRuleRegistry,
+    FeatureEvidenceRule,
+)
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.application.layer_composition import ComposedFeatureQuerySource
 from magnetatlas.application.search import SearchService
@@ -526,7 +532,17 @@ def serve(
                 )
         layer_service = create_layer_service(instances)
         composed_source = ComposedFeatureQuerySource(raw_sources, layer_service)
-        server = create_server(composed_source, layer_service, host=host, port=port)
+        evidence_service = EvidenceReportService(
+            raw_sources,
+            EvidenceEngine(EvidenceRuleRegistry((FeatureEvidenceRule(),))),
+        )
+        server = create_server(
+            composed_source,
+            layer_service,
+            evidence_service=evidence_service,
+            host=host,
+            port=port,
+        )
         actual_host, actual_port = server.server_address
         display_host = (
             "localhost" if actual_host in {"127.0.0.1", "::1"} else actual_host
