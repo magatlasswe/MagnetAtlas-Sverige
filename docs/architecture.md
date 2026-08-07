@@ -353,6 +353,13 @@ koordinatsystem och returnerar endast `AtlasFeature`. Kärnan importerar aldrig
 en konkret Collector, och repositoryt behöver inte ändras när en ny datakälla
 läggs till.
 
+Sprint 3.5b verifierar samma gräns med en filbaserad STAC-provider.
+`LantmaterietClient` äger HTTP, autentisering och atomisk ZIP-hämtning;
+`LantmaterietCollector` äger säker extraktion och strömmande GeoPackage-läsning;
+mappern normaliserar EPSG:3006-punkter till `AtlasFeature`; importern delegerar
+till oförändrad `SyncService`. Lagerkomponenterna, `DatasetInstance` och
+frontend är oförändrade.
+
 ## Långsiktiga arkitekturprinciper
 
 Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i

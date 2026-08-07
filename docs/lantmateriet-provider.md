@@ -1,7 +1,12 @@
 # Lantmäteriet-provider: research och rekommendation
 
 Research genomförd: **2026-08-07**  
-Planerad implementation: **Sprint 3.5**
+Implementerad: **Sprint 3.5b**
+
+> **Reviderat beslut:** Sprint 3.5 avbröts innan kod. Ortnamn Direkt är ett
+> fråga–svar-API som kräver namn eller punkt och kan inte skapa fullständiga
+> country- eller bbox-importer. Sprint 3.5b implementerar därför Ortnamn
+> Nedladdning, vektor via den officiella STAC-vektorkatalogen.
 
 ## Avgränsning
 
@@ -69,7 +74,7 @@ kakling, skala och attribution. Att pressa TIFF-filerna genom
 Historiska ortofoton har ett dokumenterat WMS, men WMS returnerar renderade
 bilder. Det är ett visningslager och inte en importerbar featurekälla.
 
-## Rekommenderad första implementation
+## Ursprunglig rekommendation (ersatt)
 
 **Ortnamn Direkt rekommenderas som första implementerade Lantmäteri-dataset i
 Sprint 3.5.**
@@ -106,10 +111,10 @@ produktnamn, transporttyp, format, API-version, autentiseringsklass, licensklass
 geometrityp och framtida lager-ID. Ingen importer eller autentisering aktiveras i
 Sprint 3.4.
 
-## Beslut inför Sprint 3.5
+## Beslut efter Sprint 3.5b
 
-- Implementera Ortnamn Direkt först, efter separat kontroll av gällande version
-  och villkor i Geotorget.
+- Använd Ortnamn Nedladdning för reproducerbara fulluttag och lokala bbox-urval.
+- Reservera Ortnamn Direkt för ett eventuellt framtida fjärrsökningsfall.
 - Behåll Historiska kartor som inaktiv deklaration tills rasterkontraktet finns.
 - Behandla WMS/WMTS, STAC, OGC API Features och produkt-REST som separata
   transportcapabilities inom samma provider.

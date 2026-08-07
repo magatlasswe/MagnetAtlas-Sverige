@@ -4,18 +4,18 @@
     {
       "id": "lantmateriet",
       "name": "Lantmäteriet",
-      "status": "planned",
+      "status": "active",
       "datasets": [
         {
           "id": "ortnamn",
-          "name": "Ortnamn Direkt",
-          "status": "recommended-next",
-          "transport": "rest",
-          "formats": ["geojson", "gml"],
-          "authentication": "oauth2-product-entitlement",
-          "license": "product-terms-value-data",
+          "name": "Ortnamn Nedladdning, vektor",
+          "status": "active",
+          "transport": "stac-vector-download",
+          "formats": ["zip", "geopackage"],
+          "authentication": "oauth2-or-basic-product-entitlement",
+          "license": "cc-by-4.0",
           "layer_id": null,
-          "import_enabled": false
+          "import_enabled": true
         },
         {
           "id": "historiska-kartor",

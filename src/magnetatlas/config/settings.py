@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -31,6 +31,13 @@ class Settings:
     raa_work_dir: Path = Path("data/cache/raa")
     sgu_api_url: str = "https://api.sgu.se/oppnadata"
     sgu_work_dir: Path = Path("data/cache/sgu")
+    lantmateriet_stac_url: str = "https://api.lantmateriet.se/stac-vektor/v1"
+    lantmateriet_work_dir: Path = Path("data/cache/lantmateriet")
+    lantmateriet_client_id: str | None = None
+    lantmateriet_client_secret: str | None = field(default=None, repr=False)
+    lantmateriet_token_url: str | None = None
+    lantmateriet_username: str | None = None
+    lantmateriet_password: str | None = field(default=None, repr=False)
     http_timeout: float = 20.0
 
     @classmethod
@@ -63,6 +70,23 @@ class Settings:
                 "MAGNETATLAS_SGU_API_URL", "https://api.sgu.se/oppnadata"
             ).rstrip("/"),
             sgu_work_dir=Path(os.getenv("MAGNETATLAS_SGU_WORK_DIR", "data/cache/sgu")),
+            lantmateriet_stac_url=os.getenv(
+                "MAGNETATLAS_LANTMATERIET_STAC_URL",
+                "https://api.lantmateriet.se/stac-vektor/v1",
+            ).rstrip("/"),
+            lantmateriet_work_dir=Path(
+                os.getenv(
+                    "MAGNETATLAS_LANTMATERIET_WORK_DIR",
+                    "data/cache/lantmateriet",
+                )
+            ),
+            lantmateriet_client_id=os.getenv("MAGNETATLAS_LANTMATERIET_CLIENT_ID"),
+            lantmateriet_client_secret=os.getenv(
+                "MAGNETATLAS_LANTMATERIET_CLIENT_SECRET"
+            ),
+            lantmateriet_token_url=os.getenv("MAGNETATLAS_LANTMATERIET_TOKEN_URL"),
+            lantmateriet_username=os.getenv("MAGNETATLAS_LANTMATERIET_USERNAME"),
+            lantmateriet_password=os.getenv("MAGNETATLAS_LANTMATERIET_PASSWORD"),
             http_timeout=timeout,
         )
         settings.validate()
@@ -77,10 +101,29 @@ class Settings:
             ("RAÄ API-URL", self.raa_api_url),
             ("RAÄ nedladdnings-URL", self.raa_download_url),
             ("SGU API-URL", self.sgu_api_url),
+            ("Lantmäteriet STAC-URL", self.lantmateriet_stac_url),
         ):
             parsed = urlparse(value)
             if parsed.scheme not in {"http", "https"} or not parsed.netloc:
                 raise ValueError(f"{label} måste vara en giltig HTTP(S)-URL")
+        if self.lantmateriet_token_url:
+            parsed = urlparse(self.lantmateriet_token_url)
+            if parsed.scheme != "https" or not parsed.netloc:
+                raise ValueError("Lantmäteriets token-URL måste vara en HTTPS-URL")
+        if bool(self.lantmateriet_client_id) != bool(self.lantmateriet_client_secret):
+            raise ValueError(
+                "Lantmäteriet OAuth2 kräver både client id och client secret"
+            )
+        if self.lantmateriet_client_id and not self.lantmateriet_token_url:
+            raise ValueError(
+                "Lantmäteriet OAuth2 kräver MAGNETATLAS_LANTMATERIET_TOKEN_URL"
+            )
+        if bool(self.lantmateriet_username) != bool(self.lantmateriet_password):
+            raise ValueError(
+                "Lantmäteriet Basic-auth kräver både användarnamn och lösenord"
+            )
+        if self.lantmateriet_client_id and self.lantmateriet_username:
+            raise ValueError("Välj antingen OAuth2 eller Basic-auth för Lantmäteriet")
         if self.log_level not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
             raise ValueError("MAGNETATLAS_LOG_LEVEL har ett ogiltigt värde")
 

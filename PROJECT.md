@@ -2,9 +2,9 @@
 
 Last updated: **2026-08-07**
 
-Current version: **v1.2.0-alpha**
+Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.4 – Lantmäteriet Provider Foundation (completed)**
+Current sprint: **Sprint 3.5b – Lantmäteriet Ortnamn Download (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -16,7 +16,7 @@ First real dataset: **Sprint 2.6.4 – First Real RAÄ Dataset (completed)**
 
 ## Project Status
 
-Current Version: **v1.2.0-alpha**
+Current Version: **v1.4.0-alpha**
 
 The runnable alpha currently contains the project foundation, Collector
 Framework, shared domain model, local web interface and user-experience
@@ -67,6 +67,11 @@ provider reads the documented OGC API Features contract, maps Jordarter to
 `AtlasFeature` with CC0 provenance and imports independent dataset instances.
 The existing layer API discovers and activates SGU Jordarter without changes to
 LayerRegistry, LayerService, DatasetInstance or the frontend.
+
+Sprint 3.5b implements the first Lantmäteriet dataset without changing those
+shared components. Ortnamn Nedladdning is discovered through the official STAC
+vector catalogue, downloaded as a reproducible GeoPackage snapshot and streamed
+into independent country or bbox dataset instances.
 
 ## Current Sprint
 

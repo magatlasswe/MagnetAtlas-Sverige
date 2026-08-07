@@ -33,6 +33,15 @@ from magnetatlas.infrastructure.database.repositories import (
 from magnetatlas.infrastructure.database.session import create_session_factory
 from magnetatlas.infrastructure.exporters.csv_exporter import export_csv
 from magnetatlas.infrastructure.features import load_demo_features, load_features
+from magnetatlas.infrastructure.sources.lantmateriet.client import LantmaterietClient
+from magnetatlas.infrastructure.sources.lantmateriet.collector import (
+    LANTMATERIET_SOURCE_DEFINITION,
+    ORTNAMN_DATASET,
+    LantmaterietCollector,
+)
+from magnetatlas.infrastructure.sources.lantmateriet.importer import (
+    LantmaterietImporter,
+)
 from magnetatlas.infrastructure.sources.raa.client import RAAClient
 from magnetatlas.infrastructure.sources.raa.collector import (
     RAA_SOURCE_DEFINITION,
@@ -67,6 +76,7 @@ EXPECTED_ERRORS = (MagnetAtlasError, ValueError, OSError, SQLAlchemyError)
 NATIONWIDE_MIN_FREE_BYTES = 12 * 1024**3
 RAA_SOURCE = RAA_SOURCE_DEFINITION
 SGU_SOURCE = SGU_SOURCE_DEFINITION
+LANTMATERIET_SOURCE = LANTMATERIET_SOURCE_DEFINITION
 
 
 def _abort_with_error(context: str, error: Exception) -> Never:
@@ -117,6 +127,29 @@ def _create_sgu_sync_service(
         SGUCollector(client, SGU_JORDARTER),
         repository,
         settings.sgu_work_dir,
+    )
+
+
+def _create_lantmateriet_sync_service(
+    settings: Settings, instance: DatasetInstance
+) -> SyncService:
+    repository = SqlAlchemyAtlasFeatureRepository(
+        create_session_factory(settings.database_url)
+    )
+    client = LantmaterietClient(
+        base_url=settings.lantmateriet_stac_url,
+        timeout=settings.http_timeout,
+        client_id=settings.lantmateriet_client_id,
+        client_secret=settings.lantmateriet_client_secret,
+        token_url=settings.lantmateriet_token_url,
+        username=settings.lantmateriet_username,
+        password=settings.lantmateriet_password,
+    )
+    return SyncService(
+        instance,
+        LantmaterietCollector(client, ORTNAMN_DATASET),
+        repository,
+        settings.lantmateriet_work_dir,
     )
 
 
@@ -188,6 +221,14 @@ def _sgu_dataset_instance(
     else:
         scope = DatasetScope.country(country or "sweden")
     return DatasetInstance.create(SGU_SOURCE, scope)
+
+
+def _lantmateriet_dataset_instance(
+    country: str | None, bbox: BoundingBox | None
+) -> DatasetInstance:
+    parent = DatasetScope.country(country or "sweden")
+    scope = DatasetScope.bbox(bbox, parent=parent) if bbox is not None else parent
+    return DatasetInstance.create(LANTMATERIET_SOURCE, scope)
 
 
 def _ensure_nationwide_disk_space(path: Path) -> None:
@@ -277,6 +318,41 @@ def import_sgu(
         )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("SGU-importen misslyckades", exc)
+
+
+@import_app.command("lantmateriet")
+def import_lantmateriet(
+    dataset: Annotated[str, typer.Option("--dataset")] = "ortnamn",
+    country: Annotated[str | None, typer.Option("--country")] = None,
+    bbox: Annotated[str | None, typer.Option("--bbox")] = None,
+) -> None:
+    """Importera Lantmäteriets reproducerbara vektornedladdning."""
+    try:
+        if dataset.casefold() != "ortnamn":
+            raise ValueError("--dataset stöder endast värdet ortnamn")
+        if country is not None and country.strip().casefold() != "sweden":
+            raise ValueError("--country stöder endast värdet sweden")
+        parsed_bbox = _parse_bbox(bbox)
+        settings = Settings.from_env()
+        settings.prepare_directories()
+        instance = _lantmateriet_dataset_instance(country, parsed_bbox)
+        last_reported = 0
+
+        def report_progress(imported: int) -> None:
+            nonlocal last_reported
+            if imported - last_reported >= 5_000:
+                console.print(f"Bearbetade {imported} ortnamn…")
+                last_reported = imported
+
+        result = LantmaterietImporter(
+            _create_lantmateriet_sync_service(settings, instance)
+        ).run(bbox=parsed_bbox, progress=report_progress)
+        console.print(
+            f"Importerade [bold]{result.imported}[/bold] ortnamn på "
+            f"{result.duration_seconds:.1f} sekunder."
+        )
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("Lantmäteriet-importen misslyckades", exc)
 
 
 @cache_app.command("status")

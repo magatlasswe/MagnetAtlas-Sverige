@@ -1,6 +1,6 @@
 # MagnetAtlas Sverige
 
-**Status:** Public alpha (`v1.2.0-alpha`)
+**Status:** Public alpha (`v1.4.0-alpha`)
 
 **Python:** 3.13 eller 3.14
 
@@ -15,7 +15,8 @@ Projektet är en modulär Python-applikation med CLI, SQLite, exportfunktioner o
 ett mobilanpassat webbgränssnitt.
 
 Projektet befinner sig i alpha. Demodatan är tydligt märkt. Officiella data kan
-importeras lokalt från RAÄ Kulturmiljöregistret och SGU Jordarter.
+importeras lokalt från RAÄ Kulturmiljöregistret, SGU Jordarter och Lantmäteriets
+Ortnamn Nedladdning.
 
 ## Vision
 
@@ -42,6 +43,8 @@ data.
 - Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
 - Generell SGU-provider med Jordarter som första dataset via dokumenterad OGC
   API Features och CC0.
+- Generell Lantmäteriet-provider med reproducerbara Ortnamn-snapshotar via den
+  dokumenterade STAC-vektorkatalogen och GeoPackage.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -64,6 +67,7 @@ magnetatlas --help
 magnetatlas search "bro"
 magnetatlas import raa --county ostergotland
 magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
+magnetatlas import lantmateriet --dataset ortnamn --country sweden
 magnetatlas cache status
 magnetatlas serve
 ```
@@ -103,6 +107,20 @@ magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
 magnetatlas import sgu --county stockholm --bbox 17.7,58.7,19.4,60.3
 magnetatlas import sgu --municipality vaxholm --bbox 18.2,59.35,18.5,59.5
 ```
+
+Lantmäteriets Ortnamn importeras från en versionsidentifierad, rikstäckande
+STAC-asset. Bbox filtreras lokalt under den strömmande normaliseringen:
+
+```powershell
+magnetatlas import lantmateriet --dataset ortnamn --country sweden
+magnetatlas import lantmateriet --dataset ortnamn --bbox 18.2,59.35,18.5,59.5
+```
+
+OAuth2 konfigureras med `MAGNETATLAS_LANTMATERIET_CLIENT_ID`,
+`MAGNETATLAS_LANTMATERIET_CLIENT_SECRET` och
+`MAGNETATLAS_LANTMATERIET_TOKEN_URL`. Alternativ Basic-auth använder
+`MAGNETATLAS_LANTMATERIET_USERNAME` och `MAGNETATLAS_LANTMATERIET_PASSWORD`.
+Hemligheter lagras eller loggas inte.
 
 SGU:s dokumenterade OGC-gränssnitt filtrerar geografiskt med bbox. Därför måste
 `--county` och `--municipality` kombineras med `--bbox`; namnet bevaras som

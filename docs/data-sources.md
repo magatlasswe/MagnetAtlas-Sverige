@@ -5,9 +5,24 @@ annonserar capabilities för textsökning och resultatbegränsning och returnera
 `CollectionBatch` med normaliserade `ArchiveRecord`-objekt. Det äldre
 `RiksarkivetClient.search` finns kvar för bakåtkompatibilitet.
 
-Planerade adaptrar omfattar OpenStreetMap, Lantmäteriet och SMHI. Varje integration måste dokumentera API,
+Planerade adaptrar omfattar OpenStreetMap och SMHI. Varje integration måste dokumentera API,
 licens, attribueringskrav, uppdateringsfrekvens och kända kvalitetsbegränsningar.
-RAÄ Kulturmiljöregistret är implementerat i Sprint 2.6 och SGU i Sprint 3.3.
+RAÄ Kulturmiljöregistret är implementerat i Sprint 2.6, SGU i Sprint 3.3 och
+Lantmäteriet Ortnamn Nedladdning i Sprint 3.5b.
+
+## Lantmäteriet Provider
+
+Providern använder den officiella STAC-vektorkatalogen på
+`https://api.lantmateriet.se/stac-vektor/v1`. Datasetet `ortnamn` väljer den
+senast publicerade katalogpostens ZIP-asset, bevarar item-ID och publiceringstid
+som snapshotidentitet och extraherar exakt en GeoPackage säkert. Den
+rikstäckande leveransen används för country; bbox filtreras lokalt efter
+konvertering från SWEREF 99 TM till WGS84.
+
+Den stabila objektidentiteten är löpnummer och språkkod. Originalfält,
+hämtningsadress, snapshotversion, CC BY 4.0-attribution och koordinatens
+kartografiska osäkerhet bevaras i `AtlasFeature`. OAuth2 eller Basic-auth läses
+endast från miljökonfiguration. Historiska kartor är fortsatt inaktiverade.
 
 ## SGU Provider
 
