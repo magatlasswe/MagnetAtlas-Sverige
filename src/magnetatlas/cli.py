@@ -40,6 +40,13 @@ from magnetatlas.infrastructure.sources.raa.collector import (
 )
 from magnetatlas.infrastructure.sources.raa.importer import RAACache, RAAImporter
 from magnetatlas.infrastructure.sources.riksarkivet.client import RiksarkivetClient
+from magnetatlas.infrastructure.sources.sgu.client import SGUClient
+from magnetatlas.infrastructure.sources.sgu.collector import (
+    SGU_JORDARTER,
+    SGU_SOURCE_DEFINITION,
+    SGUCollector,
+)
+from magnetatlas.infrastructure.sources.sgu.importer import SGUImporter
 from magnetatlas.interfaces.web.layers import create_layer_service
 from magnetatlas.interfaces.web.server import create_server
 
@@ -59,6 +66,7 @@ app.add_typer(cache_app, name="cache")
 EXPECTED_ERRORS = (MagnetAtlasError, ValueError, OSError, SQLAlchemyError)
 NATIONWIDE_MIN_FREE_BYTES = 12 * 1024**3
 RAA_SOURCE = RAA_SOURCE_DEFINITION
+SGU_SOURCE = SGU_SOURCE_DEFINITION
 
 
 def _abort_with_error(context: str, error: Exception) -> Never:
@@ -91,6 +99,24 @@ def _create_raa_sync_service(
     )
     return SyncService(
         selected, RAACollector(client), repository, settings.raa_work_dir
+    )
+
+
+def _create_sgu_sync_service(
+    settings: Settings, instance: DatasetInstance
+) -> SyncService:
+    repository = SqlAlchemyAtlasFeatureRepository(
+        create_session_factory(settings.database_url)
+    )
+    client = SGUClient(
+        base_url=settings.sgu_api_url,
+        timeout=settings.http_timeout,
+    )
+    return SyncService(
+        instance,
+        SGUCollector(client, SGU_JORDARTER),
+        repository,
+        settings.sgu_work_dir,
     )
 
 
@@ -140,6 +166,30 @@ def _raa_dataset_instance(
     return DatasetInstance.create(RAA_SOURCE, scope)
 
 
+def _sgu_dataset_instance(
+    country: str | None,
+    county: str | None,
+    municipality: str | None,
+    bbox: BoundingBox | None,
+) -> DatasetInstance:
+    if bbox is not None:
+        parent = None
+        if municipality is not None:
+            parent = DatasetScope.municipality(municipality)
+        elif county is not None:
+            parent = DatasetScope.county(county)
+        elif country is not None:
+            parent = DatasetScope.country(country)
+        scope = DatasetScope.bbox(bbox, parent=parent)
+    elif municipality is not None:
+        scope = DatasetScope.municipality(municipality)
+    elif county is not None:
+        scope = DatasetScope.county(county)
+    else:
+        scope = DatasetScope.country(country or "sweden")
+    return DatasetInstance.create(SGU_SOURCE, scope)
+
+
 def _ensure_nationwide_disk_space(path: Path) -> None:
     free = shutil.disk_usage(path).free
     if free < NATIONWIDE_MIN_FREE_BYTES:
@@ -187,6 +237,46 @@ def import_raa(
         )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("RAÄ-importen misslyckades", exc)
+
+
+@import_app.command("sgu")
+def import_sgu(
+    country: Annotated[str | None, typer.Option("--country")] = None,
+    county: Annotated[str | None, typer.Option("--county")] = None,
+    municipality: Annotated[str | None, typer.Option("--municipality")] = None,
+    bbox: Annotated[str | None, typer.Option("--bbox")] = None,
+) -> None:
+    """Importera SGU Jordarter från myndighetens dokumenterade OGC API."""
+    try:
+        _validate_raa_scope(country, county, municipality)
+        parsed_bbox = _parse_bbox(bbox)
+        if (county or municipality) and parsed_bbox is None:
+            raise ValueError(
+                "SGU kräver --bbox tillsammans med --county eller --municipality"
+            )
+        settings = Settings.from_env()
+        settings.prepare_directories()
+        instance = _sgu_dataset_instance(country, county, municipality, parsed_bbox)
+        last_reported = 0
+
+        def report_progress(imported: int) -> None:
+            nonlocal last_reported
+            if imported - last_reported >= 5_000:
+                console.print(f"Bearbetade {imported} SGU-objekt…")
+                last_reported = imported
+
+        result = SGUImporter(_create_sgu_sync_service(settings, instance)).run(
+            county=county,
+            municipality=municipality,
+            bbox=parsed_bbox,
+            progress=report_progress,
+        )
+        console.print(
+            f"Importerade [bold]{result.imported}[/bold] SGU-objekt på "
+            f"{result.duration_seconds:.1f} sekunder."
+        )
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("SGU-importen misslyckades", exc)
 
 
 @cache_app.command("status")

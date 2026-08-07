@@ -8,6 +8,7 @@ from magnetatlas.application.layers import LayerRegistry, LayerService
 from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.domain.features import AtlasFeature, FeatureId, Provenance
 from magnetatlas.domain.layers import LayerDefinition
+from magnetatlas.interfaces.web.layers import create_layer_service
 
 SOURCE = SourceDefinition("official-a", "Official source A")
 OTHER_SOURCE = SourceDefinition("official-b", "Official source B")
@@ -130,3 +131,19 @@ def test_service_rejects_enabling_unavailable_layer() -> None:
 
     with pytest.raises(ValueError, match="ingen installerad"):
         service.enable("future")
+
+
+def test_web_catalog_automatically_enables_sgu_soils_for_installed_dataset() -> None:
+    instance = DatasetInstance.create(
+        SourceDefinition("sgu-jordarter", "SGU Jordarter"),
+        DatasetScope.country("sweden"),
+    )
+
+    statuses = {
+        status.definition.id: status
+        for status in create_layer_service((instance,)).list_layers()
+    }
+
+    assert statuses["soil-types"].supported is True
+    assert statuses["soil-types"].active is True
+    assert statuses["bedrock"].supported is False

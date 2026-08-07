@@ -5,11 +5,47 @@ annonserar capabilities för textsökning och resultatbegränsning och returnera
 `CollectionBatch` med normaliserade `ArchiveRecord`-objekt. Det äldre
 `RiksarkivetClient.search` finns kvar för bakåtkompatibilitet.
 
-Planerade adaptrar omfattar OpenStreetMap, Lantmäteriet,
-Riksantikvarieämbetet, SGU och SMHI. Varje integration måste dokumentera API,
+Planerade adaptrar omfattar OpenStreetMap, Lantmäteriet och SMHI. Varje integration måste dokumentera API,
 licens, attribueringskrav, uppdateringsfrekvens och kända kvalitetsbegränsningar.
-RAÄ Kulturmiljöregistret är implementerat i Sprint 2.6. Övriga källor är ännu
-inte implementerade.
+RAÄ Kulturmiljöregistret är implementerat i Sprint 2.6 och SGU i Sprint 3.3.
+
+## SGU Provider
+
+SGU-integrationen är en konfigurerbar provider för flera framtida geologiska
+dataset. Providerkonfigurationen håller datasetnamn, API-sökväg, collection-ID,
+schemaversion och `SourceDefinition`; Collector-, mapper- och importflödet är
+gemensamt. Sprint 3.3 registrerar endast **Jordarter 1:25 000-1:100 000** och
+samlingen `grundlager`. Berggrund, brunnar, grundvatten, gruvor och
+mineralinformation är ännu inte implementerade.
+
+Datat läses från SGU:s dokumenterade OGC API Features:
+`https://api.sgu.se/oppnadata/jordarter25k-100k/ogc/features/v1`. GeoJSON begärs
+i CRS84/WGS84, `next`-länkar följs och normaliserade features skrivs i begränsade
+batchar genom samma `SyncService` och repositorykontrakt som RAÄ. Collectorn
+annonserar basimport men inte inkrementella ändringar, eftersom produkten saknar
+ett dokumenterat ändringsflöde.
+
+Varje SGU-objekt bevarar feature-ID, produkt- och collectionidentitet,
+originalattribut, hämtningsdatum och källänk. `Confidence` förklarar att
+kartskalan är översiktlig och inte lämpad för detaljerade markbedömningar. SGU
+anger att dess öppna geologiska data sedan den 9 juni 2024 har licensen CC0.
+
+OGC-tjänsten erbjuder bbox som dokumenterad geografisk avgränsning men inga
+namngivna läns- eller kommunparametrar. `--county` och `--municipality` kräver
+därför även `--bbox`; namnet sparas som bbox-scopeets parent. Det förhindrar att
+ett rikstäckande uttag felaktigt identifieras som ett lokalt dataset.
+
+Kommandon:
+
+```text
+magnetatlas import sgu --country sweden
+magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
+magnetatlas import sgu --county stockholm --bbox 17.7,58.7,19.4,60.3
+magnetatlas import sgu --municipality vaxholm --bbox 18.2,59.35,18.5,59.5
+```
+
+Vid kontroll 2026-08-07 rapporterade `grundlager` 2 956 837 objekt. Samtliga
+automatiska tester använder mockade HTTP-svar och kräver aldrig internet.
 
 ## RAÄ Kulturmiljöregistret
 

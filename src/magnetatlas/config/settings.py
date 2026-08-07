@@ -29,6 +29,8 @@ class Settings:
     raa_api_url: str = "https://pub.raa.se/datauttag"
     raa_download_url: str = "https://pub.raa.se/nedladdning/datauttag/lamningar_v1"
     raa_work_dir: Path = Path("data/cache/raa")
+    sgu_api_url: str = "https://api.sgu.se/oppnadata"
+    sgu_work_dir: Path = Path("data/cache/sgu")
     http_timeout: float = 20.0
 
     @classmethod
@@ -57,6 +59,10 @@ class Settings:
                 "https://pub.raa.se/nedladdning/datauttag/lamningar_v1",
             ).rstrip("/"),
             raa_work_dir=Path(os.getenv("MAGNETATLAS_RAA_WORK_DIR", "data/cache/raa")),
+            sgu_api_url=os.getenv(
+                "MAGNETATLAS_SGU_API_URL", "https://api.sgu.se/oppnadata"
+            ).rstrip("/"),
+            sgu_work_dir=Path(os.getenv("MAGNETATLAS_SGU_WORK_DIR", "data/cache/sgu")),
             http_timeout=timeout,
         )
         settings.validate()
@@ -70,6 +76,7 @@ class Settings:
         for label, value in (
             ("RAÄ API-URL", self.raa_api_url),
             ("RAÄ nedladdnings-URL", self.raa_download_url),
+            ("SGU API-URL", self.sgu_api_url),
         ):
             parsed = urlparse(value)
             if parsed.scheme not in {"http", "https"} or not parsed.netloc:

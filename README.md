@@ -14,8 +14,8 @@ normaliserar och visar spårbar geografisk information från öppna datakällor.
 Projektet är en modulär Python-applikation med CLI, SQLite, exportfunktioner och
 ett mobilanpassat webbgränssnitt.
 
-Projektet befinner sig i alpha. Demodatan är tydligt märkt, och den första
-officiella datakällan kan importeras lokalt från RAÄ Kulturmiljöregistret.
+Projektet befinner sig i alpha. Demodatan är tydligt märkt. Officiella data kan
+importeras lokalt från RAÄ Kulturmiljöregistret och SGU Jordarter.
 
 ## Vision
 
@@ -40,6 +40,8 @@ data.
 - Generell Layer Engine med datasetmedveten filtrering, lagerregister och en
   webbpanel där kulturhistoriska lämningar kan visas eller döljas.
 - Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
+- Generell SGU-provider med Jordarter som första dataset via dokumenterad OGC
+  API Features och CC0.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -61,6 +63,7 @@ verktygskonfiguration.
 magnetatlas --help
 magnetatlas search "bro"
 magnetatlas import raa --county ostergotland
+magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
 magnetatlas cache status
 magnetatlas serve
 ```
@@ -91,6 +94,21 @@ Webbens lagerpanel läser `GET /api/layers`. Ett tillgängligt lager kan växlas
 med `POST /api/layers/{id}/enable` och `POST /api/layers/{id}/disable`.
 Synligheten gäller den körande lokala serverprocessen och ändrar inte importerad
 data. Tio planerade lager visas som **Kommer senare**.
+
+SGU Jordarter importeras från den officiella samlingen `grundlager`:
+
+```powershell
+magnetatlas import sgu --country sweden
+magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
+magnetatlas import sgu --county stockholm --bbox 17.7,58.7,19.4,60.3
+magnetatlas import sgu --municipality vaxholm --bbox 18.2,59.35,18.5,59.5
+```
+
+SGU:s dokumenterade OGC-gränssnitt filtrerar geografiskt med bbox. Därför måste
+`--county` och `--municipality` kombineras med `--bbox`; namnet bevaras som
+datasetets överordnade scope. Varje import får en egen identitet, exempelvis
+`sgu-jordarter:country:sweden`. Rikstäckande `grundlager` innehöll 2 956 837
+objekt vid valideringen 2026-08-07 och är därför en stor lokal import.
 
 Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
 demodata, så att gränssnittet går att prova utan en nätverksimport.

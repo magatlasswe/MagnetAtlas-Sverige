@@ -145,12 +145,12 @@ def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) ->
     with urlopen(f"{local_server}/api/layers", timeout=2) as response:
         layers = json.load(response)["layers"]
 
-    assert len(layers) == 11
+    assert len(layers) == 13
     heritage = layers[0]
     assert heritage["id"] == "cultural-heritage"
     assert heritage["supported"] is True
     assert heritage["active"] is True
-    assert all(not item["enabled"] for item in layers[1:])
+    assert all(not item["active"] for item in layers[1:])
 
     disable = Request(
         f"{local_server}/api/layers/cultural-heritage/disable",
