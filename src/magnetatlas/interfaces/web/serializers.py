@@ -13,8 +13,27 @@ from magnetatlas.application.features import (
     feature_period,
     navigation_target,
 )
+from magnetatlas.application.layers import LayerStatus
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
+
+
+def serialize_layer(status: LayerStatus) -> dict[str, Any]:
+    """Serialize one generic map layer and its runtime state."""
+    layer = status.definition
+    return {
+        "id": layer.id,
+        "name": layer.name,
+        "description": layer.description,
+        "icon": layer.icon,
+        "category": layer.category,
+        "supported_sources": sorted(layer.supported_sources),
+        "default_visibility": layer.default_visibility,
+        "enabled": layer.enabled,
+        "experimental": layer.experimental,
+        "supported": status.supported,
+        "active": status.active,
+    }
 
 
 def _geometry(feature: AtlasFeature) -> dict[str, Any] | None:

@@ -23,13 +23,16 @@ samexistera utan att domänmodellen eller befintlig RAÄ-data blandas ihop.
 
 ### Sprint 3.2 – Layer Engine
 
-Målet är att bygga källneutrala lager ovanpå multi-source-modellen. Lager ska
-vara deklarativa vyer över dataset med filter, stil, attribution, synlighet och
-användarordning. Viewport och sökning ska kunna fråga flera aktiva dataset utan
-att kopiera källdata.
+Status: **slutförd**.
 
-Layer Engine genomförs först när Sprint 3.1 har stabiliserat dataset- och
-källidentiteterna.
+Sprinten levererar källneutrala lager ovanpå multi-source-modellen:
+`LayerDefinition`, `LayerRegistry`, datasetmedveten `LayerService`, filtrering av
+`AtlasFeature`, generella API-endpoints och en webbpanel med elva deklarerade
+lager. Kulturhistoriska lämningar är det enda aktiva produktlagret; övriga visas
+som kommande tills deras datakällor implementeras.
+
+Layer Engine använder Sprint 3.1:s stabila dataset- och källidentiteter och
+innehåller inga myndighetsspecifika regler.
 
 ### Sprint 3.3 – Offline Packages
 

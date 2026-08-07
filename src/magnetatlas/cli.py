@@ -15,11 +15,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from magnetatlas.application.collectors import CollectorRegistry
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
+from magnetatlas.application.layers import LayerFeatureQuerySource
 from magnetatlas.application.search import SearchService
 from magnetatlas.application.sync import SyncService
 from magnetatlas.config.logging import configure_logging
 from magnetatlas.config.settings import Settings
-from magnetatlas.domain.datasets import DatasetInstance, DatasetScope
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.domain.exceptions import MagnetAtlasError
 from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.infrastructure.database.feature_queries import (
@@ -39,6 +40,7 @@ from magnetatlas.infrastructure.sources.raa.collector import (
 )
 from magnetatlas.infrastructure.sources.raa.importer import RAACache, RAAImporter
 from magnetatlas.infrastructure.sources.riksarkivet.client import RiksarkivetClient
+from magnetatlas.interfaces.web.layers import create_layer_service
 from magnetatlas.interfaces.web.server import create_server
 
 app = typer.Typer(
@@ -312,21 +314,32 @@ def serve(
         configure_logging(settings.log_level)
         if features_path is not None:
             source = CatalogFeatureQuerySource(load_features(features_path))
+            active_instance = DatasetInstance.create(
+                SourceDefinition("local-json", "Lokal JSON"),
+                DatasetScope.country("sweden"),
+            )
+            instances = (active_instance,)
         else:
             session_factory = create_session_factory(settings.database_url)
             repository = SqlAlchemyAtlasFeatureRepository(session_factory)
             instance = repository.get_active_instance(RAA_SOURCE.source_id)
-            dataset_id = (
-                instance.dataset_id
-                if instance is not None
-                else DatasetInstance.create(
-                    RAA_SOURCE, DatasetScope.country("sweden")
-                ).dataset_id
+            active_instance = instance or DatasetInstance.create(
+                RAA_SOURCE, DatasetScope.country("sweden")
             )
-            source = SqlAlchemyFeatureQuerySource(session_factory, dataset_id)
+            source = SqlAlchemyFeatureQuerySource(
+                session_factory, active_instance.dataset_id
+            )
+            instances = repository.list_dataset_instances() or (active_instance,)
             if source.summary().count == 0:
                 source = CatalogFeatureQuerySource(load_demo_features())
-        server = create_server(source, host=host, port=port)
+                active_instance = DatasetInstance.create(
+                    SourceDefinition("magnetatlas-demo", "MagnetAtlas demo"),
+                    DatasetScope.country("sweden"),
+                )
+                instances = (active_instance,)
+        layer_service = create_layer_service(instances)
+        layered_source = LayerFeatureQuerySource(source, layer_service, active_instance)
+        server = create_server(layered_source, layer_service, host=host, port=port)
         actual_host, actual_port = server.server_address
         display_host = (
             "localhost" if actual_host in {"127.0.0.1", "::1"} else actual_host

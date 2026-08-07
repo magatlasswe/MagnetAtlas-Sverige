@@ -10,15 +10,24 @@ from urllib.request import Request, urlopen
 import pytest
 
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
+from magnetatlas.application.layers import LayerFeatureQuerySource
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.infrastructure.features import load_demo_features
+from magnetatlas.interfaces.web.layers import create_layer_service
 from magnetatlas.interfaces.web.server import create_server
 
 
 @pytest.fixture
 def local_server() -> Iterator[str]:
-    server = create_server(
-        CatalogFeatureQuerySource(load_demo_features()), host="127.0.0.1", port=0
+    instance = DatasetInstance.create(
+        SourceDefinition("magnetatlas-demo", "MagnetAtlas demo"),
+        DatasetScope.country("sweden"),
     )
+    layer_service = create_layer_service((instance,))
+    source = LayerFeatureQuerySource(
+        CatalogFeatureQuerySource(load_demo_features()), layer_service, instance
+    )
+    server = create_server(source, layer_service, host="127.0.0.1", port=0)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
     host, port = server.server_address
@@ -130,6 +139,53 @@ def test_feature_details_are_loaded_on_demand(local_server: str) -> None:
     assert feature["id"] == feature_id
     assert "description" in feature["properties"]
     assert "provenance" in feature["properties"]
+
+
+def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) -> None:
+    with urlopen(f"{local_server}/api/layers", timeout=2) as response:
+        layers = json.load(response)["layers"]
+
+    assert len(layers) == 11
+    heritage = layers[0]
+    assert heritage["id"] == "cultural-heritage"
+    assert heritage["supported"] is True
+    assert heritage["active"] is True
+    assert all(not item["enabled"] for item in layers[1:])
+
+    disable = Request(
+        f"{local_server}/api/layers/cultural-heritage/disable",
+        method="POST",
+        data=b"",
+    )
+    with urlopen(disable, timeout=2) as response:
+        assert json.load(response)["active"] is False
+    with urlopen(
+        f"{local_server}/api/features?bbox=10,55,25,70&limit=10", timeout=2
+    ) as response:
+        assert json.load(response)["features"] == []
+
+    enable = Request(
+        f"{local_server}/api/layers/cultural-heritage/enable",
+        method="POST",
+        data=b"",
+    )
+    with urlopen(enable, timeout=2) as response:
+        assert json.load(response)["active"] is True
+    with urlopen(f"{local_server}/api/layers/cultural-heritage", timeout=2) as response:
+        assert json.load(response)["name"] == "Kulturhistoriska lämningar"
+
+
+def test_layer_api_rejects_unknown_and_unavailable_layers(local_server: str) -> None:
+    with pytest.raises(HTTPError) as missing:
+        urlopen(f"{local_server}/api/layers/missing", timeout=2)
+    assert missing.value.code == HTTPStatus.NOT_FOUND
+
+    request = Request(
+        f"{local_server}/api/layers/bridges/enable", method="POST", data=b""
+    )
+    with pytest.raises(HTTPError) as unavailable:
+        urlopen(request, timeout=2)
+    assert unavailable.value.code == HTTPStatus.CONFLICT
 
 
 @pytest.mark.parametrize(

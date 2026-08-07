@@ -11,10 +11,12 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 from magnetatlas.application.feature_queries import FeatureQuerySource
 from magnetatlas.application.features import FeatureSearchFilters
+from magnetatlas.application.layers import LayerService
 from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.interfaces.web.serializers import (
     serialize_dataset_summary,
     serialize_feature,
+    serialize_layer,
     serialize_search_results,
     serialize_viewport,
 )
@@ -75,7 +77,9 @@ def _limit(parameters: dict[str, list[str]]) -> int:
     return limit
 
 
-def make_handler(source: FeatureQuerySource) -> type[BaseHTTPRequestHandler]:
+def make_handler(
+    source: FeatureQuerySource, layer_service: LayerService
+) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one bounded feature query source."""
 
     class MagnetAtlasRequestHandler(BaseHTTPRequestHandler):
@@ -118,6 +122,29 @@ def make_handler(source: FeatureQuerySource) -> type[BaseHTTPRequestHandler]:
             parameters = parse_qs(parsed_url.query)
             if path == "/api/dataset":
                 self._json(HTTPStatus.OK, serialize_dataset_summary(source.summary()))
+                return
+            if path == "/api/layers":
+                self._json(
+                    HTTPStatus.OK,
+                    {
+                        "layers": [
+                            serialize_layer(item)
+                            for item in layer_service.list_layers()
+                        ]
+                    },
+                )
+                return
+            if path.startswith("/api/layers/"):
+                layer_id = unquote(path.removeprefix("/api/layers/"))
+                try:
+                    layer = layer_service.get_layer(layer_id)
+                except KeyError:
+                    self._json(
+                        HTTPStatus.NOT_FOUND,
+                        {"error": "not_found", "message": "Lagret hittades inte."},
+                    )
+                    return
+                self._json(HTTPStatus.OK, serialize_layer(layer))
                 return
             if path == "/api/features":
                 try:
@@ -189,7 +216,32 @@ def make_handler(source: FeatureQuerySource) -> type[BaseHTTPRequestHandler]:
             self._route()
 
         def do_POST(self) -> None:
-            """Reject writes because the first web interface is read-only."""
+            """Change process-local layer visibility through supported endpoints."""
+            path = urlsplit(self.path).path
+            if path.startswith("/api/layers/"):
+                relative = path.removeprefix("/api/layers/")
+                layer_id, separator, action = relative.rpartition("/")
+                if separator and action in {"enable", "disable"}:
+                    try:
+                        status = (
+                            layer_service.enable(unquote(layer_id))
+                            if action == "enable"
+                            else layer_service.disable(unquote(layer_id))
+                        )
+                    except KeyError:
+                        self._json(
+                            HTTPStatus.NOT_FOUND,
+                            {"error": "not_found", "message": "Lagret hittades inte."},
+                        )
+                        return
+                    except ValueError as exc:
+                        self._json(
+                            HTTPStatus.CONFLICT,
+                            {"error": "layer_unavailable", "message": str(exc)},
+                        )
+                        return
+                    self._json(HTTPStatus.OK, serialize_layer(status))
+                    return
             self._send(
                 HTTPStatus.METHOD_NOT_ALLOWED,
                 "application/json; charset=utf-8",
@@ -204,9 +256,10 @@ def make_handler(source: FeatureQuerySource) -> type[BaseHTTPRequestHandler]:
 
 def create_server(
     source: FeatureQuerySource,
+    layer_service: LayerService,
     *,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
     """Create a local threaded HTTP server without starting its event loop."""
-    return ThreadingHTTPServer((host, port), make_handler(source))
+    return ThreadingHTTPServer((host, port), make_handler(source, layer_service))

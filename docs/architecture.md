@@ -79,8 +79,9 @@ deterministiska navigationspunkter. En infrastrukturadapter läser versionerad
 JSON och skapar validerade `AtlasFeature`-objekt. HTTP-servern serialiserar dem
 till GeoJSON utan att exponera källans `raw_data`.
 
-Webbservern använder endast fasta GET- och HEAD-routes, binder som standard till
-loopback-adressen och serverar paketerade HTML-, CSS- och JavaScript-resurser.
+Webbservern använder fasta GET- och HEAD-routes samt avgränsade POST-routes för
+processlokal lagersynlighet. Den binder som standard till loopback-adressen och
+serverar paketerade HTML-, CSS- och JavaScript-resurser.
 Klienten använder MapLibre GL JS för presentation och OpenStreetMaps rastertiles
 som enda baskarta. Domän- och applikationslagren känner inte till HTTP, JSON,
 MapLibre eller webbläsarens DOM.
@@ -133,6 +134,31 @@ baskartefel och nekad eller otillgänglig GPS. Meddelandena är svenska och
 användarinriktade. CLI-kompositionsroten översätter på motsvarande sätt förväntade
 käll-, fil-, validerings- och databasfel utan att visa tekniska undantag; full
 felinformation finns endast i debugloggning.
+
+## Layer Engine
+
+Sprint 3.2 delar lagerarkitekturen i tre källneutrala delar:
+
+- `LayerDefinition` beskriver stabil identitet, presentation, kategori,
+  kompatibla källor, standardsynlighet och tillgänglighetsflaggor.
+- `LayerRegistry` registrerar definitioner och äger processlokal synlighet.
+- `LayerService` använder importerade `DatasetInstance` för att avgöra stöd,
+  läsa aktiva lager och filtrera `AtlasFeature` med injicerade predikat.
+
+`LayerFeatureQuerySource` dekorerar webbens befintliga bounded-query-gräns. Det
+gör att viewport och sökresultat följer aktiva lager utan att Layer Engine
+behöver känna till en konkret databas eller Collector. Lagerstöd avgörs genom
+datasetinstansens `SourceDefinition`, inte genom leverantörsspecifika featurefält.
+
+Produktens elva lagerdefinitioner sätts samman under `interfaces.web`. Därmed
+innehåller domän- och applikationsmotorn inga myndighetsnamn eller särskilda
+regler för en datakälla. Endast kulturhistoriska lämningar är tillgängligt i
+Sprint 3.2; resterande definitioner exponeras inaktiverade som kommande lager.
+
+Lager-API:t består av `GET /api/layers`, `GET /api/layers/{id}`,
+`POST /api/layers/{id}/enable` och `POST /api/layers/{id}/disable`.
+POST-operationerna ändrar endast registryt i den lokala serverprocessen och
+skriver inte till dataset, repository eller användarens lokala lagring.
 
 ## RAÄ Collector och lokal synkronisering
 

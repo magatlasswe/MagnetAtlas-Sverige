@@ -37,6 +37,8 @@ data.
 - Collector Framework och en gemensam `AtlasFeature`-domänmodell.
 - Källneutrala identiteter för datakällor, importerade dataset och geografiska
   urval.
+- Generell Layer Engine med datasetmedveten filtrering, lagerregister och en
+  webbpanel där kulturhistoriska lämningar kan visas eller döljas.
 - Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
 - CLI, lokal SQLite-lagring och CSV-export.
 
@@ -83,7 +85,12 @@ Varje import sparas som en egen datasetinstans. Identiteten byggs av källa och
 scope, exempelvis `raa-kmr:municipality:vaxholm`. Country, county, municipality
 och bbox har separata identiteter. Den senast lyckade instansen för en källa är
 aktiv i befintliga cache- och kartflöden; andra instanser förblir isolerade och
-kan upptäckas genom repositorygränsen inför kommande Layer Engine.
+kan upptäckas genom repositorygränsen och används av Layer Engine.
+
+Webbens lagerpanel läser `GET /api/layers`. Ett tillgängligt lager kan växlas
+med `POST /api/layers/{id}/enable` och `POST /api/layers/{id}/disable`.
+Synligheten gäller den körande lokala serverprocessen och ändrar inte importerad
+data. Tio planerade lager visas som **Kommer senare**.
 
 Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
 demodata, så att gränssnittet går att prova utan en nätverksimport.

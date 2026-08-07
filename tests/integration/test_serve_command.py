@@ -76,8 +76,11 @@ def test_serve_prefers_imported_features_over_demo_data(
         def summary(self) -> DatasetSummary:
             return DatasetSummary(1, None, "RAÄ", "RAÄ")
 
-    def fake_create_server(source: object, **kwargs: object) -> FakeServer:
+    def fake_create_server(
+        source: object, layer_service: object, **kwargs: object
+    ) -> FakeServer:
         assert source.summary().count == 1  # type: ignore[attr-defined]
+        assert layer_service is not None
         return server
 
     monkeypatch.setenv("MAGNETATLAS_DATABASE_URL", f"sqlite:///{tmp_path / 'atlas.db'}")

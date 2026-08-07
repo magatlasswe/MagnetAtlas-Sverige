@@ -22,6 +22,7 @@ const state = {
   lastPosition: null,
   followLocation: false,
   centerOnNextLocation: false,
+  layers: [],
 };
 
 const elements = {};
@@ -45,6 +46,55 @@ function saveIds(key, ids) {
 
 function findFeature(featureId) {
   return state.featureIndex.get(String(featureId));
+}
+
+function renderLayers(layers) {
+  state.layers = layers;
+  elements.layerList.textContent = "";
+  layers.forEach((layer) => {
+    const label = document.createElement("label");
+    label.className = `layer-item${layer.enabled && layer.supported ? " is-available" : ""}`;
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = layer.active;
+    checkbox.disabled = !layer.enabled || !layer.supported;
+    checkbox.setAttribute("aria-label", layer.name);
+    const content = document.createElement("span");
+    const name = document.createElement("strong");
+    name.textContent = `${layer.active ? "✓" : "○"} ${layer.name}`;
+    const status = document.createElement("small");
+    status.textContent = layer.enabled && layer.supported ? layer.description : "Kommer senare";
+    content.append(name, status);
+    label.append(checkbox, content);
+    checkbox.addEventListener("change", async () => {
+      checkbox.disabled = true;
+      try {
+        const action = checkbox.checked ? "enable" : "disable";
+        const response = await fetch(`/api/layers/${encodeURIComponent(layer.id)}/${action}`, {
+          method: "POST",
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const updated = await response.json();
+        renderLayers(state.layers.map((item) => item.id === updated.id ? updated : item));
+        loadViewport();
+      } catch (error) {
+        checkbox.checked = !checkbox.checked;
+        checkbox.disabled = false;
+        console.error(error);
+      }
+    });
+    elements.layerList.append(label);
+  });
+}
+
+async function loadLayers() {
+  const response = await fetch("/api/layers", {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  renderLayers(payload.layers);
 }
 
 function safeExternalLink(container, text, url) {
@@ -829,6 +879,7 @@ function cacheElements() {
     nearestList: "nearest-list",
     datasetStatus: "dataset-status", datasetCount: "dataset-count",
     datasetImport: "dataset-import", datasetSource: "dataset-source",
+    layerList: "layer-list",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }
@@ -881,6 +932,7 @@ async function initialize() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const dataset = await response.json();
     renderDatasetSummary(dataset);
+    await loadLayers();
     state.map = new maplibregl.Map({
       container: "map",
       center: [16.5, 62.0],

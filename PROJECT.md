@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 3.1 – Multi-source Foundation (completed)**
+Current sprint: **Sprint 3.2 – Layer Engine (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -56,6 +56,11 @@ instances are tracked per source and incremental deletions use indexed source
 identities without loading the complete dataset. Collector capabilities and web
 source properties are now source-neutral while the ArchiveRecord path remains
 explicitly marked as the compatibility generation.
+
+Sprint 3.2 adds a source-neutral `LayerDefinition`, runtime `LayerRegistry` and
+dataset-aware `LayerService`. The local web API exposes eleven declarative
+layers and the layer panel can toggle the currently implemented cultural
+heritage layer without changing imported data.
 
 ## Current Sprint
 
@@ -194,9 +199,11 @@ meets its scalability targets.
 
 ### Sprint 3.2 – Layer Engine
 
-- Source-neutral layer definitions and user layer state
-- Multi-dataset viewport and search queries
-- Declarative styles, attribution and layer presets
+- [x] Source-neutral layer definitions and runtime visibility state
+- [x] Dataset-aware feature filtering through active layers
+- [x] Registration, support discovery, enable and disable operations
+- [x] Generic layer API and web layer panel
+- [x] Eleven declarative product layers, with one currently available
 
 ### Sprint 3.3 – Offline Packages
 

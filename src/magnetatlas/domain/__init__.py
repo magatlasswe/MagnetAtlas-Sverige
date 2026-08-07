@@ -31,6 +31,7 @@ from magnetatlas.domain.geography import (
     LineString,
     Polygon,
 )
+from magnetatlas.domain.layers import LayerDefinition
 from magnetatlas.domain.models import ArchiveRecord
 
 __all__ = [
@@ -51,6 +52,7 @@ __all__ = [
     "FeatureId",
     "GeoPoint",
     "Geometry",
+    "LayerDefinition",
     "LicenseInfo",
     "LineString",
     "Polygon",
