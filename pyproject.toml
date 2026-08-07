@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "magnetatlas-sverige"
-version = "0.6.0a0"
+version = "1.2.0a0"
 description = "Historiskt GIS-verktyg för ansvarsfullt magnetfiske i Sverige"
 readme = "README.md"
 requires-python = ">=3.13,<3.15"

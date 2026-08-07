@@ -1,6 +1,6 @@
 # MagnetAtlas Sverige
 
-**Status:** Public alpha (`v0.6.0-alpha`)
+**Status:** Public alpha (`v1.2.0-alpha`)
 
 **Python:** 3.13 eller 3.14
 

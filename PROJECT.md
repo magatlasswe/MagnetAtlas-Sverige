@@ -2,9 +2,9 @@
 
 Last updated: **2026-08-07**
 
-Current version: **v0.6.0-alpha**
+Current version: **v1.2.0-alpha**
 
-Current sprint: **Sprint 3.3 – First Additional Official Data Source (completed)**
+Current sprint: **Sprint 3.4 – Lantmäteriet Provider Foundation (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -16,7 +16,7 @@ First real dataset: **Sprint 2.6.4 – First Real RAÄ Dataset (completed)**
 
 ## Project Status
 
-Current Version: **v0.6.0-alpha**
+Current Version: **v1.2.0-alpha**
 
 The runnable alpha currently contains the project foundation, Collector
 Framework, shared domain model, local web interface and user-experience

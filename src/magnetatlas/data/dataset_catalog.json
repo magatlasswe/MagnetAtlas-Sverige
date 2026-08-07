@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "lantmateriet",
+      "name": "Lantmäteriet",
+      "status": "planned",
+      "datasets": [
+        {
+          "id": "ortnamn",
+          "name": "Ortnamn Direkt",
+          "status": "recommended-next",
+          "transport": "rest",
+          "formats": ["geojson", "gml"],
+          "authentication": "oauth2-product-entitlement",
+          "license": "product-terms-value-data",
+          "layer_id": null,
+          "import_enabled": false
+        },
+        {
+          "id": "historiska-kartor",
+          "name": "Historiska kartor",
+          "status": "future",
+          "transport": "raster-download-family",
+          "formats": ["tiff"],
+          "authentication": "product-dependent",
+          "license": "product-dependent",
+          "layer_id": "historical-maps",
+          "import_enabled": false
+        }
+      ]
+    }
+  ]
+}
