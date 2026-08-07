@@ -63,7 +63,9 @@ function renderLayers(layers) {
     const name = document.createElement("strong");
     name.textContent = `${layer.active ? "✓" : "○"} ${layer.name}`;
     const status = document.createElement("small");
-    status.textContent = layer.enabled && layer.supported ? layer.description : "Kommer senare";
+    status.textContent = layer.enabled && layer.supported
+      ? `${layer.description} · ${layer.render_mode} · ${Math.round(layer.opacity * 100)} % · ${layer.attribution}`
+      : `Kommer senare · ${layer.layer_type} · ${layer.render_mode}`;
     content.append(name, status);
     label.append(checkbox, content);
     checkbox.addEventListener("change", async () => {

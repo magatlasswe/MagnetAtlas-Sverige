@@ -360,6 +360,37 @@ mappern normaliserar EPSG:3006-punkter till `AtlasFeature`; importern delegerar
 till oförändrad `SyncService`. Lagerkomponenterna, `DatasetInstance` och
 frontend är oförändrade.
 
+## Unified Map Layer Framework
+
+Sprint 3.6 lägger `LayerCompositionService` ovanpå den oförändrade Layer Engine.
+Ansvarsgränsen är:
+
+- **Layer Engine** känner till `LayerDefinition`, aktiv status och vilka
+  `DatasetInstance` som stöder lagret. Den filtrerar `AtlasFeature` men innehåller
+  ingen renderingslogik.
+- **LayerCompositionService** kombinerar bounded frågor från flera aktiva
+  datasetinstanser och tillför källneutral metadata för synlighet, opacitet,
+  z-index, legend, attribution, licens, zoom och render mode.
+- **Renderer** är en nuvarande eller framtida gränssnittsadapter som översätter
+  composition-metadata till MapLibre-lager. Raster-, tile-, heatmap- och annan
+  ny rendering implementeras inte i Sprint 3.6.
+
+```text
+RAÄ query ──────────┐
+SGU query ──────────┼── ComposedFeatureQuerySource ── gemensam GeoJSON-karta
+Lantmäteriet query ─┘                 │
+                                      │ filtrering/synlighet
+DatasetInstance ── Layer Engine ──────┤
+                                      │
+Render metadata ─ LayerCompositionService ── lager-API ── Renderer
+                                      │
+                         VectorLayer / RasterLayer
+```
+
+`VectorLayer` beskriver AtlasFeature-baserade lager. `RasterLayer` använder
+samma metadataavtal men förutsätter inte AtlasFeature. Historiska kartor är den
+första rasterfamiljen och har status disabled samt `render_mode=future`.
+
 ## Långsiktiga arkitekturprinciper
 
 Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i

@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.5b – Lantmäteriet Ortnamn Download (completed)**
+Current sprint: **Sprint 3.6 – Unified Map Layer Framework (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -72,6 +72,13 @@ Sprint 3.5b implements the first Lantmäteriet dataset without changing those
 shared components. Ortnamn Nedladdning is discovered through the official STAC
 vector catalogue, downloaded as a reproducible GeoPackage snapshot and streamed
 into independent country or bbox dataset instances.
+
+Sprint 3.6 adds a source-neutral `LayerCompositionService` above the unchanged
+Layer Engine. Active RAÄ, SGU and Lantmäteriet dataset queries can now be merged
+into one bounded map response, while vector and raster definitions share
+opacity, order, legend, attribution, licence and renderer metadata. Historical
+maps is the first disabled raster-family declaration; no raster provider,
+importer or renderer is included.
 
 ## Current Sprint
 

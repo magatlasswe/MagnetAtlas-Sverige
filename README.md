@@ -45,6 +45,8 @@ data.
   API Features och CC0.
 - Generell Lantmäteriet-provider med reproducerbara Ortnamn-snapshotar via den
   dokumenterade STAC-vektorkatalogen och GeoPackage.
+- Gemensamt lagerkompositionsramverk för vektor- och rastermetadata, ritordning,
+  opacitet, synlighet, legend och attribution ovanpå Layer Engine.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -98,6 +100,18 @@ Webbens lagerpanel läser `GET /api/layers`. Ett tillgängligt lager kan växlas
 med `POST /api/layers/{id}/enable` och `POST /api/layers/{id}/disable`.
 Synligheten gäller den körande lokala serverprocessen och ändrar inte importerad
 data. Tio planerade lager visas som **Kommer senare**.
+
+Lager-API:t levererar även `provider`, `dataset`, `layer_type`, `geometry_type`,
+`render_mode`, `opacity`, `z_index`, legend, attribution, licens och zoomintervall.
+Panelen och framtida renderers använder endast dessa generella fält. Historiska
+kartor är registrerat som det första rasterlagret men är inaktiverat och har
+ännu ingen importer eller renderer.
+
+Layer Engine avgör vilka produktlager som finns, är aktiva och stöds av
+installerade `DatasetInstance`. `LayerCompositionService` kombinerar aktiva
+vektordataset till samma bounded kartfråga och dekorerar lagren med
+renderingsmetadata. En framtida renderer omsätter metadata till MapLibre-källor
+och lager; renderingslogik ingår inte i Layer Engine.
 
 SGU Jordarter importeras från den officiella samlingen `grundlager`:
 

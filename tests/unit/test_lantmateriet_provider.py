@@ -289,7 +289,7 @@ def test_dataset_catalog_activates_only_ortnamn_download() -> None:
 def test_protected_layer_catalog_is_unchanged() -> None:
     historical = next(item for item in BUILT_IN_LAYERS if item.id == "historical-maps")
 
-    assert len(BUILT_IN_LAYERS) == 13
+    assert len(BUILT_IN_LAYERS) == 14
     assert historical.supported_sources == frozenset()
     assert historical.enabled is False
     assert ORTNAMN_DATASET.source == LANTMATERIET_SOURCE_DEFINITION

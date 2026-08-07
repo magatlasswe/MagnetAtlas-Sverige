@@ -13,26 +13,42 @@ from magnetatlas.application.features import (
     feature_period,
     navigation_target,
 )
-from magnetatlas.application.layers import LayerStatus
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
+from magnetatlas.domain.map_layers import ComposedLayer
 
 
-def serialize_layer(status: LayerStatus) -> dict[str, Any]:
-    """Serialize one generic map layer and its runtime state."""
-    layer = status.definition
+def serialize_layer(layer: ComposedLayer) -> dict[str, Any]:
+    """Serialize one source-neutral composed map layer."""
+    definition = layer.definition
     return {
-        "id": layer.id,
-        "name": layer.name,
+        "id": definition.id,
+        "name": definition.name,
         "description": layer.description,
-        "icon": layer.icon,
+        "provider": definition.provider,
+        "dataset": definition.dataset,
+        "layer_type": definition.layer_type.value,
+        "geometry_type": definition.geometry_type,
+        "render_mode": definition.render_mode.value,
+        "visible": layer.visible,
+        "opacity": layer.opacity,
+        "z_index": definition.z_index,
+        "icon": definition.icon,
+        "legend": [
+            {"label": item.label, "color": item.color} for item in definition.legend
+        ],
+        "attribution": definition.attribution,
+        "license": definition.license,
+        "source": definition.source,
+        "min_zoom": definition.min_zoom,
+        "max_zoom": definition.max_zoom,
+        "default_enabled": definition.default_enabled,
         "category": layer.category,
-        "supported_sources": sorted(layer.supported_sources),
-        "default_visibility": layer.default_visibility,
         "enabled": layer.enabled,
-        "experimental": layer.experimental,
-        "supported": status.supported,
-        "active": status.active,
+        "supported": layer.supported,
+        # Compatibility aliases keep the existing generic panel contract stable.
+        "default_visibility": definition.default_enabled,
+        "active": layer.visible,
     }
 
 

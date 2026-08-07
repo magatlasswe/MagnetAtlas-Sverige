@@ -11,8 +11,12 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 from magnetatlas.application.feature_queries import FeatureQuerySource
 from magnetatlas.application.features import FeatureSearchFilters
+from magnetatlas.application.layer_composition import LayerCompositionService
 from magnetatlas.application.layers import LayerService
 from magnetatlas.domain.geography import BoundingBox
+from magnetatlas.interfaces.web.layer_composition import (
+    create_layer_composition_service,
+)
 from magnetatlas.interfaces.web.serializers import (
     serialize_dataset_summary,
     serialize_feature,
@@ -78,9 +82,12 @@ def _limit(parameters: dict[str, list[str]]) -> int:
 
 
 def make_handler(
-    source: FeatureQuerySource, layer_service: LayerService
+    source: FeatureQuerySource,
+    layer_service: LayerService,
+    composition_service: LayerCompositionService | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one bounded feature query source."""
+    composition = composition_service or create_layer_composition_service(layer_service)
 
     class MagnetAtlasRequestHandler(BaseHTTPRequestHandler):
         server_version = "MagnetAtlas/0.6"
@@ -128,8 +135,7 @@ def make_handler(
                     HTTPStatus.OK,
                     {
                         "layers": [
-                            serialize_layer(item)
-                            for item in layer_service.list_layers()
+                            serialize_layer(item) for item in composition.list_layers()
                         ]
                     },
                 )
@@ -137,7 +143,7 @@ def make_handler(
             if path.startswith("/api/layers/"):
                 layer_id = unquote(path.removeprefix("/api/layers/"))
                 try:
-                    layer = layer_service.get_layer(layer_id)
+                    layer = composition.get_layer(layer_id)
                 except KeyError:
                     self._json(
                         HTTPStatus.NOT_FOUND,
@@ -223,10 +229,8 @@ def make_handler(
                 layer_id, separator, action = relative.rpartition("/")
                 if separator and action in {"enable", "disable"}:
                     try:
-                        status = (
-                            layer_service.enable(unquote(layer_id))
-                            if action == "enable"
-                            else layer_service.disable(unquote(layer_id))
+                        status = composition.set_visibility(
+                            unquote(layer_id), action == "enable"
                         )
                     except KeyError:
                         self._json(
@@ -258,8 +262,12 @@ def create_server(
     source: FeatureQuerySource,
     layer_service: LayerService,
     *,
+    composition_service: LayerCompositionService | None = None,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
     """Create a local threaded HTTP server without starting its event loop."""
-    return ThreadingHTTPServer((host, port), make_handler(source, layer_service))
+    return ThreadingHTTPServer(
+        (host, port),
+        make_handler(source, layer_service, composition_service),
+    )

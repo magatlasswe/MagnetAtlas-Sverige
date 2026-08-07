@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from magnetatlas.application.collectors import CollectorRegistry
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
-from magnetatlas.application.layers import LayerFeatureQuerySource
+from magnetatlas.application.layer_composition import ComposedFeatureQuerySource
 from magnetatlas.application.search import SearchService
 from magnetatlas.application.sync import SyncService
 from magnetatlas.config.logging import configure_logging
@@ -479,33 +479,54 @@ def serve(
         settings = Settings.from_env()
         configure_logging(settings.log_level)
         if features_path is not None:
-            source = CatalogFeatureQuerySource(load_features(features_path))
             active_instance = DatasetInstance.create(
                 SourceDefinition("local-json", "Lokal JSON"),
                 DatasetScope.country("sweden"),
             )
             instances = (active_instance,)
+            raw_sources = (
+                (
+                    active_instance,
+                    CatalogFeatureQuerySource(load_features(features_path)),
+                ),
+            )
         else:
             session_factory = create_session_factory(settings.database_url)
             repository = SqlAlchemyAtlasFeatureRepository(session_factory)
-            instance = repository.get_active_instance(RAA_SOURCE.source_id)
-            active_instance = instance or DatasetInstance.create(
-                RAA_SOURCE, DatasetScope.country("sweden")
+            discovered = repository.list_dataset_instances()
+            source_ids = dict.fromkeys(
+                instance.source.source_id for instance in discovered
             )
-            source = SqlAlchemyFeatureQuerySource(
-                session_factory, active_instance.dataset_id
+            instances = tuple(
+                instance
+                for source_id in source_ids
+                if (instance := repository.get_active_instance(source_id)) is not None
             )
-            instances = repository.list_dataset_instances() or (active_instance,)
-            if source.summary().count == 0:
-                source = CatalogFeatureQuerySource(load_demo_features())
+            if not instances:
+                instances = (
+                    DatasetInstance.create(RAA_SOURCE, DatasetScope.country("sweden")),
+                )
+            raw_sources = tuple(
+                (
+                    instance,
+                    SqlAlchemyFeatureQuerySource(session_factory, instance.dataset_id),
+                )
+                for instance in instances
+            )
+            if not raw_sources or not any(
+                source.summary().count for _, source in raw_sources
+            ):
                 active_instance = DatasetInstance.create(
                     SourceDefinition("magnetatlas-demo", "MagnetAtlas demo"),
                     DatasetScope.country("sweden"),
                 )
                 instances = (active_instance,)
+                raw_sources = (
+                    (active_instance, CatalogFeatureQuerySource(load_demo_features())),
+                )
         layer_service = create_layer_service(instances)
-        layered_source = LayerFeatureQuerySource(source, layer_service, active_instance)
-        server = create_server(layered_source, layer_service, host=host, port=port)
+        composed_source = ComposedFeatureQuerySource(raw_sources, layer_service)
+        server = create_server(composed_source, layer_service, host=host, port=port)
         actual_host, actual_port = server.server_address
         display_host = (
             "localhost" if actual_host in {"127.0.0.1", "::1"} else actual_host

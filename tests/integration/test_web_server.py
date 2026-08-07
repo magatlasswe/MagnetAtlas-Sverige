@@ -145,12 +145,22 @@ def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) ->
     with urlopen(f"{local_server}/api/layers", timeout=2) as response:
         layers = json.load(response)["layers"]
 
-    assert len(layers) == 13
+    assert len(layers) == 14
     heritage = layers[0]
     assert heritage["id"] == "cultural-heritage"
     assert heritage["supported"] is True
     assert heritage["active"] is True
+    assert heritage["layer_type"] == "vector"
+    assert heritage["render_mode"] == "cluster"
+    assert heritage["opacity"] == 1.0
+    assert heritage["z_index"] == 10
+    assert heritage["attribution"] == "Riksantikvarieämbetet KMR"
     assert all(not item["active"] for item in layers[1:])
+
+    historical = next(item for item in layers if item["id"] == "historical-maps")
+    assert historical["layer_type"] == "raster"
+    assert historical["visible"] is False
+    assert historical["enabled"] is False
 
     disable = Request(
         f"{local_server}/api/layers/cultural-heritage/disable",

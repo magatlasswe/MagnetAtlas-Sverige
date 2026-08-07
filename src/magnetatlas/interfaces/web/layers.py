@@ -126,6 +126,15 @@ BUILT_IN_LAYERS = (
         frozenset(),
         enabled=False,
     ),
+    LayerDefinition(
+        "place-names",
+        "Lantmäteriet Ortnamn",
+        "Granskade och fastställda ortnamn.",
+        "●",
+        "Kartinformation",
+        frozenset({"lantmateriet-ortnamn"}),
+        default_visibility=True,
+    ),
 )
 
 
