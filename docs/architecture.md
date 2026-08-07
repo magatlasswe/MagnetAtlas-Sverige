@@ -15,11 +15,39 @@ En collector ansvarar för källprotokoll, defensiv parsning och översättning 
 domänmodeller. Applikationslagret ansvarar för validering, orkestrering och
 lagring; källadaptrar innehåller inte rankning eller annan affärslogik.
 
+## Multi-source-grund
+
+Sprint 3.1 skiljer mellan tre domänidentiteter:
+
+- `SourceDefinition` beskriver en stabil officiell datakälla eller dataprodukt.
+- `DatasetInstance` beskriver en självständigt importerad lokal instans.
+- `DatasetScope` beskriver instansens geografiska urval: country, county,
+  municipality eller WGS84-bbox.
+
+En datasetidentitet är deterministisk och kombinerar källa med normaliserat
+scope, exempelvis `raa-kmr:municipality:vaxholm`. Metadata lagrar både denna
+identitet och källans visningsnamn, scopevärden, schemaversion, synkmarkör och
+aktiv status. Repositoryt kan bevara flera instanser och markerar högst den
+senast atomiskt aktiverade instansen per källa som aktiv. Befintliga cache- och
+kartflöden fortsätter läsa den aktiva RAÄ-instansen; lagerkombination införs
+först i Sprint 3.2.
+
+Äldre `raa-kmr`-metadata migreras additivt till country-scope `sweden` och
+behåller både featuredata och aktiv status. Nya importer får alltid sin fulla
+scopebaserade identitet.
+
 `AtlasFeature` är den gemensamma domänmodellen för geografiska objekt. Modellen
 består av egna värdeobjekt för identitet, geometri, tid, proveniens, licens och
 osäkerhet och har inga beroenden på collectors, SQLAlchemy eller GIS-motorer.
 Den äldre `ArchiveRecord`-modellen finns kvar under en additiv övergång och kan
 konverteras till `AtlasFeature` vid domängränsen.
+
+Collector-descriptorn anger nu både output generation och capabilities.
+Gemensamma capabilities omfattar base import, incremental changes, remote
+search samt country-, county-, municipality- och bbox-scope. Riksarkivets
+befintliga sökväg är uttryckligen märkt `archive_record`; nya geografiska
+integrationer ska producera `atlas_feature`. Den befintliga konverteringen är
+utfasningsvägen och ingen ny kärnfunktion ska byggas enbart för ArchiveRecord.
 
 SQLite är Sprint 1-lagring. Repository-gränsen gör en framtida PostGIS-adapter
 möjlig utan att ändra användningsfallen.
@@ -181,6 +209,17 @@ lämning mappas till en fullständig `AtlasFeature` och skrivs med upsert. En po
 som RAÄ markerar som utgången tas bort eller inaktiveras enligt repositoryts
 domänneutrala kontrakt. Synkmarkören flyttas först när hela intervallet har
 slutförts och lagrats utan fel.
+
+Repositoryt projicerar käll-ID per feature och erbjuder indexerad lookup och
+batchborttagning inom en uttrycklig datasetinstans. `SyncService` skickar den
+begränsade mängden utgångna source-ID:n direkt till samma transaktion som
+upserts och synkmetadata. Inkrementell synk använder därför aldrig
+`list_features` och dess databasarbete växer med förändringsmängden i stället
+för hela datasetets storlek.
+
+Generella webbmodeller exponerar källans stabila proveniens-ID och placerar
+adapterfält under `source_properties`, grupperade med källans namespace.
+Frontend använder aldrig RAÄ-specifika fältnamn för identifiering.
 
 ### Ansvarsfördelning
 

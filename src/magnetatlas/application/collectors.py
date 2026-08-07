@@ -6,7 +6,11 @@ from collections.abc import Iterable
 from importlib import metadata
 from typing import Any, Final
 
-from magnetatlas.domain.collectors import Collector, CollectorDescriptor
+from magnetatlas.domain.collectors import (
+    CollectorCapability,
+    CollectorDescriptor,
+    CollectorPlugin,
+)
 from magnetatlas.domain.exceptions import CollectorRegistryError
 
 COLLECTOR_ENTRY_POINT_GROUP: Final = "magnetatlas.collectors"
@@ -15,25 +19,36 @@ COLLECTOR_ENTRY_POINT_GROUP: Final = "magnetatlas.collectors"
 class CollectorRegistry:
     """Register collectors explicitly or discover them through entry points."""
 
-    def __init__(self, collectors: Iterable[Collector] = ()) -> None:
-        self._collectors: dict[str, Collector] = {}
+    def __init__(self, collectors: Iterable[CollectorPlugin] = ()) -> None:
+        self._collectors: dict[str, CollectorPlugin] = {}
         for collector in collectors:
             self.register(collector)
 
-    def register(self, collector: Collector) -> None:
+    def register(self, collector: CollectorPlugin) -> None:
         """Register a validated collector under its stable identifier."""
         descriptor = getattr(collector, "descriptor", None)
-        if not isinstance(descriptor, CollectorDescriptor) or not callable(
-            getattr(collector, "collect", None)
-        ):
+        if not isinstance(descriptor, CollectorDescriptor):
             raise CollectorRegistryError("Pluginet implementerar inte Collector")
+        required_methods = {
+            CollectorCapability.BASE_IMPORT: "fetch_base_batches",
+            CollectorCapability.INCREMENTAL_CHANGES: "collect_changes",
+            CollectorCapability.REMOTE_SEARCH: "collect",
+            CollectorCapability.TEXT_SEARCH: "collect",
+        }
+        for capability, method in required_methods.items():
+            if descriptor.supports(capability) and not callable(
+                getattr(collector, method, None)
+            ):
+                raise CollectorRegistryError(
+                    f"Pluginet annonserar {capability.value} utan {method}"
+                )
         if descriptor.collector_id in self._collectors:
             raise CollectorRegistryError(
                 f"Collector-ID är redan registrerat: {descriptor.collector_id}"
             )
         self._collectors[descriptor.collector_id] = collector
 
-    def get(self, collector_id: str) -> Collector:
+    def get(self, collector_id: str) -> CollectorPlugin:
         """Return a collector by ID or raise an expected application error."""
         try:
             return self._collectors[collector_id]

@@ -7,6 +7,7 @@ from pathlib import Path
 from sqlalchemy import event, text
 
 from magnetatlas.application.features import FeatureSearchFilters
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.domain.features import AtlasFeature, FeatureId, Provenance
 from magnetatlas.domain.geography import BoundingBox, GeoPoint
 from magnetatlas.domain.repositories import DatasetMetadata, StoredFeature
@@ -36,7 +37,11 @@ def make_repository(tmp_path: Path) -> SqlAlchemyAtlasFeatureRepository:
 
 def metadata(marker: str = "2026-08-04") -> DatasetMetadata:
     return DatasetMetadata(
-        dataset_id="dataset",
+        instance=DatasetInstance(
+            "dataset",
+            SourceDefinition("official", "Official source"),
+            DatasetScope.country("sweden"),
+        ),
         schema_version="1",
         base_imported_at=datetime(2026, 8, 5, tzinfo=UTC),
         sync_marker=marker,
@@ -65,7 +70,7 @@ def test_apply_changes_upserts_deletes_and_advances_marker(tmp_path: Path) -> No
     repository.apply_changes(
         metadata("2026-08-05"),
         [StoredFeature(updated, "2")],
-        [FeatureId("official:1")],
+        ["official:1"],
     )
 
     assert repository.list_features(dataset_id="dataset") == [updated]
@@ -75,7 +80,14 @@ def test_apply_changes_upserts_deletes_and_advances_marker(tmp_path: Path) -> No
 def test_clear_dataset_does_not_touch_other_datasets(tmp_path: Path) -> None:
     repository = make_repository(tmp_path)
     repository.replace_dataset(metadata(), [StoredFeature(make_feature("one"))])
-    other = DatasetMetadata(dataset_id="other", schema_version="1")
+    other = DatasetMetadata(
+        instance=DatasetInstance(
+            "other",
+            SourceDefinition("other", "Other source"),
+            DatasetScope.county("other"),
+        ),
+        schema_version="1",
+    )
     repository.replace_dataset(other, [StoredFeature(make_feature("two"))])
 
     removed = repository.clear_dataset("dataset")
@@ -198,3 +210,88 @@ def test_incremental_features_use_one_batched_sqlite_upsert(tmp_path: Path) -> N
 
     assert len(statements) == 1
     assert repository.count_features(dataset_id="dataset") == 10
+
+
+def test_repository_lists_instances_and_looks_up_source_identity(
+    tmp_path: Path,
+) -> None:
+    repository = make_repository(tmp_path)
+    first = make_feature("feature:1")
+    second = replace(
+        make_feature("feature:2"),
+        provenance=Provenance(source="official", source_id="feature:1"),
+    )
+    repository.replace_dataset(
+        metadata(), [StoredFeature(first), StoredFeature(second)]
+    )
+
+    assert repository.list_dataset_instances() == (metadata().instance,)
+    assert repository.get_active_instance("official") == metadata().instance
+    assert repository.lookup("feature:1", dataset_id="dataset") == (
+        FeatureId("feature:1"),
+        FeatureId("feature:2"),
+    )
+    assert repository.delete("feature:1", dataset_id="dataset") == 2
+    assert repository.count_features(dataset_id="dataset") == 0
+
+
+def test_multiple_sources_keep_independent_active_instances(tmp_path: Path) -> None:
+    repository = make_repository(tmp_path)
+    repository.replace_dataset(metadata(), [StoredFeature(make_feature("one"))])
+    other = DatasetMetadata(
+        instance=DatasetInstance.create(
+            SourceDefinition("second", "Second source"),
+            DatasetScope.municipality("vaxholm"),
+        ),
+        schema_version="1",
+    )
+    repository.replace_dataset(other, [StoredFeature(make_feature("two"))])
+
+    assert repository.get_active_instance("official") == metadata().instance
+    assert repository.get_active_instance("second") == other.instance
+    assert set(repository.list_dataset_instances()) == {
+        metadata().instance,
+        other.instance,
+    }
+
+
+def test_clear_source_removes_all_its_scopes_only(tmp_path: Path) -> None:
+    repository = make_repository(tmp_path)
+    country = metadata()
+    county = replace(
+        country,
+        instance=DatasetInstance.create(
+            country.instance.source, DatasetScope.county("ostergotland")
+        ),
+    )
+    other = DatasetMetadata(
+        instance=DatasetInstance.create(
+            SourceDefinition("second", "Second source"),
+            DatasetScope.country("sweden"),
+        ),
+        schema_version="1",
+    )
+    repository.replace_dataset(country, [StoredFeature(make_feature("one"))])
+    repository.replace_dataset(county, [StoredFeature(make_feature("two"))])
+    repository.replace_dataset(other, [StoredFeature(make_feature("three"))])
+
+    assert repository.clear_source("official") == 2
+    assert repository.list_dataset_instances() == (other.instance,)
+    assert repository.count_features() == 1
+
+
+def test_bbox_parent_scope_round_trips_in_dataset_metadata(tmp_path: Path) -> None:
+    repository = make_repository(tmp_path)
+    scope = DatasetScope.bbox(
+        BoundingBox(14, 57, 17, 59), parent=DatasetScope.county("ostergotland")
+    )
+    scoped = DatasetMetadata(
+        instance=DatasetInstance.create(
+            SourceDefinition("official", "Official source"), scope
+        ),
+        schema_version="1",
+    )
+
+    repository.replace_dataset(scoped, [StoredFeature(make_feature("one"))])
+
+    assert repository.get_metadata(scoped.dataset_id) == scoped

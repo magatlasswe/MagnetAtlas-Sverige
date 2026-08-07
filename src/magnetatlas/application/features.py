@@ -11,15 +11,19 @@ from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString
 
 DEFAULT_SEARCH_LIMIT: Final = 20
 WORD_PATTERN: Final = re.compile(r"[\wåäöÅÄÖ]+", re.UNICODE)
-SEARCHABLE_PROPERTY_KEYS: Final = (
-    "raa_id",
-    "lamningsnummer",
-    "category",
-    "kommun",
-    "municipality",
-    "ort",
-    "locality",
-)
+
+
+def searchable_property_values(feature: AtlasFeature) -> tuple[str, ...]:
+    """Return searchable strings from legacy and namespaced source properties."""
+    values = [value for value in feature.properties.values() if isinstance(value, str)]
+    namespaces = feature.properties.get("source_properties")
+    if isinstance(namespaces, dict):
+        for properties in namespaces.values():
+            if isinstance(properties, dict):
+                values.extend(
+                    value for value in properties.values() if isinstance(value, str)
+                )
+    return tuple(values)
 
 
 @dataclass(frozen=True, slots=True)
@@ -121,7 +125,6 @@ def _fuzzy_term_matches(term: str, haystack: str, words: tuple[str, ...]) -> boo
 
 
 def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
-    property_values = (feature.properties.get(key) for key in SEARCHABLE_PROPERTY_KEYS)
     haystack = " ".join(
         value
         for value in (
@@ -130,7 +133,7 @@ def _searchable_text(feature: AtlasFeature) -> tuple[str, tuple[str, ...]]:
             feature.feature_type,
             feature.description,
             feature.provenance.source_id,
-            *property_values,
+            *searchable_property_values(feature),
         )
         if isinstance(value, str) and value
     ).casefold()

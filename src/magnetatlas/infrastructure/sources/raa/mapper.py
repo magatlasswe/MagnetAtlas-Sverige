@@ -224,18 +224,27 @@ def map_raa_record(
         if isinstance(update_types, list)
         else []
     )
-    properties = {
+    source_properties = {
         "raa_id": source_id,
         "lamningsnummer": number,
         "category": feature_type,
         "antikvarisk_bedomning": assessment,
-        "senast_uppdaterad": publication,
-        "source_version": str(version) if version is not None else publication,
+        "last_updated": publication,
         "aktualitetstatus": status,
         "definition_av_kvalitet": _string(raw, "definition_av_kvalitet"),
         "lagesosakerhet_i_meter": raw.get("lagesosakerhet_i_meter"),
         "update_types": normalized_updates,
+    }
+    properties = {
+        "source_version": str(version) if version is not None else publication,
         "deleted": "UTGAR" in normalized_updates,
+        "source_properties": {
+            "raa-kmr": {
+                key: value
+                for key, value in source_properties.items()
+                if value is not None
+            }
+        },
     }
     return [
         AtlasFeature(

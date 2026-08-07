@@ -6,8 +6,16 @@ from magnetatlas.domain.collectors import (
     Collector,
     CollectorCapability,
     CollectorDescriptor,
+    CollectorOutputModel,
+    CollectorPlugin,
 )
 from magnetatlas.domain.conversions import archive_record_to_atlas_feature
+from magnetatlas.domain.datasets import (
+    DatasetInstance,
+    DatasetScope,
+    DatasetScopeKind,
+    SourceDefinition,
+)
 from magnetatlas.domain.features import (
     AtlasFeature,
     Confidence,
@@ -34,7 +42,12 @@ __all__ = [
     "Collector",
     "CollectorCapability",
     "CollectorDescriptor",
+    "CollectorOutputModel",
+    "CollectorPlugin",
     "Confidence",
+    "DatasetInstance",
+    "DatasetScope",
+    "DatasetScopeKind",
     "FeatureId",
     "GeoPoint",
     "Geometry",
@@ -42,6 +55,7 @@ __all__ = [
     "LineString",
     "Polygon",
     "Provenance",
+    "SourceDefinition",
     "TimeSpan",
     "archive_record_to_atlas_feature",
 ]

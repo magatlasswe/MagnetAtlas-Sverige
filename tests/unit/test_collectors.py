@@ -11,7 +11,9 @@ from magnetatlas.domain.collectors import (
     CollectionRequest,
     CollectorCapability,
     CollectorDescriptor,
+    CollectorOutputModel,
 )
+from magnetatlas.domain.datasets import SourceDefinition
 from magnetatlas.domain.exceptions import CollectorRegistryError
 
 
@@ -89,8 +91,35 @@ def test_request_derives_required_capabilities() -> None:
 
     assert request.required_capabilities == frozenset(
         {
-            CollectorCapability.TEXT_SEARCH,
+            CollectorCapability.REMOTE_SEARCH,
             CollectorCapability.RESULT_LIMIT,
             CollectorCapability.CURSOR_PAGINATION,
         }
     )
+
+
+def test_registry_discovers_capabilities_for_atlas_feature_collectors() -> None:
+    class FeatureCollector:
+        descriptor = CollectorDescriptor(
+            collector_id="features",
+            display_name="Feature source",
+            version="1",
+            capabilities=frozenset(
+                {
+                    CollectorCapability.BASE_IMPORT,
+                    CollectorCapability.INCREMENTAL_CHANGES,
+                }
+            ),
+            output_model=CollectorOutputModel.ATLAS_FEATURE,
+            source=SourceDefinition("features", "Feature source"),
+        )
+
+        def fetch_base_batches(self, *args: object, **kwargs: object) -> object:
+            return iter(())
+
+        def collect_changes(self, *args: object, **kwargs: object) -> list[object]:
+            return []
+
+    registry = CollectorRegistry([FakeCollector(), FeatureCollector()])
+
+    assert registry.get("features").descriptor.supports(CollectorCapability.BASE_IMPORT)

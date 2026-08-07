@@ -19,6 +19,7 @@ from magnetatlas.application.search import SearchService
 from magnetatlas.application.sync import SyncService
 from magnetatlas.config.logging import configure_logging
 from magnetatlas.config.settings import Settings
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScope
 from magnetatlas.domain.exceptions import MagnetAtlasError
 from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.infrastructure.database.feature_queries import (
@@ -32,7 +33,10 @@ from magnetatlas.infrastructure.database.session import create_session_factory
 from magnetatlas.infrastructure.exporters.csv_exporter import export_csv
 from magnetatlas.infrastructure.features import load_demo_features, load_features
 from magnetatlas.infrastructure.sources.raa.client import RAAClient
-from magnetatlas.infrastructure.sources.raa.collector import RAACollector
+from magnetatlas.infrastructure.sources.raa.collector import (
+    RAA_SOURCE_DEFINITION,
+    RAACollector,
+)
 from magnetatlas.infrastructure.sources.raa.importer import RAACache, RAAImporter
 from magnetatlas.infrastructure.sources.riksarkivet.client import RiksarkivetClient
 from magnetatlas.interfaces.web.server import create_server
@@ -52,6 +56,7 @@ app.add_typer(cache_app, name="cache")
 
 EXPECTED_ERRORS = (MagnetAtlasError, ValueError, OSError, SQLAlchemyError)
 NATIONWIDE_MIN_FREE_BYTES = 12 * 1024**3
+RAA_SOURCE = RAA_SOURCE_DEFINITION
 
 
 def _abort_with_error(context: str, error: Exception) -> Never:
@@ -68,17 +73,22 @@ def _abort_with_error(context: str, error: Exception) -> Never:
     raise typer.Exit(code=1) from error
 
 
-def _create_raa_sync_service(settings: Settings) -> SyncService:
+def _create_raa_sync_service(
+    settings: Settings, instance: DatasetInstance | None = None
+) -> SyncService:
     repository = SqlAlchemyAtlasFeatureRepository(
         create_session_factory(settings.database_url)
     )
+    selected = instance or repository.get_active_instance(RAA_SOURCE.source_id)
+    if selected is None:
+        selected = DatasetInstance.create(RAA_SOURCE, DatasetScope.country("sweden"))
     client = RAAClient(
         api_url=settings.raa_api_url,
         download_url=settings.raa_download_url,
         timeout=settings.http_timeout,
     )
     return SyncService(
-        "raa-kmr", RAACollector(client), repository, settings.raa_work_dir
+        selected, RAACollector(client), repository, settings.raa_work_dir
     )
 
 
@@ -102,6 +112,30 @@ def _validate_raa_scope(
         raise ValueError("Välj endast ett av --country, --county eller --municipality")
     if country is not None and country.strip().casefold() != "sweden":
         raise ValueError("--country stöder endast värdet sweden")
+
+
+def _raa_dataset_instance(
+    country: str | None,
+    county: str | None,
+    municipality: str | None,
+    bbox: BoundingBox | None,
+) -> DatasetInstance:
+    if bbox is not None:
+        parent = None
+        if municipality is not None:
+            parent = DatasetScope.municipality(municipality)
+        elif county is not None:
+            parent = DatasetScope.county(county)
+        elif country is not None:
+            parent = DatasetScope.country(country)
+        scope = DatasetScope.bbox(bbox, parent=parent)
+    elif municipality is not None:
+        scope = DatasetScope.municipality(municipality)
+    elif county is not None:
+        scope = DatasetScope.county(county)
+    else:
+        scope = DatasetScope.country(country or "sweden")
+    return DatasetInstance.create(RAA_SOURCE, scope)
 
 
 def _ensure_nationwide_disk_space(path: Path) -> None:
@@ -129,6 +163,8 @@ def import_raa(
         settings.prepare_directories()
         if country is not None:
             _ensure_nationwide_disk_space(settings.raa_work_dir)
+        parsed_bbox = _parse_bbox(bbox)
+        instance = _raa_dataset_instance(country, county, municipality, parsed_bbox)
         last_reported = 0
 
         def report_progress(imported: int) -> None:
@@ -137,10 +173,10 @@ def import_raa(
                 console.print(f"Bearbetade {imported} RAÄ-objekt…")
                 last_reported = imported
 
-        result = RAAImporter(_create_raa_sync_service(settings)).run(
+        result = RAAImporter(_create_raa_sync_service(settings, instance)).run(
             county=county,
             municipality=municipality,
-            bbox=_parse_bbox(bbox),
+            bbox=parsed_bbox,
             progress=report_progress,
         )
         console.print(
@@ -277,9 +313,17 @@ def serve(
         if features_path is not None:
             source = CatalogFeatureQuerySource(load_features(features_path))
         else:
-            source = SqlAlchemyFeatureQuerySource(
-                create_session_factory(settings.database_url), "raa-kmr"
+            session_factory = create_session_factory(settings.database_url)
+            repository = SqlAlchemyAtlasFeatureRepository(session_factory)
+            instance = repository.get_active_instance(RAA_SOURCE.source_id)
+            dataset_id = (
+                instance.dataset_id
+                if instance is not None
+                else DatasetInstance.create(
+                    RAA_SOURCE, DatasetScope.country("sweden")
+                ).dataset_id
             )
+            source = SqlAlchemyFeatureQuerySource(session_factory, dataset_id)
             if source.summary().count == 0:
                 source = CatalogFeatureQuerySource(load_demo_features())
         server = create_server(source, host=host, port=port)

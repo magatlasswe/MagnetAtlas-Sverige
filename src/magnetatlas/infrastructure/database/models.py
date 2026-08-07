@@ -64,6 +64,17 @@ class DatasetMetadataRow(Base):
     __tablename__ = "dataset_metadata"
 
     dataset_id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    source_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    source_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    scope_kind: Mapped[str] = mapped_column(String(50), nullable=False)
+    scope_value: Mapped[str | None] = mapped_column(Text)
+    scope_west: Mapped[float | None] = mapped_column(Float)
+    scope_south: Mapped[float | None] = mapped_column(Float)
+    scope_east: Mapped[float | None] = mapped_column(Float)
+    scope_north: Mapped[float | None] = mapped_column(Float)
+    scope_parent_kind: Mapped[str | None] = mapped_column(String(50))
+    scope_parent_value: Mapped[str | None] = mapped_column(Text)
+    is_active: Mapped[bool] = mapped_column(nullable=False, default=False)
     schema_version: Mapped[str] = mapped_column(String(100), nullable=False)
     base_imported_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     sync_marker: Mapped[str | None] = mapped_column(Text)

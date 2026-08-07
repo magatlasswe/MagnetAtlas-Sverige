@@ -100,6 +100,17 @@ def _navigation(feature: AtlasFeature) -> dict[str, Any] | None:
     }
 
 
+def _source_properties(feature: AtlasFeature) -> dict[str, Any]:
+    value = feature.properties.get("source_properties")
+    if not isinstance(value, dict):
+        return {}
+    return {
+        namespace: properties
+        for namespace, properties in value.items()
+        if isinstance(namespace, str) and isinstance(properties, dict)
+    }
+
+
 def serialize_feature(
     feature: AtlasFeature, catalog: FeatureCatalog | None = None
 ) -> dict[str, Any]:
@@ -144,11 +155,7 @@ def serialize_feature(
                 "source_url": feature.provenance.source_url,
                 "fetched_at": feature.provenance.fetched_at.isoformat(),
             },
-            "source_details": {
-                "raa_id": feature.properties.get("raa_id"),
-                "category": feature.properties.get("category"),
-                "last_updated": feature.properties.get("senast_uppdaterad"),
-            },
+            "source_properties": _source_properties(feature),
             "license": (
                 {
                     "name": license_info.name,
@@ -183,7 +190,10 @@ def serialize_map_feature(feature: AtlasFeature) -> dict[str, Any]:
             "title": feature.title,
             "feature_type": feature.feature_type,
             "place": feature.place,
-            "source_details": {"raa_id": feature.properties.get("raa_id")},
+            "source": {
+                "name": feature.provenance.source,
+                "id": feature.provenance.source_id,
+            },
             "navigation": _navigation(feature),
         },
     }
@@ -244,7 +254,7 @@ def serialize_feature_collection(
             "count": len(selected),
             "latest_import": latest_import.isoformat() if latest_import else None,
             "source": ", ".join(sources) if sources else None,
-            "status": "Demo" if is_demo else "RAÄ" if selected else "Tom",
+            "status": "Demo" if is_demo else "Officiell" if selected else "Tom",
         },
         "features": [serialize_feature(feature, catalog) for feature in selected],
     }

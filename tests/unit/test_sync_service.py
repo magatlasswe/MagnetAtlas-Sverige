@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from magnetatlas.application.sync import SyncScheduler, SyncService
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.domain.features import AtlasFeature, FeatureId, Provenance
 from magnetatlas.domain.repositories import DatasetMetadata
 from magnetatlas.infrastructure.database.repositories import (
@@ -17,6 +18,11 @@ from magnetatlas.infrastructure.database.repositories import (
 from magnetatlas.infrastructure.database.session import create_session_factory
 
 NOW = datetime(2026, 8, 5, 12, tzinfo=UTC)
+INSTANCE = DatasetInstance(
+    "raa",
+    SourceDefinition("raa", "RAÄ"),
+    DatasetScope.country("sweden"),
+)
 
 
 def feature(identifier: str, *, deleted: bool = False) -> AtlasFeature:
@@ -36,6 +42,7 @@ class FakeCollector:
         self.base_features = [feature("base")]
         self.changes: list[AtlasFeature] = []
         self.base_calls = 0
+        self.base_kwargs: list[dict[str, object]] = []
         self.change_calls: list[tuple[date, date]] = []
         self.fail_base = False
         self.fail_after_first = False
@@ -44,6 +51,7 @@ class FakeCollector:
         self, destination: Path, **kwargs: object
     ) -> Iterator[tuple[AtlasFeature, ...]]:
         self.base_calls += 1
+        self.base_kwargs.append(dict(kwargs))
         if self.fail_base:
             raise RuntimeError("avbruten")
 
@@ -72,7 +80,7 @@ def service(
 ) -> tuple[SyncService, SqlAlchemyAtlasFeatureRepository]:
     repo = repository(tmp_path)
     return (
-        SyncService("raa", collector, repo, tmp_path, clock=lambda: NOW),
+        SyncService(INSTANCE, collector, repo, tmp_path, clock=lambda: NOW),
         repo,
     )
 
@@ -101,7 +109,9 @@ def test_valid_cache_avoids_source_calls(tmp_path: Path) -> None:
     assert collector.change_calls == []
 
 
-def test_incremental_sync_updates_only_changes_and_deletions(tmp_path: Path) -> None:
+def test_incremental_sync_updates_only_changes_and_deletions(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     collector = FakeCollector()
     collector.base_features = [feature("keep"), feature("remove")]
     sync, repo = service(tmp_path, collector)
@@ -110,7 +120,7 @@ def test_incremental_sync_updates_only_changes_and_deletions(tmp_path: Path) -> 
     assert original is not None
     repo.apply_changes(
         DatasetMetadata(
-            dataset_id="raa",
+            instance=INSTANCE,
             schema_version="3.0",
             base_imported_at=original.base_imported_at,
             sync_marker="2026-08-02",
@@ -120,15 +130,49 @@ def test_incremental_sync_updates_only_changes_and_deletions(tmp_path: Path) -> 
         [],
     )
     collector.changes = [feature("new"), feature("remove", deleted=True)]
+    list_features = repo.list_features
+    monkeypatch.setattr(
+        repo,
+        "list_features",
+        lambda **kwargs: pytest.fail("Inkrementell synk läste hela datasetet"),
+    )
 
     result = sync.refresh()
 
     assert result.mode == "incremental"
     assert collector.change_calls == [(date(2026, 8, 3), date(2026, 8, 4))]
-    assert {item.provenance.source_id for item in repo.list_features()} == {
+    assert {item.provenance.source_id for item in list_features()} == {
         "keep",
         "new",
     }
+
+
+def test_cache_status_identifies_dataset_instance(tmp_path: Path) -> None:
+    sync, _ = service(tmp_path, FakeCollector())
+
+    assert sync.status().instance == INSTANCE
+    sync.refresh()
+    assert sync.status().instance == INSTANCE
+
+
+def test_scoped_refresh_reimports_same_scope_instead_of_global_changes(
+    tmp_path: Path,
+) -> None:
+    collector = FakeCollector()
+    instance = DatasetInstance.create(
+        INSTANCE.source, DatasetScope.municipality("vaxholm")
+    )
+    sync = SyncService(
+        instance, collector, repository(tmp_path), tmp_path, clock=lambda: NOW
+    )
+
+    sync.refresh(municipality="vaxholm")
+    result = sync.refresh(force=True)
+
+    assert result.mode == "base"
+    assert collector.base_calls == 2
+    assert collector.base_kwargs[-1]["municipality"] == "vaxholm"
+    assert collector.change_calls == []
 
 
 def test_failed_base_import_preserves_last_successful_dataset(tmp_path: Path) -> None:

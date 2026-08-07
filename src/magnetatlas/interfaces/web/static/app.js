@@ -97,6 +97,16 @@ function provenanceText(properties) {
   return `${provenance.source}, käll-ID ${provenance.source_id}, hämtad ${fetched}`;
 }
 
+function sourceProperty(properties, name) {
+  const namespaces = Object.values(properties.source_properties || {});
+  for (const values of namespaces) {
+    if (values && typeof values === "object" && values[name] != null) {
+      return values[name];
+    }
+  }
+  return null;
+}
+
 function boundsForGeometry(geometry) {
   if (!geometry) return null;
   const points = [];
@@ -190,11 +200,11 @@ function showFeature(feature, { focus = false, remember = true } = {}) {
   else elements.featureLicense.textContent = "Licensuppgift saknas";
   elements.featureProvenance.textContent = provenanceText(properties);
   elements.featureCoordinates.textContent = coordinatesText(feature);
-  const details = properties.source_details || {};
+  const sourceId = properties.source?.id;
   [
-    [elements.raaIdRow, elements.raaId, details.raa_id],
-    [elements.raaCategoryRow, elements.raaCategory, details.category],
-    [elements.raaUpdatedRow, elements.raaUpdated, details.last_updated],
+    [elements.sourceIdRow, elements.sourceId, sourceId],
+    [elements.sourceCategoryRow, elements.sourceCategory, sourceProperty(properties, "category")],
+    [elements.sourceUpdatedRow, elements.sourceUpdated, sourceProperty(properties, "last_updated")],
   ].forEach(([row, target, value]) => {
     row.hidden = !value;
     target.textContent = value || "";
@@ -260,8 +270,9 @@ function showPopup(feature, coordinates) {
     "popup-meta",
     [properties.feature_type, properties.place].filter(Boolean).join(" · "),
   );
-  const details = properties.source_details || {};
-  if (details.raa_id) appendText(card, "popup-meta", `RAÄ-ID: ${details.raa_id}`);
+  if (properties.source?.id) {
+    appendText(card, "popup-meta", `Käll-ID: ${properties.source.id}`);
+  }
   const actions = document.createElement("div");
   actions.className = "popup-actions";
   actions.append(popupAction("Visa detaljer", () => loadFeatureDetails(feature.id)));
@@ -364,7 +375,7 @@ function renderSearchResults(features, message = null) {
       detail.textContent = [
         feature.properties.feature_type,
         feature.properties.place,
-        feature.properties.source_details?.raa_id,
+        feature.properties.source?.id,
       ].filter(Boolean).join(" · ");
       button.append(title, detail);
       button.addEventListener("click", () => selectFeature(feature));
@@ -805,8 +816,9 @@ function cacheElements() {
     featureConfidence: "feature-confidence", featureSource: "feature-source",
     featureLicense: "feature-license", featureProvenance: "feature-provenance",
     featureCoordinates: "feature-coordinates", navigationNote: "navigation-note",
-    raaIdRow: "raa-id-row", raaId: "raa-id", raaCategoryRow: "raa-category-row",
-    raaCategory: "raa-category", raaUpdatedRow: "raa-updated-row", raaUpdated: "raa-updated",
+    sourceIdRow: "source-id-row", sourceId: "source-id",
+    sourceCategoryRow: "source-category-row", sourceCategory: "source-category",
+    sourceUpdatedRow: "source-updated-row", sourceUpdated: "source-updated",
     navigateButton: "navigate-button", favoriteButton: "favorite-button", whyButton: "why-button",
     whyDialog: "why-dialog", closeWhy: "close-why", whySources: "why-sources",
     whyEstimated: "why-estimated", whyDataSource: "why-data-source",

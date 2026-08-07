@@ -82,3 +82,38 @@ def test_legacy_feature_table_is_backfilled_and_indexed(tmp_path: Path) -> None:
         connection.execute("SELECT count(*) FROM atlas_features_fts").fetchone()[0] == 1
     )
     connection.close()
+
+
+def test_legacy_dataset_metadata_gains_source_scope_and_active_identity(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "legacy-metadata.db"
+    connection = sqlite3.connect(path)
+    connection.execute(
+        "CREATE TABLE dataset_metadata (dataset_id TEXT PRIMARY KEY, "
+        "schema_version TEXT NOT NULL, base_imported_at DATETIME, "
+        "sync_marker TEXT, cache_valid_until DATETIME)"
+    )
+    connection.execute(
+        "INSERT INTO dataset_metadata(dataset_id,schema_version) VALUES(?,?)",
+        ("raa-kmr", "3.0"),
+    )
+    connection.commit()
+    connection.close()
+
+    create_session_factory(f"sqlite:///{path}")
+
+    connection = sqlite3.connect(path)
+    migrated = connection.execute(
+        "SELECT source_id,source_name,scope_kind,scope_value,is_active "
+        "FROM dataset_metadata WHERE dataset_id='raa-kmr'"
+    ).fetchone()
+    assert migrated == (
+        "raa-kmr",
+        "RAÄ Kulturmiljöregistret",
+        "country",
+        "sweden",
+        1,
+    )
+    assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+    connection.close()

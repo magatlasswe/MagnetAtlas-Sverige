@@ -171,7 +171,10 @@ def test_collector_reads_current_uuid_schema_and_quality(tmp_path: Path) -> None
 
     assert feature.title == "Namngiven lämning"
     assert feature.geometry_confidence.rationale == "God"
-    assert feature.properties["lagesosakerhet_i_meter"] == 2
+    assert (
+        feature.properties["source_properties"]["raa-kmr"]["lagesosakerhet_i_meter"]
+        == 2
+    )
 
 
 def test_collector_rejects_unmappable_geopackage(tmp_path: Path) -> None:

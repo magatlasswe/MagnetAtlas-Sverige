@@ -10,7 +10,14 @@ from sqlalchemy import delete, func, insert, select, text, update
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, sessionmaker
 
+from magnetatlas.domain.datasets import (
+    DatasetInstance,
+    DatasetScope,
+    DatasetScopeKind,
+    SourceDefinition,
+)
 from magnetatlas.domain.features import AtlasFeature, FeatureId
+from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.domain.models import ArchiveRecord
 from magnetatlas.domain.repositories import DatasetMetadata, StoredFeature
 from magnetatlas.infrastructure.database.models import (
@@ -102,8 +109,37 @@ def _aware(value: datetime | None) -> datetime | None:
 
 
 def _metadata_to_domain(row: DatasetMetadataRow) -> DatasetMetadata:
+    kind = DatasetScopeKind(row.scope_kind)
+    scope = (
+        DatasetScope.bbox(
+            BoundingBox(
+                west=row.scope_west,
+                south=row.scope_south,
+                east=row.scope_east,
+                north=row.scope_north,
+            ),
+            parent=(
+                DatasetScope(
+                    DatasetScopeKind(row.scope_parent_kind),
+                    value=row.scope_parent_value,
+                )
+                if row.scope_parent_kind is not None
+                else None
+            ),
+        )
+        if kind is DatasetScopeKind.BBOX
+        and row.scope_west is not None
+        and row.scope_south is not None
+        and row.scope_east is not None
+        and row.scope_north is not None
+        else DatasetScope(kind, value=row.scope_value)
+    )
     return DatasetMetadata(
-        dataset_id=row.dataset_id,
+        instance=DatasetInstance(
+            dataset_id=row.dataset_id,
+            source=SourceDefinition(row.source_id, row.source_name),
+            scope=scope,
+        ),
         schema_version=row.schema_version,
         base_imported_at=_aware(row.base_imported_at),
         sync_marker=row.sync_marker,
@@ -118,11 +154,36 @@ class SqlAlchemyAtlasFeatureRepository:
         self._session_factory = session_factory
 
     @staticmethod
-    def _set_metadata(session: Session, metadata: DatasetMetadata) -> None:
+    def _set_metadata(
+        session: Session, metadata: DatasetMetadata, *, activate: bool = False
+    ) -> None:
+        instance = metadata.instance
+        scope = instance.scope
+        if activate:
+            session.execute(
+                update(DatasetMetadataRow)
+                .where(DatasetMetadataRow.source_id == instance.source.source_id)
+                .values(is_active=False)
+            )
         row = session.get(DatasetMetadataRow, metadata.dataset_id)
         if row is None:
             row = DatasetMetadataRow(dataset_id=metadata.dataset_id)
             session.add(row)
+            row.is_active = activate
+        elif activate:
+            row.is_active = True
+        row.source_id = instance.source.source_id
+        row.source_name = instance.source.display_name
+        row.scope_kind = scope.kind.value
+        row.scope_value = scope.value
+        row.scope_west = scope.bounds.west if scope.bounds else None
+        row.scope_south = scope.bounds.south if scope.bounds else None
+        row.scope_east = scope.bounds.east if scope.bounds else None
+        row.scope_north = scope.bounds.north if scope.bounds else None
+        row.scope_parent_kind = (
+            scope.parent_kind.value if scope.parent_kind is not None else None
+        )
+        row.scope_parent_value = scope.parent_value
         row.schema_version = metadata.schema_version
         row.base_imported_at = metadata.base_imported_at
         row.sync_marker = metadata.sync_marker
@@ -224,18 +285,43 @@ class SqlAlchemyAtlasFeatureRepository:
         self,
         metadata: DatasetMetadata,
         upserts: Sequence[StoredFeature],
-        deletes: Sequence[FeatureId],
+        delete_source_ids: Sequence[str],
     ) -> None:
         with self._session_factory() as session, session.begin():
-            if deletes:
+            if delete_source_ids:
                 session.execute(
                     delete(AtlasFeatureRow).where(
                         AtlasFeatureRow.dataset_id == metadata.dataset_id,
-                        AtlasFeatureRow.feature_id.in_(str(item) for item in deletes),
+                        AtlasFeatureRow.source_id.in_(delete_source_ids),
                     )
                 )
             self._upsert_batch(session, metadata.dataset_id, upserts)
             self._set_metadata(session, metadata)
+
+    def lookup(self, source_id: str, *, dataset_id: str) -> tuple[FeatureId, ...]:
+        """Resolve all feature identities for one source identity."""
+        with self._session_factory() as session:
+            values = session.scalars(
+                select(AtlasFeatureRow.feature_id).where(
+                    AtlasFeatureRow.dataset_id == dataset_id,
+                    AtlasFeatureRow.source_id == source_id,
+                )
+            ).all()
+        return tuple(FeatureId(value) for value in values)
+
+    def delete(self, source_ids: str | Sequence[str], *, dataset_id: str) -> int:
+        """Delete a bounded batch by source identity without loading documents."""
+        selected = (source_ids,) if isinstance(source_ids, str) else tuple(source_ids)
+        if not selected:
+            return 0
+        with self._session_factory() as session, session.begin():
+            result = session.execute(
+                delete(AtlasFeatureRow).where(
+                    AtlasFeatureRow.dataset_id == dataset_id,
+                    AtlasFeatureRow.source_id.in_(selected),
+                )
+            )
+            return result.rowcount or 0
 
     def list_features(self, *, dataset_id: str | None = None) -> list[AtlasFeature]:
         with self._session_factory() as session:
@@ -280,6 +366,25 @@ class SqlAlchemyAtlasFeatureRepository:
             row = session.get(DatasetMetadataRow, dataset_id)
             return _metadata_to_domain(row) if row is not None else None
 
+    def list_dataset_instances(self) -> tuple[DatasetInstance, ...]:
+        """List imported dataset identities without materializing features."""
+        with self._session_factory() as session:
+            rows = session.scalars(
+                select(DatasetMetadataRow).order_by(DatasetMetadataRow.dataset_id)
+            ).all()
+        return tuple(_metadata_to_domain(row).instance for row in rows)
+
+    def get_active_instance(self, source_id: str) -> DatasetInstance | None:
+        """Return the active imported instance for one source."""
+        with self._session_factory() as session:
+            row = session.scalar(
+                select(DatasetMetadataRow).where(
+                    DatasetMetadataRow.source_id == source_id,
+                    DatasetMetadataRow.is_active.is_(True),
+                )
+            )
+        return _metadata_to_domain(row).instance if row is not None else None
+
     def count_features(self, *, dataset_id: str | None = None) -> int:
         with self._session_factory() as session:
             statement = select(func.count()).select_from(AtlasFeatureRow)
@@ -295,6 +400,24 @@ class SqlAlchemyAtlasFeatureRepository:
             session.execute(
                 delete(DatasetMetadataRow).where(
                     DatasetMetadataRow.dataset_id == dataset_id
+                )
+            )
+            return result.rowcount or 0
+
+    def clear_source(self, source_id: str) -> int:
+        """Remove every local dataset instance belonging to one source."""
+        with self._session_factory() as session, session.begin():
+            dataset_ids = select(DatasetMetadataRow.dataset_id).where(
+                DatasetMetadataRow.source_id == source_id
+            )
+            result = session.execute(
+                delete(AtlasFeatureRow).where(
+                    AtlasFeatureRow.dataset_id.in_(dataset_ids)
+                )
+            )
+            session.execute(
+                delete(DatasetMetadataRow).where(
+                    DatasetMetadataRow.source_id == source_id
                 )
             )
             return result.rowcount or 0
@@ -348,7 +471,9 @@ class SqlAlchemyDatasetImportSession:
                 .where(AtlasFeatureRow.dataset_id == self._staging_id)
                 .values(dataset_id=self._metadata.dataset_id)
             )
-            SqlAlchemyAtlasFeatureRepository._set_metadata(session, self._metadata)
+            SqlAlchemyAtlasFeatureRepository._set_metadata(
+                session, self._metadata, activate=True
+            )
             session.execute(text("ANALYZE atlas_features"))
         self._finished = True
 

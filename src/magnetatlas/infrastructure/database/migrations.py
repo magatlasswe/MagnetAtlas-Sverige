@@ -10,7 +10,7 @@ from sqlalchemy import Engine
 from magnetatlas.infrastructure.database.projections import feature_projection
 from magnetatlas.infrastructure.features.json_repository import feature_from_document
 
-SQLITE_SCHEMA_VERSION = 2
+SQLITE_SCHEMA_VERSION = 3
 PROJECTION_COLUMNS = {
     "source": "TEXT",
     "source_id": "TEXT",
@@ -40,6 +40,46 @@ def migrate_sqlite(engine: Engine, *, batch_size: int = 500) -> None:
     with engine.begin() as connection:
         version = int(connection.exec_driver_sql("PRAGMA user_version").scalar() or 0)
         if version >= SQLITE_SCHEMA_VERSION:
+            return
+        metadata_columns = {
+            row[1]
+            for row in connection.exec_driver_sql(
+                "PRAGMA table_info(dataset_metadata)"
+            ).fetchall()
+        }
+        metadata_additions = {
+            "source_id": "TEXT",
+            "source_name": "TEXT",
+            "scope_kind": "TEXT",
+            "scope_value": "TEXT",
+            "scope_west": "REAL",
+            "scope_south": "REAL",
+            "scope_east": "REAL",
+            "scope_north": "REAL",
+            "scope_parent_kind": "TEXT",
+            "scope_parent_value": "TEXT",
+            "is_active": "INTEGER NOT NULL DEFAULT 0",
+        }
+        for name, column_type in metadata_additions.items():
+            if name not in metadata_columns:
+                connection.exec_driver_sql(
+                    f'ALTER TABLE dataset_metadata ADD COLUMN "{name}" {column_type}'
+                )
+        connection.exec_driver_sql(
+            "UPDATE dataset_metadata SET "
+            "source_id=COALESCE(source_id, CASE WHEN dataset_id LIKE 'raa-kmr%' "
+            "THEN 'raa-kmr' ELSE dataset_id END), "
+            "source_name=COALESCE(source_name, CASE WHEN dataset_id LIKE 'raa-kmr%' "
+            "THEN 'RAÄ Kulturmiljöregistret' ELSE dataset_id END), "
+            "scope_kind=COALESCE(scope_kind, 'country'), "
+            "scope_value=COALESCE(scope_value, 'sweden'), is_active=1"
+        )
+        connection.exec_driver_sql(
+            "CREATE INDEX IF NOT EXISTS ix_dataset_metadata_source_active "
+            "ON dataset_metadata(source_id, is_active)"
+        )
+        if version >= 2:
+            connection.exec_driver_sql(f"PRAGMA user_version={SQLITE_SCHEMA_VERSION}")
             return
         existing = {
             row[1]

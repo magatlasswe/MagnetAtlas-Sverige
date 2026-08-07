@@ -54,9 +54,13 @@ def test_serializer_supports_geometries_and_omits_raw_data(
         ),
         geometry=geometry,
         properties={
-            "raa_id": "abc",
-            "category": "Fornlämning",
-            "senast_uppdaterad": "2026-01-01",
+            "source_properties": {
+                "example": {
+                    "external_id": "abc",
+                    "category": "Fornlämning",
+                    "last_updated": "2026-01-01",
+                }
+            },
         },
     )
     payload = serialize_feature_collection(FeatureCatalog([feature]))
@@ -73,7 +77,7 @@ def test_serializer_supports_geometries_and_omits_raw_data(
         "count": 1,
         "latest_import": "2026-01-01T00:00:00+00:00",
         "source": "demo",
-        "status": "RAÄ",
+        "status": "Officiell",
     }
     assert serialized["properties"]["provenance"] == {
         "source": "demo",
@@ -81,10 +85,12 @@ def test_serializer_supports_geometries_and_omits_raw_data(
         "source_url": None,
         "fetched_at": "2026-01-01T00:00:00+00:00",
     }
-    assert serialized["properties"]["source_details"] == {
-        "raa_id": "abc",
-        "category": "Fornlämning",
-        "last_updated": "2026-01-01",
+    assert serialized["properties"]["source_properties"] == {
+        "example": {
+            "external_id": "abc",
+            "category": "Fornlämning",
+            "last_updated": "2026-01-01",
+        }
     }
     assert serialized["properties"]["discovery"] == {
         "supporting_sources": ["demo"],

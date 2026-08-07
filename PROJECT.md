@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v0.6.0-alpha**
 
-Current sprint: **Sprint 3.0 – Nationwide RAÄ (completed)**
+Current sprint: **Sprint 3.1 – Multi-source Foundation (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -49,6 +49,13 @@ Sprint 3.0 validates the complete nationwide RAÄ chain with 838,178 normalized
 features. Country, county and municipality scopes are explicit, nationwide
 imports are protected by a free-space preflight, and bounded web queries have
 been measured against the full local dataset.
+
+Sprint 3.1 separates source definitions, imported dataset instances and
+geographical scopes. Every new import has a deterministic identity, active
+instances are tracked per source and incremental deletions use indexed source
+identities without loading the complete dataset. Collector capabilities and web
+source properties are now source-neutral while the ArchiveRecord path remains
+explicitly marked as the compatibility generation.
 
 ## Current Sprint
 
@@ -175,16 +182,45 @@ API becomes available.
 New data sources and map layers are postponed until the nationwide RAÄ chain
 meets its scalability targets.
 
-### Sprint 3.5 – Search Engine
+### Sprint 3.1 – Multi-source Foundation
 
-- Ranking
-- Combined searches
-- Better filtering
+- [x] Source, dataset instance and geographic scope identities
+- [x] Country, county, municipality and bbox dataset scopes
+- [x] Indexed incremental synchronization by source identity
+- [x] Dataset-aware metadata, active cache status and instance discovery
+- [x] One capability-based Collector foundation
+- [x] Explicit ArchiveRecord-to-AtlasFeature migration path
+- [x] Source-neutral API metadata and `source_properties`
 
-### Sprint 4.0 – AI Assistant
+### Sprint 3.2 – Layer Engine
 
-Only after the data model, Collectors and APIs are stable. AI must never invent
-historical facts.
+- Source-neutral layer definitions and user layer state
+- Multi-dataset viewport and search queries
+- Declarative styles, attribution and layer presets
+
+### Sprint 3.3 – Offline Packages
+
+- Versioned and checksummed regional data packages
+- Atomic installation, update and removal
+- Local application assets and licensed offline-basemap contract
+
+### Sprint 3.4 – Second Official Data Source
+
+- Implement one separately evaluated official Swedish data source
+- Validate Collector, dataset, layer, attribution and offline contracts
+- Verify combined RAÄ and second-source map behavior end to end
+
+### Sprint 3.5 – Mobile Foundation
+
+- Installable PWA application shell
+- Mobile-first layer, search and offline flows
+- Native-shell validation with local SQLite and regional packages
+
+### Sprint 4.0 – Explainable AI Assistant
+
+Only after the multi-source model, Layer Engine, offline contract, second
+official source and mobile foundation are stable. Every answer must be grounded
+in displayed source data and provenance; AI must never invent historical facts.
 
 ### Version 1.0
 

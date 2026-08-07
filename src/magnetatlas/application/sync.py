@@ -9,6 +9,7 @@ from pathlib import Path
 from time import perf_counter
 
 from magnetatlas.domain.collectors import AtlasFeatureCollector
+from magnetatlas.domain.datasets import DatasetInstance, DatasetScopeKind
 from magnetatlas.domain.features import AtlasFeature
 from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.domain.repositories import (
@@ -35,6 +36,7 @@ class CacheStatus:
 
     available: bool
     feature_count: int
+    instance: DatasetInstance | None = None
     schema_version: str | None = None
     base_imported_at: datetime | None = None
     sync_marker: str | None = None
@@ -51,7 +53,7 @@ class SyncService:
 
     def __init__(
         self,
-        dataset_id: str,
+        instance: DatasetInstance,
         collector: AtlasFeatureCollector,
         repository: AtlasFeatureRepository,
         work_dir: Path,
@@ -59,7 +61,7 @@ class SyncService:
         cache_ttl: timedelta = timedelta(hours=24),
         clock: Callable[[], datetime] | None = None,
     ) -> None:
-        self._dataset_id = dataset_id
+        self._instance = instance
         self._collector = collector
         self._repository = repository
         self._work_dir = work_dir
@@ -68,13 +70,16 @@ class SyncService:
 
     def status(self) -> CacheStatus:
         """Read local cache status without any source call."""
-        metadata = self._repository.get_metadata(self._dataset_id)
-        count = self._repository.count_features(dataset_id=self._dataset_id)
+        metadata = self._repository.get_metadata(self._instance.dataset_id)
+        count = self._repository.count_features(dataset_id=self._instance.dataset_id)
         if metadata is None:
-            return CacheStatus(available=False, feature_count=count)
+            return CacheStatus(
+                available=False, feature_count=count, instance=self._instance
+            )
         return CacheStatus(
             available=True,
             feature_count=count,
+            instance=metadata.instance,
             schema_version=metadata.schema_version,
             base_imported_at=metadata.base_imported_at,
             sync_marker=metadata.sync_marker,
@@ -83,7 +88,7 @@ class SyncService:
 
     def clear(self) -> int:
         """Remove the selected local dataset and its synchronization metadata."""
-        return self._repository.clear_dataset(self._dataset_id)
+        return self._repository.clear_source(self._instance.source.source_id)
 
     def refresh(
         self,
@@ -94,13 +99,36 @@ class SyncService:
         force: bool = False,
     ) -> SyncResult:
         """Use a base import when absent, otherwise synchronize changes."""
-        metadata = self._repository.get_metadata(self._dataset_id)
+        metadata = self._repository.get_metadata(self._instance.dataset_id)
         now = self._clock()
         if metadata is None or county or municipality or bbox:
             return self.base_import(
                 county=county,
                 municipality=municipality,
                 bbox=bbox,
+            )
+        scope = metadata.instance.scope
+        if scope.kind is not DatasetScopeKind.COUNTRY:
+            return self.base_import(
+                county=(
+                    scope.value
+                    if scope.kind is DatasetScopeKind.COUNTY
+                    else (
+                        scope.parent_value
+                        if scope.parent_kind is DatasetScopeKind.COUNTY
+                        else None
+                    )
+                ),
+                municipality=(
+                    scope.value
+                    if scope.kind is DatasetScopeKind.MUNICIPALITY
+                    else (
+                        scope.parent_value
+                        if scope.parent_kind is DatasetScopeKind.MUNICIPALITY
+                        else None
+                    )
+                ),
+                bbox=scope.bounds,
             )
         if (
             not force
@@ -122,7 +150,7 @@ class SyncService:
         started = perf_counter()
         now = self._clock()
         self._work_dir.mkdir(parents=True, exist_ok=True)
-        destination = self._work_dir / f"{self._dataset_id}.gpkg"
+        destination = self._work_dir / f"{self._instance.source.source_id}.gpkg"
         batches = self._collector.fetch_base_batches(
             destination,
             county=county,
@@ -131,7 +159,7 @@ class SyncService:
         )
         marker = (now.date() - timedelta(days=1)).isoformat()
         metadata = DatasetMetadata(
-            dataset_id=self._dataset_id,
+            instance=self._instance,
             schema_version=self._collector.base_schema_version,
             base_imported_at=now,
             sync_marker=marker,
@@ -163,7 +191,7 @@ class SyncService:
 
     def incremental_sync(self) -> SyncResult:
         """Apply all changes after the last completed marker atomically."""
-        metadata = self._repository.get_metadata(self._dataset_id)
+        metadata = self._repository.get_metadata(self._instance.dataset_id)
         if metadata is None or metadata.sync_marker is None:
             return self.base_import()
         now = self._clock()
@@ -171,7 +199,7 @@ class SyncService:
         end = now.date() - timedelta(days=1)
         if start > end:
             refreshed = DatasetMetadata(
-                dataset_id=metadata.dataset_id,
+                instance=metadata.instance,
                 schema_version=metadata.schema_version,
                 base_imported_at=metadata.base_imported_at,
                 sync_marker=metadata.sync_marker,
@@ -180,31 +208,29 @@ class SyncService:
             self._repository.apply_changes(refreshed, [], [])
             return SyncResult("incremental", 0, 0, metadata.sync_marker)
         changes = self._collector.collect_changes(start, end)
-        existing = self._repository.list_features(dataset_id=self._dataset_id)
         deleted_source_ids = {
             feature.provenance.source_id
             for feature in changes
             if feature.properties.get("deleted") is True
         }
-        delete_ids = [
-            feature.feature_id
-            for feature in existing
-            if feature.provenance.source_id in deleted_source_ids
-        ]
         upserts = [
             StoredFeature(feature, _source_version(feature))
             for feature in changes
             if feature.properties.get("deleted") is not True
         ]
         next_metadata = DatasetMetadata(
-            dataset_id=metadata.dataset_id,
+            instance=metadata.instance,
             schema_version=metadata.schema_version,
             base_imported_at=metadata.base_imported_at,
             sync_marker=end.isoformat(),
             cache_valid_until=now + self._cache_ttl,
         )
-        self._repository.apply_changes(next_metadata, upserts, delete_ids)
-        return SyncResult("incremental", len(upserts), len(delete_ids), end.isoformat())
+        self._repository.apply_changes(
+            next_metadata, upserts, tuple(deleted_source_ids)
+        )
+        return SyncResult(
+            "incremental", len(upserts), len(deleted_source_ids), end.isoformat()
+        )
 
 
 class SyncScheduler:

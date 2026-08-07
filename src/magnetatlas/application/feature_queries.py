@@ -91,7 +91,7 @@ class CatalogFeatureQuerySource:
             count=len(selected),
             latest_import=latest,
             source=", ".join(sources) if sources else None,
-            status="Demo" if is_demo else "RAÄ" if selected else "Tom",
+            status="Demo" if is_demo else "Officiell" if selected else "Tom",
             is_demo=is_demo,
         )
 

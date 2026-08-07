@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from magnetatlas.application.features import SEARCHABLE_PROPERTY_KEYS
+from magnetatlas.application.features import searchable_property_values
 from magnetatlas.domain.features import AtlasFeature
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 
@@ -40,7 +40,6 @@ def _geometry_bounds(
 
 def feature_projection(feature: AtlasFeature) -> dict[str, Any]:
     """Project frequently queried values without changing the stored document."""
-    property_values = (feature.properties.get(key) for key in SEARCHABLE_PROPERTY_KEYS)
     search_text = " ".join(
         value
         for value in (
@@ -49,7 +48,7 @@ def feature_projection(feature: AtlasFeature) -> dict[str, Any]:
             feature.feature_type,
             feature.description,
             feature.provenance.source_id,
-            *property_values,
+            *searchable_property_values(feature),
         )
         if isinstance(value, str) and value
     ).casefold()

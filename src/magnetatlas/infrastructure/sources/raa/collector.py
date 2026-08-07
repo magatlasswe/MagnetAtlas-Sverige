@@ -9,7 +9,12 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from magnetatlas.domain.collectors import CollectorDescriptor
+from magnetatlas.domain.collectors import (
+    CollectorCapability,
+    CollectorDescriptor,
+    CollectorOutputModel,
+)
+from magnetatlas.domain.datasets import SourceDefinition
 from magnetatlas.domain.exceptions import DataSourceError
 from magnetatlas.domain.features import AtlasFeature
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
@@ -21,6 +26,7 @@ from magnetatlas.infrastructure.sources.raa.client import (
 from magnetatlas.infrastructure.sources.raa.mapper import map_raa_record
 
 DEFAULT_IMPORT_BATCH_SIZE = 500
+RAA_SOURCE_DEFINITION = SourceDefinition("raa-kmr", "RAÄ Kulturmiljöregistret")
 SOURCE_FIELDS = (
     "lamningsnummer",
     "raa_nummer",
@@ -225,6 +231,18 @@ class RAACollector:
         collector_id="raa",
         display_name="RAÄ Kulturmiljöregistret",
         version=API_VERSION,
+        capabilities=frozenset(
+            {
+                CollectorCapability.BASE_IMPORT,
+                CollectorCapability.INCREMENTAL_CHANGES,
+                CollectorCapability.COUNTRY_SCOPE,
+                CollectorCapability.COUNTY_SCOPE,
+                CollectorCapability.MUNICIPALITY_SCOPE,
+                CollectorCapability.BBOX_SCOPE,
+            }
+        ),
+        output_model=CollectorOutputModel.ATLAS_FEATURE,
+        source=RAA_SOURCE_DEFINITION,
     )
 
     def __init__(self, client: RAAClient) -> None:

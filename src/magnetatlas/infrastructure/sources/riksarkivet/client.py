@@ -14,7 +14,9 @@ from magnetatlas.domain.collectors import (
     CollectionRequest,
     CollectorCapability,
     CollectorDescriptor,
+    CollectorOutputModel,
 )
+from magnetatlas.domain.datasets import SourceDefinition
 from magnetatlas.domain.exceptions import DataSourceError
 from magnetatlas.infrastructure.sources.errors import transport_error_message
 from magnetatlas.infrastructure.sources.riksarkivet.mapper import map_item
@@ -50,10 +52,13 @@ class RiksarkivetClient:
         version="1.0",
         capabilities=frozenset(
             {
+                CollectorCapability.REMOTE_SEARCH,
                 CollectorCapability.TEXT_SEARCH,
                 CollectorCapability.RESULT_LIMIT,
             }
         ),
+        output_model=CollectorOutputModel.ARCHIVE_RECORD,
+        source=SourceDefinition("riksarkivet", "Riksarkivet"),
     )
 
     def __init__(

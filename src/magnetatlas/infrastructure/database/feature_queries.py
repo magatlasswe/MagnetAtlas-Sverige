@@ -64,7 +64,7 @@ class SqlAlchemyFeatureQuerySource:
             count=count,
             latest_import=metadata.base_imported_at if metadata is not None else None,
             source=source,
-            status="RAÄ" if count else "Tom",
+            status="Officiell" if count else "Tom",
         )
 
     def _rows(self, session: Session) -> ScalarResult[AtlasFeatureRow]:

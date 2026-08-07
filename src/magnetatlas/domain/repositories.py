@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 
+from magnetatlas.domain.datasets import DatasetInstance
 from magnetatlas.domain.features import AtlasFeature, FeatureId
 from magnetatlas.domain.models import ArchiveRecord
 
@@ -31,15 +32,13 @@ class StoredFeature:
 class DatasetMetadata:
     """Source-neutral state associated with one locally persisted dataset."""
 
-    dataset_id: str
+    instance: DatasetInstance
     schema_version: str
     base_imported_at: datetime | None = None
     sync_marker: str | None = None
     cache_valid_until: datetime | None = None
 
     def __post_init__(self) -> None:
-        if not self.dataset_id.strip():
-            raise ValueError("dataset_id får inte vara tomt")
         if not self.schema_version.strip():
             raise ValueError("schema_version får inte vara tomt")
         for value in (
@@ -50,6 +49,11 @@ class DatasetMetadata:
                 value.tzinfo is None or value.utcoffset() is None
             ):
                 raise ValueError("Metadata-tidpunkter måste innehålla tidszon")
+
+    @property
+    def dataset_id(self) -> str:
+        """Return the persisted identity of this dataset instance."""
+        return self.instance.dataset_id
 
 
 class DatasetImportSession(Protocol):
@@ -79,8 +83,12 @@ class AtlasFeatureRepository(Protocol):
         self,
         metadata: DatasetMetadata,
         upserts: Sequence[StoredFeature],
-        deletes: Sequence[FeatureId],
+        delete_source_ids: Sequence[str],
     ) -> None: ...
+
+    def lookup(self, source_id: str, *, dataset_id: str) -> tuple[FeatureId, ...]: ...
+
+    def delete(self, source_ids: str | Sequence[str], *, dataset_id: str) -> int: ...
 
     def list_features(self, *, dataset_id: str | None = None) -> list[AtlasFeature]: ...
 
@@ -94,6 +102,12 @@ class AtlasFeatureRepository(Protocol):
 
     def get_metadata(self, dataset_id: str) -> DatasetMetadata | None: ...
 
+    def list_dataset_instances(self) -> tuple[DatasetInstance, ...]: ...
+
+    def get_active_instance(self, source_id: str) -> DatasetInstance | None: ...
+
     def count_features(self, *, dataset_id: str | None = None) -> int: ...
 
     def clear_dataset(self, dataset_id: str) -> int: ...
+
+    def clear_source(self, source_id: str) -> int: ...

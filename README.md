@@ -35,6 +35,8 @@ data.
 - Lokal lista över närmaste historiska objekt när GPS används.
 - Favoriter, historik samt ljust och mörkt tema.
 - Collector Framework och en gemensam `AtlasFeature`-domänmodell.
+- Källneutrala identiteter för datakällor, importerade dataset och geografiska
+  urval.
 - Officiell RAÄ-basimport, inkrementell synk och lokal SQLite-cache.
 - CLI, lokal SQLite-lagring och CSV-export.
 
@@ -77,10 +79,16 @@ minst 12 GiB ledigt i arbetskatalogen och kan ta lång tid. Börja normalt med e
 län eller en kommun. Endast ett av `--country`, `--county` och `--municipality`
 får anges per import.
 
+Varje import sparas som en egen datasetinstans. Identiteten byggs av källa och
+scope, exempelvis `raa-kmr:municipality:vaxholm`. Country, county, municipality
+och bbox har separata identiteter. Den senast lyckade instansen för en källa är
+aktiv i befintliga cache- och kartflöden; andra instanser förblir isolerade och
+kan upptäckas genom repositorygränsen inför kommande Layer Engine.
+
 Om ingen RAÄ-cache finns visar `magnetatlas serve` tydligt märkt syntetisk
 demodata, så att gränssnittet går att prova utan en nätverksimport.
 När minst ett riktigt RAÄ-objekt finns används enbart den lokala RAÄ-cachen;
-kartan visar då antal objekt, senaste import, datakälla och status **RAÄ**.
+kartan visar då antal objekt, senaste import, datakälla och status **Officiell**.
 
 `magnetatlas serve` startar applikationen på `http://localhost:8000/` och öppnar
 standardwebbläsaren. Stoppa servern med Ctrl+C. Baskartan kräver
