@@ -10,10 +10,12 @@ from importlib import resources
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from magnetatlas.application.evidence import EvidenceReportService
+from magnetatlas.application.evidence_rules import EvidenceRulesLibrary
 from magnetatlas.application.feature_queries import FeatureQuerySource
 from magnetatlas.application.features import FeatureSearchFilters
 from magnetatlas.application.layer_composition import LayerCompositionService
 from magnetatlas.application.layers import LayerService
+from magnetatlas.domain.evidence_rules import EvidenceCategory
 from magnetatlas.domain.geography import BoundingBox
 from magnetatlas.interfaces.web.layer_composition import (
     create_layer_composition_service,
@@ -21,9 +23,11 @@ from magnetatlas.interfaces.web.layer_composition import (
 from magnetatlas.interfaces.web.serializers import (
     serialize_dataset_summary,
     serialize_evidence,
+    serialize_evidence_category,
     serialize_evidence_report,
     serialize_feature,
     serialize_layer,
+    serialize_rule_metadata,
     serialize_search_results,
     serialize_viewport,
 )
@@ -89,6 +93,7 @@ def make_handler(
     layer_service: LayerService,
     composition_service: LayerCompositionService | None = None,
     evidence_service: EvidenceReportService | None = None,
+    rules_library: EvidenceRulesLibrary | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one bounded feature query source."""
     composition = composition_service or create_layer_composition_service(layer_service)
@@ -133,6 +138,55 @@ def make_handler(
             parameters = parse_qs(parsed_url.query)
             if path == "/api/dataset":
                 self._json(HTTPStatus.OK, serialize_dataset_summary(source.summary()))
+                return
+            if path == "/api/evidence-rules":
+                if rules_library is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "evidence_rules_unavailable"},
+                    )
+                    return
+                self._json(
+                    HTTPStatus.OK,
+                    {
+                        "rules": [
+                            serialize_rule_metadata(rule.metadata)
+                            for rule in rules_library.list()
+                        ]
+                    },
+                )
+                return
+            if path.startswith("/api/evidence-rules/"):
+                if rules_library is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "evidence_rules_unavailable"},
+                    )
+                    return
+                rule_id = unquote(path.removeprefix("/api/evidence-rules/"))
+                try:
+                    rule = rules_library.get(rule_id)
+                except KeyError:
+                    self._json(
+                        HTTPStatus.NOT_FOUND,
+                        {
+                            "error": "not_found",
+                            "message": "Evidensregeln hittades inte.",
+                        },
+                    )
+                    return
+                self._json(HTTPStatus.OK, serialize_rule_metadata(rule.metadata))
+                return
+            if path == "/api/evidence-categories":
+                self._json(
+                    HTTPStatus.OK,
+                    {
+                        "categories": [
+                            serialize_evidence_category(category)
+                            for category in EvidenceCategory
+                        ]
+                    },
+                )
                 return
             if path in {"/api/evidence-report", "/api/evidence"}:
                 if evidence_service is None:
@@ -316,11 +370,18 @@ def create_server(
     *,
     composition_service: LayerCompositionService | None = None,
     evidence_service: EvidenceReportService | None = None,
+    rules_library: EvidenceRulesLibrary | None = None,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
     """Create a local threaded HTTP server without starting its event loop."""
     return ThreadingHTTPServer(
         (host, port),
-        make_handler(source, layer_service, composition_service, evidence_service),
+        make_handler(
+            source,
+            layer_service,
+            composition_service,
+            evidence_service,
+            rules_library,
+        ),
     )

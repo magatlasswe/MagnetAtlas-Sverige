@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.7 – Evidence Engine (completed)**
+Current sprint: **Sprint 3.8 – Evidence Rules Framework (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -86,6 +86,13 @@ feature identity, snapshot, confidence, provenance and licence. Bounded
 EvidenceReports are available through a generic API and contain no generated
 claims, ranking, machine learning or AI. Future AI is contractually restricted
 to EvidenceReport and must not consume raw features or provider data.
+
+Sprint 3.8 adds a separate rule library above that frozen engine. Public
+`RuleMetadata`, semantic `RuleVersion`, source-aware `EvidenceContext`, pure
+`EvidenceMatcher` implementations and unweighted `EvidenceRuleSet` groupings
+make rules discoverable and testable without analysis, scores, ranking or AI.
+Six initial generic rules identify only explicit normalized properties. The API
+and web panel expose metadata, never matcher internals.
 
 ## Current Sprint
 

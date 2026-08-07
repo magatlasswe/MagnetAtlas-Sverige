@@ -49,6 +49,8 @@ data.
   opacitet, synlighet, legend och attribution ovanpå Layer Engine.
 - Deterministisk Evidence Engine som omvandlar spårbara `AtlasFeature` till
   versionsmärkta evidensobjekt och bounded `EvidenceReport` utan AI eller ranking.
+- Generellt Evidence Rules Framework med versionshanterad metadata, rena
+  matchers, stabil registrering och oviktade rulesets.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -141,6 +143,23 @@ Future AI
 `GET /api/evidence/{id}` levererar ett enskilt spårbart evidensobjekt. Det finns
 ingen AI- eller ranking-endpoint. Framtida AI får endast läsa `EvidenceReport`;
 den får aldrig läsa råa providers, råa dataset eller råa `AtlasFeature`.
+
+## Evidence Rules Framework
+
+Regelbiblioteket ligger ovanpå den oförändrade Evidence Engine. Varje regel har
+en semantisk `RuleVersion`, publik `RuleMetadata`, en `EvidenceCategory` och en
+ren `EvidenceMatcher`. Matchern får läsa ett `AtlasFeature` och ett skrivskyddat
+`EvidenceContext`, men får inte ändra objekt, poängsätta resultat eller skapa
+AI-text. `EvidenceRuleSet` grupperar regelversioner utan vikter eller poäng.
+
+Regelmetadata finns via `/api/evidence-rules`, `/api/evidence-rules/{id}` och
+`/api/evidence-categories`. Webbgränssnittet visar version, kategori, status och
+beskrivning från API:t och känner inte till intern regelimplementation.
+
+```text
+AtlasFeature → Evidence → Evidence Rules → EvidenceReport
+    → Future Analysis → Future Ranking → Future AI
+```
 
 SGU Jordarter importeras från den officiella samlingen `grundlager`:
 

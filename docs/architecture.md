@@ -432,6 +432,42 @@ läsa `EvidenceReport`. Den får inte läsa råa `AtlasFeature`, providerobjekt,
 rådata eller datasetfiler. Sprint 3.7 innehåller ingen AI-, ranking- eller
 maskininlärningsimplementation.
 
+## Evidence Rules Framework
+
+Sprint 3.8 lägger ett separat regelbibliotek ovanpå den oförändrade Evidence
+Engine. `RuleMetadata` är det publika kontraktet och innehåller stabilt ID,
+semantisk `RuleVersion`, kategori, käll- och datasetstöd, evidenstyp, status och
+skapad tid. `EvidenceMatcher` är ett rent predikat som endast får läsa
+`AtlasFeature` och ett skrivskyddat `EvidenceContext`. Matchers får aldrig ändra
+features, skapa ranking eller generera AI-text.
+
+`EvidenceRulesLibrary` skyddar mot duplicerade `(rule_id, version)` och listar
+regler stabilt. Uppslag på ID väljer senaste installerade semantiska version.
+`EvidenceRuleSet` grupperar exakta regelversioner utan vikter eller poäng. API:t
+serialiserar enbart metadata; matcherimplementationer lämnar aldrig
+applikationslagret.
+
+```text
+AtlasFeature
+    ↓
+Evidence
+    ↓
+Evidence Rules (metadata + rena matchers + oviktade rulesets)
+    ↓
+EvidenceReport
+    ↓
+Future Analysis
+    ↓
+Future Ranking
+    ↓
+Future AI (får endast läsa EvidenceReport)
+```
+
+De initiala reglerna för bro, väg, hamn, jordart, ortnamn och historisk karta
+identifierar endast uttryckliga normaliserade egenskaper eller deklarerat
+dataset. De drar inga historiska slutsatser. Regeln för historiska kartor är
+förberedd men inaktiverad tills ett verifierbart dataset finns.
+
 ## Långsiktiga arkitekturprinciper
 
 Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i

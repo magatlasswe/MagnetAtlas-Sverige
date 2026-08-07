@@ -15,9 +15,11 @@ from magnetatlas.application.evidence import (
     EvidenceRuleRegistry,
     FeatureEvidenceRule,
 )
+from magnetatlas.application.evidence_rules import create_default_evidence_rules_library
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.application.layers import LayerFeatureQuerySource
 from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
+from magnetatlas.domain.evidence_rules import EvidenceCategory
 from magnetatlas.infrastructure.features import load_demo_features
 from magnetatlas.interfaces.web.layers import create_layer_service
 from magnetatlas.interfaces.web.server import create_server
@@ -41,6 +43,7 @@ def local_server() -> Iterator[str]:
         source,
         layer_service,
         evidence_service=evidence_service,
+        rules_library=create_default_evidence_rules_library(),
         host="127.0.0.1",
         port=0,
     )
@@ -85,6 +88,8 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "dataset-source" in html
         assert "evidence-count" in html
         assert "evidence-list" in html
+        assert "rules-count" in html
+        assert "rules-list" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -108,6 +113,7 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"distanceKilometers" in javascript
         assert b"renderDatasetSummary" in javascript
         assert b"/api/dataset" in javascript
+        assert b"/api/evidence-rules" in javascript
         assert b"viewportParameters" in javascript
         assert b"scheduleViewportLoad" in javascript
         assert b"AbortController" in javascript
@@ -181,6 +187,25 @@ def test_evidence_api_serves_reports_lists_and_traceable_items(
 
     with urlopen(f"{local_server}/api/evidence?{query}", timeout=2) as response:
         assert len(json.load(response)["evidence"]) == 10
+
+
+def test_evidence_rule_api_exposes_metadata_categories_and_latest_rule(
+    local_server: str,
+) -> None:
+    with urlopen(f"{local_server}/api/evidence-rules", timeout=2) as response:
+        rules = json.load(response)["rules"]
+    with urlopen(f"{local_server}/api/evidence-rules/bridge", timeout=2) as response:
+        bridge = json.load(response)
+    with urlopen(f"{local_server}/api/evidence-categories", timeout=2) as response:
+        categories = json.load(response)["categories"]
+
+    assert len(rules) == 6
+    assert bridge["id"] == "bridge"
+    assert bridge["version"] == "1.0.0"
+    assert "implementation" not in bridge
+    assert [item["id"] for item in categories] == [
+        category.value for category in EvidenceCategory
+    ]
 
 
 def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) -> None:

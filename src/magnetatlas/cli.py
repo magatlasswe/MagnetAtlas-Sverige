@@ -20,6 +20,7 @@ from magnetatlas.application.evidence import (
     EvidenceRuleRegistry,
     FeatureEvidenceRule,
 )
+from magnetatlas.application.evidence_rules import create_default_evidence_rules_library
 from magnetatlas.application.feature_queries import CatalogFeatureQuerySource
 from magnetatlas.application.layer_composition import ComposedFeatureQuerySource
 from magnetatlas.application.search import SearchService
@@ -532,14 +533,18 @@ def serve(
                 )
         layer_service = create_layer_service(instances)
         composed_source = ComposedFeatureQuerySource(raw_sources, layer_service)
+        rules_library = create_default_evidence_rules_library()
         evidence_service = EvidenceReportService(
             raw_sources,
-            EvidenceEngine(EvidenceRuleRegistry((FeatureEvidenceRule(),))),
+            EvidenceEngine(
+                EvidenceRuleRegistry((FeatureEvidenceRule(), *rules_library.list()))
+            ),
         )
         server = create_server(
             composed_source,
             layer_service,
             evidence_service=evidence_service,
+            rules_library=rules_library,
             host=host,
             port=port,
         )

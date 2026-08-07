@@ -99,6 +99,32 @@ async function loadLayers() {
   renderLayers(payload.layers);
 }
 
+function renderEvidenceRules(rules) {
+  elements.rulesCount.textContent = rules.length.toLocaleString("sv-SE");
+  elements.rulesList.replaceChildren();
+  rules.forEach((rule) => {
+    const item = document.createElement("div");
+    item.className = `layer-item${rule.enabled ? " is-available" : ""}`;
+    const content = document.createElement("span");
+    const heading = document.createElement("strong");
+    heading.textContent = `${rule.title} · v${rule.version}`;
+    const details = document.createElement("small");
+    details.textContent = `${rule.category} · ${rule.enabled ? "Aktiv" : "Inaktiv"} · ${rule.description}`;
+    content.append(heading, details);
+    item.append(content);
+    elements.rulesList.append(item);
+  });
+}
+
+async function loadEvidenceRules() {
+  const response = await fetch("/api/evidence-rules", {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  renderEvidenceRules(payload.rules);
+}
+
 function renderEvidence(report) {
   elements.evidenceCount.textContent = report.evidence_count.toLocaleString("sv-SE");
   elements.evidenceList.replaceChildren();
@@ -917,6 +943,7 @@ function cacheElements() {
     datasetImport: "dataset-import", datasetSource: "dataset-source",
     layerList: "layer-list",
     evidenceCount: "evidence-count", evidenceList: "evidence-list",
+    rulesCount: "rules-count", rulesList: "rules-list",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }
@@ -970,6 +997,7 @@ async function initialize() {
     const dataset = await response.json();
     renderDatasetSummary(dataset);
     await loadLayers();
+    await loadEvidenceRules();
     state.map = new maplibregl.Map({
       container: "map",
       center: [16.5, 62.0],

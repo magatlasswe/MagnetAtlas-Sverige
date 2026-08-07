@@ -14,9 +14,31 @@ from magnetatlas.application.features import (
     navigation_target,
 )
 from magnetatlas.domain.evidence import Evidence, EvidenceReport, EvidenceSource
+from magnetatlas.domain.evidence_rules import EvidenceCategory, RuleMetadata
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 from magnetatlas.domain.map_layers import ComposedLayer
+
+
+def serialize_rule_metadata(metadata: RuleMetadata) -> dict[str, Any]:
+    """Serialize only the public contract of an evidence rule."""
+    return {
+        "id": metadata.id,
+        "version": str(metadata.version),
+        "category": metadata.category.value,
+        "title": metadata.title,
+        "description": metadata.description,
+        "provider_support": sorted(metadata.provider_support),
+        "dataset_support": sorted(metadata.dataset_support),
+        "evidence_type": metadata.evidence_type.value,
+        "enabled": metadata.enabled,
+        "created_at": metadata.created_at.isoformat(),
+    }
+
+
+def serialize_evidence_category(category: EvidenceCategory) -> dict[str, str]:
+    """Serialize one stable category identifier and display name."""
+    return {"id": category.value, "name": category.name.replace("_", " ").title()}
 
 
 def serialize_layer(layer: ComposedLayer) -> dict[str, Any]:
