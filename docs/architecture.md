@@ -456,7 +456,7 @@ Evidence Rules (metadata + rena matchers + oviktade rulesets)
     ↓
 EvidenceReport
     ↓
-Future Analysis
+Analysis
     ↓
 Future Ranking
     ↓
@@ -467,6 +467,52 @@ De initiala reglerna för bro, väg, hamn, jordart, ortnamn och historisk karta
 identifierar endast uttryckliga normaliserade egenskaper eller deklarerat
 dataset. De drar inga historiska slutsatser. Regeln för historiska kartor är
 förberedd men inaktiverad tills ett verifierbart dataset finns.
+
+## Analysmotor
+
+Sprint 3.9 bygger ett separat applikationslager ovanpå Evidence Engine och
+Evidence Rules Framework. Dess enda datagräns är `EvidenceReport`:
+`AnalysisContext` innehåller rapporten och exponerar dess oföränderliga
+`Evidence`-objekt. Analysdomänen importerar inte `AtlasFeature`, och motorn har
+ingen åtkomst till providers, datasetfiler, collectors eller repositories.
+
+`AnalysisRule` är versionshanterad och deterministisk. De initiala generiska
+reglerna klassificerar uttryckligt deklarerade `EvidenceType` till
+`AnalysisCategory`. Varje träff ger ett eget `AnalysisResult` med exakt
+evidensreferens, kopierad confidence, regel-ID, regelversion, analysversion och
+fast orsakskod. Motorn sammanväger inte confidence och skapar inga vikter,
+poäng, rekommendationer eller ranking. `AnalysisSummary` innehåller endast antal
+resultat, använda evidens och resultat per kategori.
+
+```text
+Providers
+    ↓
+AtlasFeature
+    ↓
+Evidence Engine
+    ↓
+Evidence
+    ↓
+Evidence Rules
+    ↓
+EvidenceReport  ← enda tillåtna analysindata
+    ↓
+AnalysisContext
+    ↓
+versionerade AnalysisRule
+    ↓
+AnalysisResult + AnalysisSummary
+    ↓
+Analysis
+    ↓
+Future Ranking
+    ↓
+Future AI
+```
+
+Analys-API:t serialiserar endast analysmetadata och evidens-ID:n. Det inkluderar
+aldrig evidenspayload, råa features eller providersvar. Sammanfattningstexterna
+är fasta regeltexter; ingen fri text genereras och ingen AI används.
 
 ## Långsiktiga arkitekturprinciper
 

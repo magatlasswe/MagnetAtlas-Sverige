@@ -9,6 +9,10 @@ from urllib.request import Request, urlopen
 
 import pytest
 
+from magnetatlas.application.analysis import (
+    AnalysisService,
+    create_default_analysis_engine,
+)
 from magnetatlas.application.evidence import (
     EvidenceEngine,
     EvidenceReportService,
@@ -39,11 +43,15 @@ def local_server() -> Iterator[str]:
         ((instance, CatalogFeatureQuerySource(load_demo_features())),),
         EvidenceEngine(EvidenceRuleRegistry((FeatureEvidenceRule(),))),
     )
+    analysis_service = AnalysisService(
+        evidence_service, create_default_analysis_engine()
+    )
     server = create_server(
         source,
         layer_service,
         evidence_service=evidence_service,
         rules_library=create_default_evidence_rules_library(),
+        analysis_service=analysis_service,
         host="127.0.0.1",
         port=0,
     )
@@ -90,6 +98,8 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "evidence-list" in html
         assert "rules-count" in html
         assert "rules-list" in html
+        assert "analysis-count" in html
+        assert "analysis-list" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -114,6 +124,7 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"renderDatasetSummary" in javascript
         assert b"/api/dataset" in javascript
         assert b"/api/evidence-rules" in javascript
+        assert b"/api/analysis-report" in javascript
         assert b"viewportParameters" in javascript
         assert b"scheduleViewportLoad" in javascript
         assert b"AbortController" in javascript
@@ -206,6 +217,27 @@ def test_evidence_rule_api_exposes_metadata_categories_and_latest_rule(
     assert [item["id"] for item in categories] == [
         category.value for category in EvidenceCategory
     ]
+
+
+def test_analysis_api_exposes_traceable_metadata_and_detail(local_server: str) -> None:
+    query = "bbox=10,55,25,70&limit=10&area=test-area"
+    with urlopen(f"{local_server}/api/analysis-report?{query}", timeout=2) as response:
+        report = json.load(response)
+
+    assert report["area"] == "test-area"
+    assert report["summary"]["result_count"] == 10
+    assert report["summary"]["evidence_count"] == 10
+    assert all(item["evidence_references"] for item in report["results"])
+    assert "features" not in report
+
+    result_id = report["results"][0]["id"]
+    with urlopen(f"{local_server}/api/analysis/{result_id}", timeout=2) as response:
+        result = json.load(response)
+    assert result["id"] == result_id
+    assert result["rule_version"] == "1.0.0"
+
+    with urlopen(f"{local_server}/api/analysis?{query}", timeout=2) as response:
+        assert len(json.load(response)["analysis"]) == 10
 
 
 def test_layer_api_lists_reads_disables_and_enables_layers(local_server: str) -> None:

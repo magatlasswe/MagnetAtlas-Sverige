@@ -51,6 +51,8 @@ data.
   versionsmärkta evidensobjekt och bounded `EvidenceReport` utan AI eller ranking.
 - Generellt Evidence Rules Framework med versionshanterad metadata, rena
   matchers, stabil registrering och oviktade rulesets.
+- Deterministisk Analysmotor som endast läser `EvidenceReport` och skapar
+  spårbara, oviktade analysresultat utan AI, ranking eller maskininlärning.
 - CLI, lokal SQLite-lagring och CSV-export.
 
 ## Installation
@@ -158,7 +160,35 @@ beskrivning från API:t och känner inte till intern regelimplementation.
 
 ```text
 AtlasFeature → Evidence → Evidence Rules → EvidenceReport
-    → Future Analysis → Future Ranking → Future AI
+    → Analysis → Future Ranking → Future AI
+```
+
+## Analysmotor
+
+Analysmotorn tar en färdig `EvidenceReport` som enda indata. Versionshanterade
+`AnalysisRule` läser evidens genom ett oföränderligt `AnalysisContext` och
+skapar `AnalysisResult` med kategori, confidence, regelversion,
+analysversion, fast orsakskod och exakta evidensreferenser. Initialt skapas ett
+resultat per matchande evidensobjekt; confidence kopieras från evidensen och
+sammanvägs aldrig.
+
+`GET /api/analysis` levererar resultatmetadata,
+`GET /api/analysis/{id}` levererar ett enskilt resultat och
+`GET /api/analysis-report` levererar rapportmetadata och count-only summary.
+Inga råa features, providerobjekt eller datasetfiler exponeras genom API:t.
+
+```text
+AtlasFeature
+    ↓
+Evidence
+    ↓
+Evidence Rules
+    ↓
+Analysis
+    ↓
+Future Ranking
+    ↓
+Future AI
 ```
 
 SGU Jordarter importeras från den officiella samlingen `grundlager`:

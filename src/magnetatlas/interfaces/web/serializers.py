@@ -13,11 +13,48 @@ from magnetatlas.application.features import (
     feature_period,
     navigation_target,
 )
+from magnetatlas.domain.analysis import Analysis, AnalysisResult
 from magnetatlas.domain.evidence import Evidence, EvidenceReport, EvidenceSource
 from magnetatlas.domain.evidence_rules import EvidenceCategory, RuleMetadata
 from magnetatlas.domain.features import AtlasFeature, Confidence, TimeSpan
 from magnetatlas.domain.geography import BoundingBox, GeoPoint, LineString, Polygon
 from magnetatlas.domain.map_layers import ComposedLayer
+
+
+def serialize_analysis_result(result: AnalysisResult) -> dict[str, Any]:
+    """Serialize explainable analysis metadata without source data."""
+    return {
+        "id": result.id,
+        "category": result.category.value,
+        "created_at": result.created_at.isoformat(),
+        "evidence_references": list(result.evidence_references),
+        "summary": result.summary,
+        "confidence": result.confidence.value,
+        "rule_id": result.rule_id,
+        "rule_version": result.rule_version,
+        "analysis_version": result.analysis_version,
+        "reason_code": result.reason_code,
+    }
+
+
+def serialize_analysis(analysis: Analysis) -> dict[str, Any]:
+    """Serialize an analysis report containing metadata and references only."""
+    return {
+        "id": analysis.id,
+        "area": analysis.area,
+        "created_at": analysis.created_at.isoformat(),
+        "analysis_version": analysis.analysis_version,
+        "evidence_report_created_at": analysis.evidence_report_created_at.isoformat(),
+        "summary": {
+            "result_count": analysis.summary.result_count,
+            "evidence_count": analysis.summary.evidence_count,
+            "categories": [
+                {"category": category.value, "count": count}
+                for category, count in analysis.summary.categories
+            ],
+        },
+        "results": [serialize_analysis_result(result) for result in analysis.results],
+    }
 
 
 def serialize_rule_metadata(metadata: RuleMetadata) -> dict[str, Any]:

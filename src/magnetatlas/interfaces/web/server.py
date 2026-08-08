@@ -9,6 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
 from urllib.parse import parse_qs, unquote, urlsplit
 
+from magnetatlas.application.analysis import AnalysisService
 from magnetatlas.application.evidence import EvidenceReportService
 from magnetatlas.application.evidence_rules import EvidenceRulesLibrary
 from magnetatlas.application.feature_queries import FeatureQuerySource
@@ -21,6 +22,8 @@ from magnetatlas.interfaces.web.layer_composition import (
     create_layer_composition_service,
 )
 from magnetatlas.interfaces.web.serializers import (
+    serialize_analysis,
+    serialize_analysis_result,
     serialize_dataset_summary,
     serialize_evidence,
     serialize_evidence_category,
@@ -94,6 +97,7 @@ def make_handler(
     composition_service: LayerCompositionService | None = None,
     evidence_service: EvidenceReportService | None = None,
     rules_library: EvidenceRulesLibrary | None = None,
+    analysis_service: AnalysisService | None = None,
 ) -> type[BaseHTTPRequestHandler]:
     """Build a request handler bound to one bounded feature query source."""
     composition = composition_service or create_layer_composition_service(layer_service)
@@ -138,6 +142,56 @@ def make_handler(
             parameters = parse_qs(parsed_url.query)
             if path == "/api/dataset":
                 self._json(HTTPStatus.OK, serialize_dataset_summary(source.summary()))
+                return
+            if path in {"/api/analysis", "/api/analysis-report"}:
+                if analysis_service is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "analysis_unavailable"},
+                    )
+                    return
+                try:
+                    analysis = analysis_service.create_analysis(
+                        area=parameters.get("area", ["bbox"])[0],
+                        bbox=_bounds(parameters),
+                        limit=_limit(parameters),
+                    )
+                except ValueError as exc:
+                    self._json(
+                        HTTPStatus.BAD_REQUEST,
+                        {"error": "invalid_request", "message": str(exc)},
+                    )
+                    return
+                payload = serialize_analysis(analysis)
+                self._json(
+                    HTTPStatus.OK,
+                    (
+                        payload
+                        if path.endswith("report")
+                        else {"analysis": payload["results"]}
+                    ),
+                )
+                return
+            if path.startswith("/api/analysis/"):
+                if analysis_service is None:
+                    self._json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": "analysis_unavailable"},
+                    )
+                    return
+                result_id = unquote(path.removeprefix("/api/analysis/"))
+                try:
+                    result = analysis_service.get_result(result_id)
+                except KeyError:
+                    self._json(
+                        HTTPStatus.NOT_FOUND,
+                        {
+                            "error": "not_found",
+                            "message": "Analysresultatet hittades inte.",
+                        },
+                    )
+                    return
+                self._json(HTTPStatus.OK, serialize_analysis_result(result))
                 return
             if path == "/api/evidence-rules":
                 if rules_library is None:
@@ -371,6 +425,7 @@ def create_server(
     composition_service: LayerCompositionService | None = None,
     evidence_service: EvidenceReportService | None = None,
     rules_library: EvidenceRulesLibrary | None = None,
+    analysis_service: AnalysisService | None = None,
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> ThreadingHTTPServer:
@@ -383,5 +438,6 @@ def create_server(
             composition_service,
             evidence_service,
             rules_library,
+            analysis_service,
         ),
     )

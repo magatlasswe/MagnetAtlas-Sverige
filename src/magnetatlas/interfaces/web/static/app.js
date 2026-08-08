@@ -158,6 +158,39 @@ async function loadEvidence() {
   renderEvidence(await response.json());
 }
 
+function renderAnalysis(analysis) {
+  elements.analysisCount.textContent = analysis.summary.result_count.toLocaleString("sv-SE");
+  elements.analysisList.replaceChildren();
+  if (!analysis.results.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "Inga analyser för evidensen i kartutsnittet.";
+    elements.analysisList.append(empty);
+    return;
+  }
+  analysis.results.slice(0, 100).forEach((result) => {
+    const item = document.createElement("div");
+    item.className = "layer-item is-available";
+    const content = document.createElement("span");
+    const heading = document.createElement("strong");
+    heading.textContent = `${result.category} · ${result.confidence}`;
+    const details = document.createElement("small");
+    details.textContent = `${result.summary} · ${result.evidence_references.length} evidens · ${result.rule_id}@${result.rule_version}`;
+    content.append(heading, details);
+    item.append(content);
+    elements.analysisList.append(item);
+  });
+}
+
+async function loadAnalysis() {
+  const parameters = viewportParameters();
+  parameters.set("area", "visible-map");
+  const response = await fetch(`/api/analysis-report?${parameters}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  renderAnalysis(await response.json());
+}
+
 function safeExternalLink(container, text, url) {
   container.textContent = "";
   if (!url) {
@@ -542,6 +575,7 @@ async function loadViewport() {
     const collection = await response.json();
     replaceViewport(collection);
     await loadEvidence();
+    await loadAnalysis();
     if (collection.summary.truncated) {
       elements.mapStatusText.textContent = "Många objekt finns här. Zooma in för att se alla.";
     } else {
@@ -944,6 +978,7 @@ function cacheElements() {
     layerList: "layer-list",
     evidenceCount: "evidence-count", evidenceList: "evidence-list",
     rulesCount: "rules-count", rulesList: "rules-list",
+    analysisCount: "analysis-count", analysisList: "analysis-list",
   };
   Object.entries(ids).forEach(([name, id]) => { elements[name] = byId(id); });
 }

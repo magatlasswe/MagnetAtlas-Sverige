@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.8 – Evidence Rules Framework (completed)**
+Current sprint: **Sprint 3.9 – Analysis Engine (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -93,6 +93,13 @@ Sprint 3.8 adds a separate rule library above that frozen engine. Public
 make rules discoverable and testable without analysis, scores, ranking or AI.
 Six initial generic rules identify only explicit normalized properties. The API
 and web panel expose metadata, never matcher internals.
+
+Sprint 3.9 adds a deterministic Analysis Engine above `EvidenceReport` and the
+evidence-rule output boundary. Analysis rules receive no AtlasFeature,
+provider, repository or dataset-file access. Each initial result references one
+exact Evidence identity, copies its confidence without aggregation and records
+fixed rule, reason and analysis versions. The engine provides category counts
+but no scores, weights, recommendations, ranking, machine learning or AI.
 
 ## Current Sprint
 

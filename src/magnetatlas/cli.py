@@ -13,6 +13,10 @@ from rich.console import Console
 from rich.table import Table
 from sqlalchemy.exc import SQLAlchemyError
 
+from magnetatlas.application.analysis import (
+    AnalysisService,
+    create_default_analysis_engine,
+)
 from magnetatlas.application.collectors import CollectorRegistry
 from magnetatlas.application.evidence import (
     EvidenceEngine,
@@ -540,11 +544,15 @@ def serve(
                 EvidenceRuleRegistry((FeatureEvidenceRule(), *rules_library.list()))
             ),
         )
+        analysis_service = AnalysisService(
+            evidence_service, create_default_analysis_engine()
+        )
         server = create_server(
             composed_source,
             layer_service,
             evidence_service=evidence_service,
             rules_library=rules_library,
+            analysis_service=analysis_service,
             host=host,
             port=port,
         )
