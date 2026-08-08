@@ -205,6 +205,7 @@ tempCodeRunnerFile.py
 
 # MagnetAtlas local downloads, caches, and transient database files
 data/cache/
+data/database/
 *.part
 *.gpkg.part
 *.tmp

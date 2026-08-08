@@ -16,15 +16,16 @@ from magnetatlas.infrastructure.sources.errors import transport_error_message
 
 CRS84 = "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
 DEFAULT_BASE_URL = "https://api.sgu.se/oppnadata"
-DEFAULT_PAGE_SIZE = 1_000
+DEFAULT_PAGE_SIZE = 5_000
+DEFAULT_RETRY_COUNT = 8
 
 
 def _session_with_retry() -> requests.Session:
     session = requests.Session()
     retry = Retry(
-        total=3,
-        connect=3,
-        read=3,
+        total=DEFAULT_RETRY_COUNT,
+        connect=DEFAULT_RETRY_COUNT,
+        read=DEFAULT_RETRY_COUNT,
         backoff_factor=0.5,
         status_forcelist=(429, 500, 502, 503, 504),
         allowed_methods=frozenset({"GET"}),

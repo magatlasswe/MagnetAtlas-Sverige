@@ -7,7 +7,12 @@ import pytest
 
 from magnetatlas.domain.collectors import CollectorCapability, CollectorOutputModel
 from magnetatlas.domain.geography import BoundingBox
-from magnetatlas.infrastructure.sources.sgu.client import CRS84, SGUClient
+from magnetatlas.infrastructure.sources.sgu.client import (
+    CRS84,
+    DEFAULT_PAGE_SIZE,
+    DEFAULT_RETRY_COUNT,
+    SGUClient,
+)
 from magnetatlas.infrastructure.sources.sgu.collector import (
     SGU_JORDARTER,
     SGU_SOURCE_DEFINITION,
@@ -47,6 +52,11 @@ class FakeSession:
     def get(self, url: str, **kwargs: object) -> FakeResponse:
         self.calls.append({"url": url, **kwargs})
         return FakeResponse(next(self.payloads))
+
+
+def test_national_transport_defaults_stay_within_sgu_contract() -> None:
+    assert 1_000 < DEFAULT_PAGE_SIZE <= 10_000
+    assert DEFAULT_RETRY_COUNT == 8
 
 
 def test_client_uses_documented_ogc_parameters_and_next_links() -> None:

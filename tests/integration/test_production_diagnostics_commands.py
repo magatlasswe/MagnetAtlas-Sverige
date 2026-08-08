@@ -76,6 +76,8 @@ def production_database(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path
     monkeypatch.setenv(
         "MAGNETATLAS_LANTMATERIET_WORK_DIR", str(tmp_path / "lantmateriet")
     )
+    monkeypatch.setenv("MAGNETATLAS_LANTMATERIET_USERNAME", "test-user")
+    monkeypatch.setenv("MAGNETATLAS_LANTMATERIET_PASSWORD", "test-password")
     return path
 
 
@@ -163,3 +165,17 @@ def test_doctor_fails_clearly_when_official_imports_are_missing(
     assert "RAÄ Sverige" in result.output
     assert "SGU Jordarter" in result.output
     assert "Lantmäteriet Ortnamn" in result.output
+
+
+def test_doctor_requires_lantmateriet_authentication(
+    production_database: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("MAGNETATLAS_LANTMATERIET_USERNAME")
+    monkeypatch.delenv("MAGNETATLAS_LANTMATERIET_PASSWORD")
+
+    result = CliRunner().invoke(app, ["doctor"])
+
+    assert result.exit_code == 1
+    assert "[FEL] OAuth2-konfiguration" in result.output
+    assert "kräver" in result.output
+    assert "behörighet" in result.output

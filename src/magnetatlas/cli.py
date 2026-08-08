@@ -103,6 +103,11 @@ REQUIRED_PRODUCTION_DATASETS = {
     "SGU Jordarter": "sgu-jordarter:country:sweden",
     "Lantmäteriet Ortnamn": "lantmateriet-ortnamn:country:sweden",
 }
+REQUIRED_PRODUCTION_LAYERS = {
+    "cultural-heritage",
+    "soil-types",
+    "place-names",
+}
 
 
 def _database_path(settings: Settings) -> Path:
@@ -611,12 +616,34 @@ def doctor() -> None:
         active_instances = tuple(item.instance for item in rows if item.active)
         layer_service = create_layer_service(active_instances)
         layers = layer_service.list_layers()
-        report(bool(layers), "Layer Engine", f"{len(layers)} lager registrerade")
+        active_layer_ids = {layer.definition.id for layer in layers if layer.active}
+        missing_layers = sorted(REQUIRED_PRODUCTION_LAYERS - active_layer_ids)
+        report(
+            not missing_layers,
+            "Layer Engine",
+            (
+                "alla produktionslager aktiva"
+                if not missing_layers
+                else f"inaktiva lager: {', '.join(missing_layers)}"
+            ),
+        )
         composition = create_layer_composition_service(layer_service)
         api_payload = tuple(
             serialize_layer(layer) for layer in composition.list_layers()
         )
-        report(bool(api_payload), "API", f"{len(api_payload)} lager serialiserbara")
+        api_active_ids = {
+            str(layer["id"]) for layer in api_payload if layer.get("visible") is True
+        }
+        missing_api_layers = sorted(REQUIRED_PRODUCTION_LAYERS - api_active_ids)
+        report(
+            not missing_api_layers,
+            "API",
+            (
+                "alla produktionslager exponerade"
+                if not missing_api_layers
+                else f"lager saknas: {', '.join(missing_api_layers)}"
+            ),
+        )
         report(bool(rows), "DatasetInstances", f"{len(rows)} registrerade")
         feature_count = sum(item.feature_count for item in rows)
         report(feature_count > 0, "Feature-antal", str(feature_count))
@@ -636,8 +663,9 @@ def doctor() -> None:
         report(True, "Miljövariabler", "konfigurationen är giltig")
         oauth_configured = bool(settings.lantmateriet_client_id)
         basic_configured = bool(settings.lantmateriet_username)
+        authentication_configured = oauth_configured or basic_configured
         report(
-            True,
+            authentication_configured,
             "OAuth2-konfiguration",
             (
                 "OAuth2 konfigurerad"
@@ -645,7 +673,7 @@ def doctor() -> None:
                 else (
                     "Basic-auth konfigurerad"
                     if basic_configured
-                    else "inte konfigurerad; valfri för öppna nedladdningar"
+                    else "saknas; Lantmäteriets STAC-produkt kräver behörighet"
                 )
             ),
         )
