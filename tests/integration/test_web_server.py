@@ -100,6 +100,15 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert "rules-list" in html
         assert "analysis-count" in html
         assert "analysis-list" in html
+        assert "map-sidebar" in html
+        assert "layer-zoom-info" in html
+        assert "legend-list" in html
+        assert "active-feature-count" in html
+        assert "active-provider-count" in html
+        assert "active-layer-stat" in html
+        assert "feature-provider" in html
+        assert "feature-dataset" in html
+        assert "feature-category" in html
         assert "Varför visas denna plats?" in html
         assert "Navigera hit" in html
         assert "maplibre-gl@5.24.0" in html
@@ -138,8 +147,29 @@ def test_server_serves_html_static_assets_and_security_headers(
         assert b"magnetatlas.theme" in javascript
         assert b"getClusterExpansionZoom" in javascript
         assert b"showWhy" in javascript
+        assert b"renderLegend" in javascript
+        assert b"updateZoomInformation" in javascript
+        assert b"applyFeatureStyles" in javascript
+        assert b'slider.type = "range"' in javascript
         assert "Visa detaljer" in javascript_text
         assert "popup-history" not in javascript_text
+
+    with urlopen(f"{local_server}/static/app.css", timeout=2) as response:
+        stylesheet = response.read().decode("utf-8")
+        assert response.headers.get_content_type() == "text/css"
+        assert ".layer-category" in stylesheet
+        assert ".opacity-control" in stylesheet
+        assert ".atlas-statistics" in stylesheet
+        assert "@media (max-width: 47.99rem)" in stylesheet
+
+
+def test_frontend_layer_presentation_is_provider_neutral(local_server: str) -> None:
+    with urlopen(f"{local_server}/static/app.js", timeout=2) as response:
+        javascript = response.read().decode("utf-8").casefold()
+
+    assert "raa" not in javascript
+    assert "sgu" not in javascript
+    assert "lantmÃ¤teriet" not in javascript
 
 
 def test_dataset_and_viewport_apis_are_separate_and_bounded(

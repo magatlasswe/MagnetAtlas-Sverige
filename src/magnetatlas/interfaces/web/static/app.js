@@ -23,6 +23,7 @@ const state = {
   followLocation: false,
   centerOnNextLocation: false,
   layers: [],
+  datasetSummary: null,
 };
 
 const elements = {};
@@ -48,46 +49,179 @@ function findFeature(featureId) {
   return state.featureIndex.get(String(featureId));
 }
 
+const LAYER_COLORS = [
+  "#8f3b2f", "#31688e", "#4f772d", "#8b5a2b", "#6d4c91", "#007f86",
+  "#b05a00", "#465d73", "#a23e78", "#5e6b32", "#2f6f4e", "#704214",
+];
+
+function stableColor(value) {
+  const hash = [...String(value)].reduce(
+    (result, character) => ((result * 31) + character.codePointAt(0)) >>> 0,
+    0,
+  );
+  return LAYER_COLORS[hash % LAYER_COLORS.length];
+}
+
+function layerColor(layer) {
+  return layer.legend?.[0]?.color || stableColor(layer.id);
+}
+
+function normalizedWords(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("sv-SE")
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 3)
+    .map((word) => word.replace(/s$/, ""));
+}
+
+function layerForFeature(properties) {
+  const sourceWords = new Set(normalizedWords(properties.source?.name));
+  const candidates = state.layers.filter((layer) => layer.enabled && layer.supported);
+  const match = candidates
+    .map((layer) => {
+      const words = normalizedWords(`${layer.provider} ${layer.dataset} ${layer.name}`);
+      const score = words.filter((word) => sourceWords.has(word)).length;
+      return { layer, score };
+    })
+    .sort((left, right) => right.score - left.score)[0];
+  return match?.score > 0 ? match.layer : null;
+}
+
+function renderLegend() {
+  elements.legendList.replaceChildren();
+  const active = state.layers.filter((layer) => layer.active && layer.supported);
+  active.forEach((layer) => {
+    const entries = layer.legend?.length
+      ? layer.legend
+      : [{ label: layer.name, color: layerColor(layer) }];
+    entries.forEach((entry) => {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      const swatch = document.createElement("span");
+      swatch.className = `legend-swatch legend-swatch-${layer.geometry_type}`;
+      swatch.style.setProperty("--legend-color", entry.color);
+      const text = document.createElement("span");
+      text.textContent = `${entry.label} · ${layer.provider}`;
+      item.append(swatch, text);
+      elements.legendList.append(item);
+    });
+  });
+  if (!active.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "Aktivera ett lager för att visa dess legend.";
+    elements.legendList.append(empty);
+  }
+}
+
+function updateLayerStatistics() {
+  const active = state.layers.filter((layer) => layer.active && layer.supported);
+  elements.activeLayerCount.textContent = `${active.length} aktiva`;
+  elements.activeLayerStat.textContent = active.length.toLocaleString("sv-SE");
+  elements.activeProviderCount.textContent = new Set(active.map((layer) => layer.provider))
+    .size.toLocaleString("sv-SE");
+}
+
+function updateZoomInformation() {
+  if (!state.map) return;
+  const zoom = state.map.getZoom();
+  const active = state.layers.filter((layer) => layer.active && layer.supported);
+  const available = active.filter((layer) => zoom >= layer.min_zoom && zoom <= layer.max_zoom);
+  elements.layerZoomInfo.textContent = active.length
+    ? `Zoom ${zoom.toFixed(1)} · ${available.length} av ${active.length} aktiva lager visas här`
+    : `Zoom ${zoom.toFixed(1)} · inga aktiva lager`;
+}
+
 function renderLayers(layers) {
   state.layers = layers;
-  elements.layerList.textContent = "";
+  elements.layerList.replaceChildren();
+  const categories = new Map();
   layers.forEach((layer) => {
-    const label = document.createElement("label");
-    label.className = `layer-item${layer.enabled && layer.supported ? " is-available" : ""}`;
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = layer.active;
-    checkbox.disabled = !layer.enabled || !layer.supported;
-    checkbox.setAttribute("aria-label", layer.name);
-    const content = document.createElement("span");
-    const name = document.createElement("strong");
-    name.textContent = `${layer.active ? "✓" : "○"} ${layer.name}`;
-    const status = document.createElement("small");
-    status.textContent = layer.enabled && layer.supported
-      ? `${layer.description} · ${layer.render_mode} · ${Math.round(layer.opacity * 100)} % · ${layer.attribution}`
-      : `Kommer senare · ${layer.layer_type} · ${layer.render_mode}`;
-    content.append(name, status);
-    label.append(checkbox, content);
-    checkbox.addEventListener("change", async () => {
-      checkbox.disabled = true;
-      try {
-        const action = checkbox.checked ? "enable" : "disable";
-        const response = await fetch(`/api/layers/${encodeURIComponent(layer.id)}/${action}`, {
-          method: "POST",
-          headers: { Accept: "application/json" },
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const updated = await response.json();
-        renderLayers(state.layers.map((item) => item.id === updated.id ? updated : item));
-        loadViewport();
-      } catch (error) {
-        checkbox.checked = !checkbox.checked;
-        checkbox.disabled = false;
-        console.error(error);
-      }
-    });
-    elements.layerList.append(label);
+    const category = layer.category || "Övrigt";
+    categories.set(category, [...(categories.get(category) || []), layer]);
   });
+  categories.forEach((categoryLayers, category) => {
+    const group = document.createElement("section");
+    group.className = "layer-category";
+    const heading = document.createElement("h3");
+    heading.textContent = category;
+    group.append(heading);
+    categoryLayers.forEach((layer) => {
+      const card = document.createElement("article");
+      card.className = `layer-item${layer.enabled && layer.supported ? " is-available" : " is-future"}${layer.active ? " is-active" : ""}`;
+      card.style.setProperty("--layer-color", layerColor(layer));
+      const label = document.createElement("label");
+      label.className = "layer-toggle";
+      const icon = document.createElement("span");
+      icon.className = "layer-icon";
+      icon.textContent = layer.icon || "◇";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = layer.active;
+      checkbox.disabled = !layer.enabled || !layer.supported;
+      checkbox.setAttribute("aria-label", layer.name);
+      const content = document.createElement("span");
+      const name = document.createElement("strong");
+      name.textContent = layer.name;
+      const status = document.createElement("small");
+      status.textContent = layer.enabled && layer.supported
+        ? `${layer.active ? "Aktivt" : "Inaktivt"} · ${layer.description}`
+        : `Kommer senare · ${layer.layer_type}`;
+      content.append(name, status);
+      label.append(icon, content, checkbox);
+      card.append(label);
+      const metadata = document.createElement("div");
+      metadata.className = "layer-metadata";
+      metadata.textContent = `${layer.provider} · ${layer.dataset} · zoom ${layer.min_zoom}–${layer.max_zoom}`;
+      card.append(metadata);
+      if (layer.enabled && layer.supported) {
+        const opacity = document.createElement("label");
+        opacity.className = "opacity-control";
+        const text = document.createElement("span");
+        text.textContent = "Opacitet";
+        const value = document.createElement("output");
+        value.textContent = `${Math.round(layer.opacity * 100)} %`;
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = "0";
+        slider.max = "100";
+        slider.value = String(Math.round(layer.opacity * 100));
+        slider.setAttribute("aria-label", `Opacitet för ${layer.name}`);
+        slider.addEventListener("input", () => {
+          layer.opacity = Number(slider.value) / 100;
+          value.textContent = `${slider.value} %`;
+          applyFeatureStyles();
+        });
+        opacity.append(text, slider, value);
+        card.append(opacity);
+      }
+      checkbox.addEventListener("change", async () => {
+        checkbox.disabled = true;
+        try {
+          const action = checkbox.checked ? "enable" : "disable";
+          const response = await fetch(`/api/layers/${encodeURIComponent(layer.id)}/${action}`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const updated = await response.json();
+          renderLayers(state.layers.map((item) => item.id === updated.id ? updated : item));
+          loadViewport();
+        } catch (error) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.disabled = false;
+          console.error(error);
+        }
+      });
+      group.append(card);
+    });
+    elements.layerList.append(group);
+  });
+  updateLayerStatistics();
+  renderLegend();
+  updateZoomInformation();
+  applyFeatureStyles();
 }
 
 async function loadLayers() {
@@ -323,6 +457,7 @@ function toggleFavorite() {
 
 function showFeature(feature, { focus = false, remember = true } = {}) {
   const properties = feature.properties;
+  const layer = layerForFeature(properties);
   elements.welcome.hidden = true;
   elements.libraryContent.hidden = true;
   elements.featureContent.hidden = false;
@@ -332,6 +467,9 @@ function showFeature(feature, { focus = false, remember = true } = {}) {
   elements.featurePlace.textContent = properties.place || "Platsangivelse saknas";
   elements.featureTime.textContent = timeText(properties.time_span);
   elements.featureDescription.textContent = properties.description || "Beskrivning saknas.";
+  elements.featureProvider.textContent = layer?.provider || properties.source?.name || "Okänd";
+  elements.featureDataset.textContent = layer?.dataset || "Datasetuppgift saknas";
+  elements.featureCategory.textContent = layer?.category || properties.feature_type;
   elements.geometryConfidence.textContent = confidenceText(properties.geometry_confidence);
   elements.featureConfidence.textContent = confidenceText(properties.confidence);
   safeExternalLink(
@@ -403,6 +541,7 @@ function showWhy(feature) {
 function showPopup(feature, coordinates) {
   if (state.popup) state.popup.remove();
   const properties = feature.properties;
+  const layer = layerForFeature(properties);
   const card = document.createElement("div");
   card.className = "popup-card";
   const title = document.createElement("strong");
@@ -414,9 +553,25 @@ function showPopup(feature, coordinates) {
     "popup-meta",
     [properties.feature_type, properties.place].filter(Boolean).join(" · "),
   );
-  if (properties.source?.id) {
-    appendText(card, "popup-meta", `Käll-ID: ${properties.source.id}`);
-  }
+  const facts = document.createElement("dl");
+  facts.className = "popup-facts";
+  [
+    ["Provider", layer?.provider || properties.source?.name],
+    ["Dataset", layer?.dataset],
+    ["Kategori", layer?.category || properties.feature_type],
+    ["Confidence", confidenceText(properties.confidence)],
+    ["Licens", properties.license?.name],
+  ].filter(([, value]) => value).forEach(([label, value]) => {
+    const row = document.createElement("div");
+    const term = document.createElement("dt");
+    term.textContent = label;
+    const description = document.createElement("dd");
+    description.textContent = value;
+    row.append(term, description);
+    facts.append(row);
+  });
+  card.append(facts);
+  if (properties.source?.name) appendText(card, "popup-source", properties.source.name);
   const actions = document.createElement("div");
   actions.className = "popup-actions";
   actions.append(popupAction("Visa detaljer", () => loadFeatureDetails(feature.id)));
@@ -461,8 +616,8 @@ async function loadFeatureDetails(featureId, { focus = false } = {}) {
 }
 
 async function selectFeature(feature, { focus = true, popup = false, coordinates = null } = {}) {
-  if (popup && coordinates) showPopup(feature, coordinates);
-  await loadFeatureDetails(feature.id, { focus });
+  const detailed = await loadFeatureDetails(feature.id, { focus });
+  if (popup && coordinates && detailed) showPopup(detailed, coordinates);
   closeSearch();
 }
 
@@ -508,6 +663,10 @@ function renderSearchResults(features, message = null) {
     empty.textContent = message || "Ingen plats matchar din sökning och dina filter.";
     elements.searchResults.append(empty);
   } else {
+    const summary = document.createElement("p");
+    summary.className = "search-summary";
+    summary.textContent = `${features.length.toLocaleString("sv-SE")} träffar · visa med Enter`;
+    elements.searchResults.append(summary);
     features.slice(0, 20).forEach((feature) => {
       const button = document.createElement("button");
       button.className = "search-result";
@@ -533,6 +692,55 @@ function renderSearchResults(features, message = null) {
 function updateVisibleFeatures(collection) {
   const source = state.map?.getSource("atlas-features");
   if (source) source.setData(collection);
+  elements.activeFeatureCount.textContent = collection.features.length.toLocaleString("sv-SE");
+  applyFeatureStyles();
+}
+
+function styleExpressions() {
+  const sources = new Map();
+  state.collection.features.forEach((feature) => {
+    const name = feature.properties.source?.name;
+    if (!name || sources.has(name)) return;
+    const layer = layerForFeature(feature.properties);
+    sources.set(name, {
+      color: layer ? layerColor(layer) : stableColor(name),
+      opacity: layer?.opacity ?? 0.8,
+    });
+  });
+  if (!sources.size) return { color: "#55615a", opacity: 0.75 };
+  const sourceName = ["get", "name", ["get", "source"]];
+  const color = ["match", sourceName];
+  const opacity = ["match", sourceName];
+  sources.forEach((style, name) => {
+    color.push(name, style.color);
+    opacity.push(name, style.opacity);
+  });
+  color.push("#55615a");
+  opacity.push(0.75);
+  return { color, opacity };
+}
+
+function applyFeatureStyles() {
+  if (!state.map?.getLayer("atlas-points")) return;
+  const expressions = styleExpressions();
+  const selectedColor = [
+    "case",
+    ["boolean", ["feature-state", "selected"], false],
+    "#f59e0b",
+    expressions.color,
+  ];
+  state.map.setPaintProperty("atlas-polygons", "fill-color", selectedColor);
+  state.map.setPaintProperty(
+    "atlas-polygons",
+    "fill-opacity",
+    ["*", expressions.opacity, 0.42],
+  );
+  state.map.setPaintProperty("atlas-lines", "line-color", selectedColor);
+  state.map.setPaintProperty("atlas-lines", "line-opacity", expressions.opacity);
+  state.map.setPaintProperty("atlas-point-halos", "circle-stroke-color", expressions.color);
+  state.map.setPaintProperty("atlas-point-halos", "circle-opacity", expressions.opacity);
+  state.map.setPaintProperty("atlas-points", "circle-color", selectedColor);
+  state.map.setPaintProperty("atlas-points", "circle-opacity", expressions.opacity);
 }
 
 function replaceViewport(collection) {
@@ -650,8 +858,10 @@ function initializeFacets() {
 }
 
 function renderDatasetSummary(summary) {
+  state.datasetSummary = summary;
   elements.datasetStatus.textContent = summary.status;
   elements.datasetCount.textContent = summary.count.toLocaleString("sv-SE");
+  elements.activeFeatureCount.textContent = summary.count.toLocaleString("sv-SE");
   elements.datasetImport.textContent = summary.latest_import
     ? new Date(summary.latest_import).toLocaleString("sv-SE")
     : "Ingen import registrerad";
@@ -947,6 +1157,7 @@ function installFeatureLayers() {
       if (feature) selectFeature(feature, { focus: true, popup: true, coordinates: event.lngLat });
     });
   });
+  applyFeatureStyles();
 }
 
 function cacheElements() {
@@ -958,7 +1169,9 @@ function cacheElements() {
     libraryContent: "library-content", favoriteList: "favorite-list", recentList: "recent-list",
     featureContent: "feature-content", closePanel: "close-panel", featureType: "feature-type",
     featureTitle: "feature-title", featurePlace: "feature-place", featureTime: "feature-time",
-    featureDescription: "feature-description", geometryConfidence: "geometry-confidence",
+    featureDescription: "feature-description", featureProvider: "feature-provider",
+    featureDataset: "feature-dataset", featureCategory: "feature-category",
+    geometryConfidence: "geometry-confidence",
     featureConfidence: "feature-confidence", featureSource: "feature-source",
     featureLicense: "feature-license", featureProvenance: "feature-provenance",
     featureCoordinates: "feature-coordinates", navigationNote: "navigation-note",
@@ -975,7 +1188,10 @@ function cacheElements() {
     nearestList: "nearest-list",
     datasetStatus: "dataset-status", datasetCount: "dataset-count",
     datasetImport: "dataset-import", datasetSource: "dataset-source",
-    layerList: "layer-list",
+    layerList: "layer-list", legendList: "legend-list",
+    layerZoomInfo: "layer-zoom-info", activeLayerCount: "active-layer-count",
+    activeFeatureCount: "active-feature-count", activeProviderCount: "active-provider-count",
+    activeLayerStat: "active-layer-stat",
     evidenceCount: "evidence-count", evidenceList: "evidence-list",
     rulesCount: "rules-count", rulesList: "rules-list",
     analysisCount: "analysis-count", analysisList: "analysis-list",
@@ -988,6 +1204,20 @@ function installInterfaceEvents() {
   elements.searchInput.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeSearch();
     if (event.key === "Enter") elements.searchResults.querySelector(".search-result")?.click();
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      elements.searchResults.querySelector(".search-result")?.focus();
+    }
+  });
+  elements.searchResults.addEventListener("keydown", (event) => {
+    const results = [...elements.searchResults.querySelectorAll(".search-result")];
+    const index = results.indexOf(document.activeElement);
+    if (event.key === "ArrowDown" && results[index + 1]) results[index + 1].focus();
+    if (event.key === "ArrowUp") (results[index - 1] || elements.searchInput).focus();
+    if (event.key === "Escape") {
+      closeSearch();
+      elements.searchInput.focus();
+    }
   });
   [elements.typeFilter, elements.periodFilter, elements.sourceFilter].forEach((filter) => {
     filter.addEventListener("change", runSearch);
@@ -1072,6 +1302,7 @@ async function initialize() {
       startAtGrantedLocation();
     });
     state.map.on("moveend", scheduleViewportLoad);
+    state.map.on("zoomend", updateZoomInformation);
     state.map.on("error", (event) => {
       elements.mapStatus.hidden = false;
       elements.mapStatus.classList.add("is-error");

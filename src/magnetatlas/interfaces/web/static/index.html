@@ -18,10 +18,11 @@
       </a>
       <div class="search" role="search">
         <label class="sr-only" for="feature-search">Sök i atlasen</label>
+        <span class="search-icon" aria-hidden="true">⌕</span>
         <input
           id="feature-search"
           type="search"
-          placeholder="Sök plats eller namn…"
+          placeholder="Sök namn, plats eller objekttyp…"
           autocomplete="off"
           aria-controls="search-results"
           aria-expanded="false"
@@ -76,37 +77,46 @@
         <button id="follow-location" type="button" aria-pressed="false" title="Låt kartan följa din GPS-position">Följ mig: av</button>
       </section>
 
-      <section class="layer-panel" aria-labelledby="layer-panel-title">
-        <p class="eyebrow">Kartinnehåll</p>
-        <h2 id="layer-panel-title">Lager</h2>
-        <div id="layer-list" class="layer-list" aria-live="polite">
-          <p>Laddar lager…</p>
-        </div>
-      </section>
+      <aside class="map-sidebar" aria-label="Kartverktyg">
+        <section class="layer-panel layer-panel-primary" aria-labelledby="layer-panel-title">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Kartinnehåll</p>
+              <h2 id="layer-panel-title">Lager</h2>
+            </div>
+            <span id="active-layer-count" class="count-badge">0 aktiva</span>
+          </div>
+          <p id="layer-zoom-info" class="zoom-info">Zooma i kartan för lagerinformation.</p>
+          <div id="layer-list" class="layer-list" aria-live="polite">
+            <p>Laddar lager…</p>
+          </div>
+          <div id="map-legend" class="map-legend" aria-label="Teckenförklaring">
+            <h3>Teckenförklaring</h3>
+            <div id="legend-list"><p>Aktivera ett lager för att visa dess legend.</p></div>
+          </div>
+        </section>
 
-      <section class="layer-panel" aria-labelledby="evidence-panel-title">
-        <p class="eyebrow">Verifierbart underlag</p>
-        <h2 id="evidence-panel-title">Evidence <span id="evidence-count">0</span></h2>
-        <div id="evidence-list" class="layer-list" aria-live="polite">
-          <p>Flytta kartan för att läsa evidens.</p>
-        </div>
-      </section>
+        <details class="context-panel">
+          <summary>Verifierbart underlag <span id="evidence-count">0</span></summary>
+          <div id="evidence-list" class="layer-list" aria-live="polite">
+            <p>Flytta kartan för att läsa evidens.</p>
+          </div>
+        </details>
 
-      <section class="layer-panel" aria-labelledby="rules-panel-title">
-        <p class="eyebrow">Installerat regelbibliotek</p>
-        <h2 id="rules-panel-title">Evidensregler <span id="rules-count">0</span></h2>
-        <div id="rules-list" class="layer-list" aria-live="polite">
-          <p>Laddar regler…</p>
-        </div>
-      </section>
+        <details class="context-panel">
+          <summary>Evidensregler <span id="rules-count">0</span></summary>
+          <div id="rules-list" class="layer-list" aria-live="polite">
+            <p>Laddar regler…</p>
+          </div>
+        </details>
 
-      <section class="layer-panel" aria-labelledby="analysis-panel-title">
-        <p class="eyebrow">Deterministisk analys</p>
-        <h2 id="analysis-panel-title">Analyser <span id="analysis-count">0</span></h2>
-        <div id="analysis-list" class="layer-list" aria-live="polite">
-          <p>Flytta kartan för att analysera evidens.</p>
-        </div>
-      </section>
+        <details class="context-panel">
+          <summary>Analyser <span id="analysis-count">0</span></summary>
+          <div id="analysis-list" class="layer-list" aria-live="polite">
+            <p>Flytta kartan för att analysera evidens.</p>
+          </div>
+        </details>
+      </aside>
 
       <aside id="info-panel" class="info-panel" aria-label="Platsinformation">
         <button id="close-panel" class="close-button" type="button" aria-label="Stäng information" hidden>×</button>
@@ -114,6 +124,11 @@
           <p class="eyebrow">Välkommen</p>
           <h1>Utforska historiska platser</h1>
           <p>Sök efter en plats eller klicka på ett objekt på kartan.</p>
+          <section class="atlas-statistics" aria-label="Aktiv kartstatistik">
+            <div><strong id="active-feature-count">–</strong><span>aktiva objekt</span></div>
+            <div><strong id="active-provider-count">–</strong><span>providers</span></div>
+            <div><strong id="active-layer-stat">–</strong><span>kartlager</span></div>
+          </section>
           <dl class="dataset-summary" aria-label="Lokal datastatus">
             <div><dt>Status</dt><dd id="dataset-status">Laddar…</dd></div>
             <div><dt>Objekt</dt><dd id="dataset-count">–</dd></div>
@@ -150,6 +165,9 @@
           </div>
 
           <dl class="facts">
+            <div><dt>Provider</dt><dd id="feature-provider"></dd></div>
+            <div><dt>Dataset</dt><dd id="feature-dataset"></dd></div>
+            <div><dt>Kategori</dt><dd id="feature-category"></dd></div>
             <div><dt>Position</dt><dd id="geometry-confidence"></dd></div>
             <div><dt>Uppgift</dt><dd id="feature-confidence"></dd></div>
             <div><dt>Källa</dt><dd id="feature-source"></dd></div>
