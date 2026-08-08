@@ -514,6 +514,19 @@ Analys-API:t serialiserar endast analysmetadata och evidens-ID:n. Det inkluderar
 aldrig evidenspayload, råa features eller providersvar. Sammanfattningstexterna
 är fasta regeltexter; ingen fri text genereras och ingen AI används.
 
+## Produktionsdiagnostik
+
+Sprint 3.9.1 tillför en read-only diagnostikadapter bredvid SQLite-repositoryt.
+Den läser `dataset_metadata` och aggregerade featureantal utan att materialisera
+hela dataset. CLI-kommandona `status`, `datasets`, `providers` och `doctor`
+använder adaptern och skapar inga alternativa domänmodeller eller databaser.
+
+`doctor` kontrollerar SQLite-schema och integritet, bygger befintlig Layer Engine
+från aktiva DatasetInstances och serialiserar lager genom samma generiska
+API-kontrakt som webbservern. Produktionskravet använder exakta kanoniska
+country-identiteter; en migrerad legacy-rad accepteras därför inte som RAÄ
+Sverige enbart för att dess scope-fält råkar säga `country:sweden`.
+
 ## Långsiktiga arkitekturprinciper
 
 Följande principer styr framtida utbyggnad men innebär ingen produktfunktion i

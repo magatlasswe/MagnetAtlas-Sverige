@@ -4,7 +4,7 @@ Last updated: **2026-08-07**
 
 Current version: **v1.4.0-alpha**
 
-Current sprint: **Sprint 3.9 – Analysis Engine (completed)**
+Current sprint: **Sprint 3.9.1 – Production Database Verification (completed)**
 
 Validation release: **Sprint 2.6.1 – Real World Validation (completed)**
 
@@ -100,6 +100,12 @@ provider, repository or dataset-file access. Each initial result references one
 exact Evidence identity, copies its confidence without aggregation and records
 fixed rule, reason and analysis versions. The engine provides category counts
 but no scores, weights, recommendations, ranking, machine learning or AI.
+
+Sprint 3.9.1 adds network-free production observability without changing data
+models or providers. `status`, `datasets`, `providers` and `doctor` read the
+configured SQLite database, distinguish installed provider code from persisted
+imports and validate the canonical country DatasetInstances. Every successful
+import now prints a receipt read back from committed database state.
 
 ## Current Sprint
 

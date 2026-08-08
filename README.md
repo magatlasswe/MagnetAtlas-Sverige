@@ -77,8 +77,24 @@ magnetatlas import raa --county ostergotland
 magnetatlas import sgu --bbox 18.2,59.35,18.5,59.5
 magnetatlas import lantmateriet --dataset ortnamn --country sweden
 magnetatlas cache status
+magnetatlas status
+magnetatlas datasets
+magnetatlas providers
+magnetatlas doctor
 magnetatlas serve
 ```
+
+Produktionsdiagnostiken är nätverksfri. `status` sammanfattar den faktiska
+SQLite-filen, `datasets` visar varje importerad DatasetInstance med antal,
+snapshot och licens, och `providers` skiljer mellan installerad kod och faktiskt
+importerad data. `doctor` kontrollerar schema, lager/API-kontrakt, featureantal,
+miljökonfiguration och cache samt kräver de kanoniska country-importerna för RAÄ
+Sverige, SGU Jordarter och Lantmäteriet Ortnamn. Ett felresultat ändrar aldrig
+databasen.
+
+Efter en lyckad import läser CLI tillbaka DatasetInstance från SQLite och skriver
+provider, dataset, beständigt objektantal, databasfil och aktiv status. Kvittot
+baseras alltså på committad databasstatus, inte enbart collectorns räknare.
 
 För en första lokal provkörning:
 

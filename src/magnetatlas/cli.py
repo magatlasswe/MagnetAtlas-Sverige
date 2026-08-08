@@ -11,7 +11,9 @@ from typing import Annotated, Never
 import typer
 from rich.console import Console
 from rich.table import Table
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
 
 from magnetatlas.application.analysis import (
     AnalysisService,
@@ -34,6 +36,10 @@ from magnetatlas.config.settings import Settings
 from magnetatlas.domain.datasets import DatasetInstance, DatasetScope, SourceDefinition
 from magnetatlas.domain.exceptions import MagnetAtlasError
 from magnetatlas.domain.geography import BoundingBox
+from magnetatlas.infrastructure.database.diagnostics import (
+    DatasetDiagnostic,
+    SqlAlchemyDatabaseDiagnostics,
+)
 from magnetatlas.infrastructure.database.feature_queries import (
     SqlAlchemyFeatureQuerySource,
 )
@@ -67,7 +73,11 @@ from magnetatlas.infrastructure.sources.sgu.collector import (
     SGUCollector,
 )
 from magnetatlas.infrastructure.sources.sgu.importer import SGUImporter
+from magnetatlas.interfaces.web.layer_composition import (
+    create_layer_composition_service,
+)
 from magnetatlas.interfaces.web.layers import create_layer_service
+from magnetatlas.interfaces.web.serializers import serialize_layer
 from magnetatlas.interfaces.web.server import create_server
 
 app = typer.Typer(
@@ -88,6 +98,73 @@ NATIONWIDE_MIN_FREE_BYTES = 12 * 1024**3
 RAA_SOURCE = RAA_SOURCE_DEFINITION
 SGU_SOURCE = SGU_SOURCE_DEFINITION
 LANTMATERIET_SOURCE = LANTMATERIET_SOURCE_DEFINITION
+REQUIRED_PRODUCTION_DATASETS = {
+    "RAÄ Sverige": "raa-kmr:country:sweden",
+    "SGU Jordarter": "sgu-jordarter:country:sweden",
+    "Lantmäteriet Ortnamn": "lantmateriet-ortnamn:country:sweden",
+}
+
+
+def _database_path(settings: Settings) -> Path:
+    if not settings.database_url.startswith("sqlite:///"):
+        raise ValueError("Diagnostik stöder för närvarande endast lokal SQLite")
+    value = settings.database_url.removeprefix("sqlite:///")
+    if value == ":memory:":
+        raise ValueError("Diagnostik kräver en beständig SQLite-fil")
+    return Path(value).resolve()
+
+
+def _read_only_session_factory(settings: Settings) -> sessionmaker[Session]:
+    path = _database_path(settings)
+    if not path.is_file():
+        raise ValueError(f"Databasen saknas: {path}")
+    engine = create_engine(
+        f"sqlite:///file:{path.as_posix()}?mode=ro&uri=true",
+        connect_args={"check_same_thread": False},
+    )
+    return sessionmaker(bind=engine, expire_on_commit=False)
+
+
+def _diagnostics(settings: Settings) -> SqlAlchemyDatabaseDiagnostics:
+    return SqlAlchemyDatabaseDiagnostics(_read_only_session_factory(settings))
+
+
+def _scope_text(dataset: DatasetDiagnostic) -> str:
+    return dataset.instance.scope.identity
+
+
+def _format_time(value: object) -> str:
+    return value.isoformat() if hasattr(value, "isoformat") else "-"
+
+
+def _print_import_verification(
+    settings: Settings,
+    instance: DatasetInstance,
+    *,
+    provider: str,
+    dataset_name: str,
+) -> None:
+    diagnostics = SqlAlchemyDatabaseDiagnostics(
+        create_session_factory(settings.database_url)
+    )
+    persisted = next(
+        (
+            item
+            for item in diagnostics.datasets()
+            if item.instance.dataset_id == instance.dataset_id
+        ),
+        None,
+    )
+    console.print("\n[bold green]Import klar[/bold green]")
+    console.print(f"Provider: {provider}")
+    console.print(f"Dataset: {dataset_name}")
+    console.print(f"Objekt: {persisted.feature_count if persisted else 0}")
+    console.print(f"Databas: {_database_path(settings)}")
+    console.print(f"DatasetInstance: {instance.dataset_id}")
+    status = (
+        "Aktiverad" if persisted is not None and persisted.active else "Ej verifierad"
+    )
+    console.print(f"Status: {status}")
 
 
 def _abort_with_error(context: str, error: Exception) -> Never:
@@ -287,6 +364,12 @@ def import_raa(
             f"Importerade [bold]{result.imported}[/bold] RAÄ-objekt på "
             f"{result.duration_seconds:.1f} sekunder."
         )
+        _print_import_verification(
+            settings,
+            instance,
+            provider="RAÄ",
+            dataset_name="Kulturmiljöregistret",
+        )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("RAÄ-importen misslyckades", exc)
 
@@ -327,6 +410,12 @@ def import_sgu(
             f"Importerade [bold]{result.imported}[/bold] SGU-objekt på "
             f"{result.duration_seconds:.1f} sekunder."
         )
+        _print_import_verification(
+            settings,
+            instance,
+            provider="SGU",
+            dataset_name="Jordarter",
+        )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("SGU-importen misslyckades", exc)
 
@@ -361,6 +450,12 @@ def import_lantmateriet(
         console.print(
             f"Importerade [bold]{result.imported}[/bold] ortnamn på "
             f"{result.duration_seconds:.1f} sekunder."
+        )
+        _print_import_verification(
+            settings,
+            instance,
+            provider="Lantmäteriet",
+            dataset_name="Ortnamn",
         )
     except EXPECTED_ERRORS as exc:
         _abort_with_error("Lantmäteriet-importen misslyckades", exc)
@@ -406,6 +501,180 @@ def cache_clear() -> None:
 @app.callback()
 def main() -> None:
     """Run MagnetAtlas-Sverige commands."""
+
+
+@app.command("status")
+def production_status() -> None:
+    """Show concise, authoritative local production database status."""
+    try:
+        settings = Settings.from_env()
+        path = _database_path(settings)
+        datasets = _diagnostics(settings).datasets()
+        active_instances = tuple(item.instance for item in datasets if item.active)
+        layer_service = create_layer_service(active_instances)
+        console.print(f"Databasfil: {path}")
+        console.print(f"Databasstorlek: {path.stat().st_size} byte")
+        console.print(f"AtlasFeatures: {sum(item.feature_count for item in datasets)}")
+        console.print(f"DatasetInstances: {len(datasets)}")
+        console.print(
+            f"Providers: {len({item.instance.source.source_id for item in datasets})}"
+        )
+        console.print(
+            f"Aktiva lager: {sum(item.active for item in layer_service.list_layers())}"
+        )
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("Produktionsstatus kunde inte läsas", exc)
+
+
+@app.command("datasets")
+def list_datasets() -> None:
+    """List every persisted DatasetInstance and its verification metadata."""
+    try:
+        rows = _diagnostics(Settings.from_env()).datasets()
+        table = Table(title="DatasetInstances")
+        for heading in (
+            "Provider",
+            "Dataset",
+            "Scope",
+            "Aktiv",
+            "Objekt",
+            "Importerad",
+            "Snapshot",
+            "Licens",
+        ):
+            table.add_column(heading, overflow="fold")
+        for row in rows:
+            table.add_row(
+                row.instance.source.display_name,
+                row.instance.dataset_id,
+                _scope_text(row),
+                "Ja" if row.active else "Nej",
+                str(row.feature_count),
+                _format_time(row.imported_at),
+                row.snapshot or "-",
+                row.license_name or "-",
+            )
+        Console(width=200).print(table)
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("Dataset kunde inte läsas", exc)
+
+
+@app.command("providers")
+def list_providers() -> None:
+    """Show installed provider implementations and persisted activation state."""
+    try:
+        rows = _diagnostics(Settings.from_env()).datasets()
+        table = Table(title="Providers")
+        for heading in ("Provider", "Installerad", "Importerad", "Aktiv"):
+            table.add_column(heading)
+        for name, source_id in (
+            ("RAÄ", RAA_SOURCE.source_id),
+            ("SGU", SGU_SOURCE.source_id),
+            ("Lantmäteriet", LANTMATERIET_SOURCE.source_id),
+        ):
+            matching = tuple(
+                item for item in rows if item.instance.source.source_id == source_id
+            )
+            table.add_row(
+                name,
+                "Ja",
+                "Ja" if matching else "Nej",
+                "Ja" if any(item.active for item in matching) else "Nej",
+            )
+        console.print(table)
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("Providerstatus kunde inte läsas", exc)
+
+
+@app.command("doctor")
+def doctor() -> None:
+    """Verify local production readiness without network access."""
+    failed = False
+
+    def report(ok: bool, label: str, detail: str) -> None:
+        nonlocal failed
+        failed = failed or not ok
+        symbol = "OK" if ok else "FEL"
+        style = "green" if ok else "red"
+        console.print(f"[{style}][{symbol}][/{style}] {label}: {detail}")
+
+    try:
+        settings = Settings.from_env()
+        path = _database_path(settings)
+        report(path.is_file(), "Databas hittad", str(path))
+        if not path.is_file():
+            raise typer.Exit(code=1)
+        diagnostics = _diagnostics(settings)
+        schema_ok, schema_detail = diagnostics.schema_status()
+        report(schema_ok, "Schema OK", schema_detail)
+        rows = diagnostics.datasets()
+        active_instances = tuple(item.instance for item in rows if item.active)
+        layer_service = create_layer_service(active_instances)
+        layers = layer_service.list_layers()
+        report(bool(layers), "Layer Engine", f"{len(layers)} lager registrerade")
+        composition = create_layer_composition_service(layer_service)
+        api_payload = tuple(
+            serialize_layer(layer) for layer in composition.list_layers()
+        )
+        report(bool(api_payload), "API", f"{len(api_payload)} lager serialiserbara")
+        report(bool(rows), "DatasetInstances", f"{len(rows)} registrerade")
+        feature_count = sum(item.feature_count for item in rows)
+        report(feature_count > 0, "Feature-antal", str(feature_count))
+        persisted = {item.instance.dataset_id: item for item in rows}
+        missing = [
+            name
+            for name, dataset_id in REQUIRED_PRODUCTION_DATASETS.items()
+            if (item := persisted.get(dataset_id)) is None
+            or not item.active
+            or item.feature_count == 0
+        ]
+        report(
+            not missing,
+            "Saknade importer",
+            "inga" if not missing else ", ".join(missing),
+        )
+        report(True, "Miljövariabler", "konfigurationen är giltig")
+        oauth_configured = bool(settings.lantmateriet_client_id)
+        basic_configured = bool(settings.lantmateriet_username)
+        report(
+            True,
+            "OAuth2-konfiguration",
+            (
+                "OAuth2 konfigurerad"
+                if oauth_configured
+                else (
+                    "Basic-auth konfigurerad"
+                    if basic_configured
+                    else "inte konfigurerad; valfri för öppna nedladdningar"
+                )
+            ),
+        )
+        partials = tuple(
+            path
+            for directory in (
+                settings.raa_work_dir,
+                settings.sgu_work_dir,
+                settings.lantmateriet_work_dir,
+            )
+            if directory.exists()
+            for path in directory.glob("*.part")
+        )
+        staging = diagnostics.staging_count()
+        report(
+            not partials and staging == 0,
+            "Cache",
+            (
+                "inga ofullständiga importer"
+                if not partials and staging == 0
+                else f"{len(partials)} partialfiler, {staging} stagingrader"
+            ),
+        )
+    except typer.Exit:
+        raise
+    except EXPECTED_ERRORS as exc:
+        _abort_with_error("Doctor kunde inte slutföras", exc)
+    if failed:
+        raise typer.Exit(code=1)
 
 
 @app.command()

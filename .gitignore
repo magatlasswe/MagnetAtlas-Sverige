@@ -203,6 +203,23 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# MagnetAtlas local downloads, caches, and transient database files
+data/cache/
+*.part
+*.gpkg.part
+*.tmp
+*.temp
+*.download
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.gpkg-journal
+*.gpkg-wal
+*.gpkg-shm
+
 # Ruff stuff:
 .ruff_cache/
 

@@ -38,6 +38,8 @@ def test_import_sgu_country_uses_an_independent_dataset_instance() -> None:
 
     assert result.exit_code == 0, result.output
     assert "37" in result.output
+    assert "Import klar" in result.output
+    assert "Provider: SGU" in result.output
     assert FakeImporter.calls[0]["bbox"] is None
     instance = _sgu_dataset_instance("sweden", None, None, None)
     assert instance.dataset_id == "sgu-jordarter:country:sweden"

@@ -44,6 +44,8 @@ def test_import_lantmateriet_country_creates_dataset_instance() -> None:
 
     assert result.exit_code == 0, result.output
     assert "41" in result.output
+    assert "Import klar" in result.output
+    assert "Provider: Lantmäteriet" in result.output
     instance = _lantmateriet_dataset_instance("sweden", None)
     assert instance.dataset_id == "lantmateriet-ortnamn:country:sweden"
     assert instance.scope == DatasetScope.country("sweden")

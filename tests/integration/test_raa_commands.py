@@ -53,6 +53,8 @@ def test_import_raa_passes_geographic_scope(fake_service: FakeSyncService) -> No
 
     assert result.exit_code == 0, result.output
     assert "12" in result.output
+    assert "Import klar" in result.output
+    assert "DatasetInstance:" in result.output
     assert fake_service.import_args is not None
     assert fake_service.import_args["county"] == "ostergotland"
     assert fake_service.import_args["bbox"] is not None
